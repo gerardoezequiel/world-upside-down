@@ -1,109 +1,444 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The World, Corrected</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/src/style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upside Down — A Map That Questions Everything</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Libre+Franklin:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@300;400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/src/landing.css" />
 </head>
 <body>
 
-<div id="page">
+<!-- ==========================================
+     HERO — THE MAP
+     ========================================== -->
+<section class="hero" id="hero">
+  <div class="hero-map-wrapper">
+    <iframe id="map-iframe" src="/map#11/51.507/-0.128/180" frameborder="0" allow="fullscreen" loading="lazy"></iframe>
+    <div class="hero-map-shield"></div>
+  </div>
 
-  <!-- ── TOP BAND ── -->
-  <div id="top-band">
-    <div class="title-group">
-      <h1 id="city-title">The World, Corrected</h1>
-      <span class="subtitle">An exercise in unlearning north</span>
-    </div>
-    <div id="coords">
-      <span id="coords-lat">0.00° N</span>
-      <span class="coord-sep">/</span>
-      <span id="coords-lon">0.00° E</span>
-      <span class="coord-sep">/</span>
-      <span id="coords-zoom">z2.5</span>
+  <div class="hero-overlay">
+    <div class="hero-content">
+      <div class="hero-overline">A Cartographic Provocation</div>
+      <h1 class="hero-title">
+        UPSIDE<br><span class="flip">DOWN</span>
+      </h1>
+      <p class="hero-subtitle">The world looks different from here. That's the point.</p>
+      <div class="hero-actions">
+        <a href="/map" class="hero-launch">Launch the Map</a>
+        <a href="#scandal" class="hero-scroll-link">or scroll to learn why</a>
+      </div>
     </div>
   </div>
 
-  <!-- ── MAP FRAME ── -->
-  <div id="map-frame">
-    <div id="map"></div>
+  <a href="#scandal" class="scroll-indicator">
+    <div class="scroll-line"></div>
+  </a>
+</section>
 
-    <!-- ── Manifesto overlay ── -->
-    <div id="manifesto">
-      <p>"There is no up or down in space.<br/>
-      Only habit decides where north goes."</p>
+<!-- ==========================================
+     THE SCANDAL
+     ========================================== -->
+<section class="scandal" id="scandal">
+  <div class="container">
+    <div class="scandal-layout">
+      <div class="scandal-content">
+        <div class="section-label reveal">The Blue Marble Scandal</div>
+        <h2 class="big-statement reveal reveal-delay-1">
+          The first photograph of Earth had <em>south on top.</em><br>
+          NASA flipped it.
+        </h2>
+        <p class="body-text reveal reveal-delay-2">
+          In 1972, the Apollo 17 crew captured the most iconic image of our planet: the Blue Marble.
+          In the original photograph, the southern tip of Africa pointed upward. But before releasing it,
+          NASA <strong>rotated the image 180&deg;</strong> to match the convention that north belongs on top.
+          They literally turned the planet upside down to make it look "right."
+        </p>
+      </div>
+      <div class="blue-marble-pair reveal reveal-delay-2">
+        <div class="marble-item">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/3/39/The_Earth_seen_from_Apollo_17_%28Original_Orientation%29.jpg" alt="Blue Marble original orientation, south on top" class="marble-img" loading="lazy" />
+          <span class="marble-label">Original photograph</span>
+        </div>
+        <div class="marble-rotate-arrow" aria-hidden="true">&#x27F3;</div>
+        <div class="marble-item">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/c/cb/The_Blue_Marble_%28remastered%29.jpg" alt="Blue Marble NASA version, north on top" class="marble-img marble-flipped" loading="lazy" />
+          <span class="marble-label">"Corrected" by NASA</span>
+        </div>
+      </div>
     </div>
   </div>
+</section>
 
-  <!-- ── BOTTOM BAND ── -->
-  <div id="bot-band">
-
-    <!-- Scale block: north arrow + scale bar + ratio -->
-    <div class="scale-block">
-      <div class="north-arrow" id="north-arrow">
-        <svg width="38" height="38" viewBox="0 0 60 60">
-          <line x1="30" y1="0" x2="30" y2="60" stroke="#E87461" stroke-width="0.6"/>
-          <line x1="0" y1="30" x2="60" y2="30" stroke="#E87461" stroke-width="0.6"/>
-          <circle cx="30" cy="30" r="24" fill="none" stroke="#E87461" stroke-width="1.8"/>
-          <circle cx="30" cy="30" r="20" fill="none" stroke="#E87461" stroke-width="0.6"/>
-          <!-- Pointer fills downward — north is down in this projection -->
-          <rect x="27" y="30" width="6" height="24" fill="#E87461"/>
-          <text x="30" y="64" text-anchor="middle" font-family="Space Mono,monospace" font-size="7" font-weight="700" fill="#E87461">N</text>
-        </svg>
-      </div>
-      <div class="scale-wrapper">
-        <svg id="scale-svg"></svg>
-      </div>
-      <span class="scale-ratio" id="scale-ratio"></span>
+<!-- ==========================================
+     TORRES GARCIA QUOTE
+     ========================================== -->
+<section class="quote-section section-dark torres-section">
+  <div class="torres-layout">
+    <div class="torres-img-wrapper reveal">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/0d/Joaqu%C3%ADn_Torres_Garc%C3%ADa_-_Am%C3%A9rica_Invertida.jpg" alt="Am&eacute;rica Invertida by Torres Garc&iacute;a, 1943" class="torres-img" loading="lazy" />
     </div>
+    <blockquote class="reveal reveal-delay-1">
+      <p>"Nuestro norte es el Sur. No debe haber norte, para nosotros, sino por oposici&oacute;n a nuestro Sur.
+      Por eso ahora ponemos el mapa al rev&eacute;s."</p>
+      <cite>Joaqu&iacute;n Torres Garc&iacute;a, Universalismo Constructivo, 1935</cite>
+    </blockquote>
+  </div>
+</section>
 
-    <!-- Legend -->
-    <div class="legend-block">
-      <div class="legend-title">Risograph Palette &middot; Legend</div>
-      <div class="legend-row">
-        <div class="leg-item">
-          <svg viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="1" fill="#EDE8E0" stroke="#C4BAA8" stroke-width="0.8"/></svg>
-          <span>Land</span>
-        </div>
-        <div class="leg-item">
-          <svg viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="1" fill="#9B8E7E" stroke="#8B7D6B" stroke-width="0.8"/></svg>
-          <span>Water</span>
-        </div>
-        <div class="leg-item">
-          <svg viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="1" fill="#9EC4D4" stroke="#7BAFC2" stroke-width="0.8" opacity="0.7"/></svg>
-          <span>Buildings</span>
-        </div>
-        <div class="leg-item">
-          <svg viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="1" fill="#E87461" stroke="#D06050" stroke-width="0.8" opacity="0.8"/></svg>
-          <span>Parks &middot; Green</span>
-        </div>
-        <div class="leg-item">
-          <svg viewBox="0 0 14 14">
-            <line x1="2" y1="7" x2="12" y2="7" stroke="#1A1A2E" stroke-width="2"/>
-            <line x1="2" y1="10" x2="12" y2="10" stroke="#6E6E80" stroke-width="1"/>
-          </svg>
-          <span>Roads</span>
-        </div>
-        <div class="leg-item">
-          <svg viewBox="0 0 14 14">
-            <line x1="2" y1="7" x2="12" y2="7" stroke="#C9A0A0" stroke-width="1.2" stroke-dasharray="2,1.5"/>
-          </svg>
-          <span>Boundaries</span>
-        </div>
-      </div>
+<!-- ==========================================
+     FACTS — Horizontal scroll (8 cards)
+     ========================================== -->
+<section>
+  <div class="facts-scroll">
+    <div class="fact-card fact-dark">
+      <span class="fact-number">01</span>
+      <p class="fact-text">The word "orientation" comes from <em>oriens</em>, Latin for "east." Medieval European maps had east on top, toward Paradise and the rising sun.</p>
+      <span class="fact-source">Etymology</span>
     </div>
-
-    <!-- Source -->
-    <div class="source-text">
-      South-up Mercator projection<br>
-      Protomaps &middot; OpenStreetMap
+    <div class="fact-card fact-accent">
+      <span class="fact-number">02</span>
+      <p class="fact-text">China invented the compass and called it the "south-pointing stone." Calling it "north-pointing" was a European choice.</p>
+      <span class="fact-source">History of Science</span>
+    </div>
+    <div class="fact-card fact-dark">
+      <span class="fact-number">03</span>
+      <p class="fact-text">Ancient Egyptian maps placed south on top because the Nile flows northward, downhill. South was the source. South was supreme.</p>
+      <span class="fact-source">Ancient Egypt</span>
+    </div>
+    <div class="fact-card fact-accent">
+      <span class="fact-number">04</span>
+      <p class="fact-text">Swiss maps were oriented with south on top for centuries. The Alps made a natural horizon to the south.</p>
+      <span class="fact-source">Alpine Cartography</span>
+    </div>
+    <div class="fact-card fact-dark">
+      <span class="fact-number">05</span>
+      <p class="fact-text">When participants were shown south-up maps, the measured psychological bias that equates "north = good, south = bad" completely disappeared.</p>
+      <span class="fact-source">Psychological Research</span>
+    </div>
+    <div class="fact-card fact-accent">
+      <span class="fact-number">06</span>
+      <p class="fact-text">North has only been "up" for about 500 years. For most of human history, east, south, or southeast was on top.</p>
+      <span class="fact-source">Cartographic History</span>
+    </div>
+    <div class="fact-card fact-dark">
+      <span class="fact-number">07</span>
+      <p class="fact-text">The Mercator projection makes Europe appear larger than South America. In reality, South America is nearly twice the size of Europe.</p>
+      <span class="fact-source">Projection Bias</span>
+    </div>
+    <div class="fact-card fact-accent">
+      <span class="fact-number">08</span>
+      <p class="fact-text">There is no physical reason for north to be up. In space, Earth has no top or bottom. Orientation is a psychological construct, not a geographic one.</p>
+      <span class="fact-source">Cognitive Science</span>
     </div>
   </div>
+</section>
 
-</div>
+<!-- ==========================================
+     TIMELINE (8 cards)
+     ========================================== -->
+<section class="timeline-section">
+  <div class="timeline-header">
+    <div class="section-label reveal">5,000 Years of Orientation</div>
+    <h2 class="big-statement reveal reveal-delay-1">Which way is <em>up?</em></h2>
+  </div>
+  <div class="timeline-grid">
+    <div class="timeline-card reveal">
+      <div class="timeline-arrow">&uarr;</div>
+      <div class="timeline-era">S</div>
+      <div class="timeline-period">Ancient Egypt &middot; ~3000 BCE</div>
+      <div class="timeline-direction">South is up</div>
+      <p class="timeline-reason">The Nile flows north, therefore south, the source, is the natural "top" of the world.</p>
+    </div>
+    <div class="timeline-card reveal reveal-delay-1">
+      <div class="timeline-arrow">&rarr;</div>
+      <div class="timeline-era">E</div>
+      <div class="timeline-period">Medieval Europe &middot; 500&ndash;1500 CE</div>
+      <div class="timeline-direction">East is up</div>
+      <p class="timeline-reason">The direction of Paradise and the rising sun. Our word "orientation" literally means "facing east."</p>
+    </div>
+    <div class="timeline-card reveal reveal-delay-2">
+      <div class="timeline-arrow">&uarr;</div>
+      <div class="timeline-era">S</div>
+      <div class="timeline-period">Islamic Golden Age &middot; 1154</div>
+      <div class="timeline-direction">South is up</div>
+      <p class="timeline-reason">Al-Idrisi's Tabula Rogeriana, one of the most advanced maps in history, placed south on top.</p>
+    </div>
+    <div class="timeline-card reveal reveal-delay-3">
+      <div class="timeline-arrow">&uarr;</div>
+      <div class="timeline-era">S</div>
+      <div class="timeline-period">Chinese Cartography</div>
+      <div class="timeline-direction">South is up</div>
+      <p class="timeline-reason">The compass was the "south-pointing stone." South was the primary direction.</p>
+    </div>
+    <div class="timeline-card reveal">
+      <div class="timeline-arrow">&darr;</div>
+      <div class="timeline-era">N</div>
+      <div class="timeline-period">Renaissance &middot; 1569</div>
+      <div class="timeline-direction">North wins</div>
+      <p class="timeline-reason">Mercator's projection + European maritime expansion + compass convention = north on top becomes the "standard."</p>
+    </div>
+    <div class="timeline-card reveal reveal-delay-1">
+      <div class="timeline-arrow">&darr;</div>
+      <div class="timeline-era">N</div>
+      <div class="timeline-period">Colonial Era &middot; 1600s&ndash;1900s</div>
+      <div class="timeline-direction">North consolidates</div>
+      <p class="timeline-reason">European empires spread north-up maps across the globe. Colonial education systems cemented the convention as "objective truth."</p>
+    </div>
+    <div class="timeline-card reveal reveal-delay-2">
+      <div class="timeline-arrow">&#x21C5;</div>
+      <div class="timeline-era">!</div>
+      <div class="timeline-period">Counter-Cartography &middot; 1943&ndash;now</div>
+      <div class="timeline-direction">Artists rebel</div>
+      <p class="timeline-reason">Torres Garc&iacute;a, Fuller, McArthur and others flip the map. South-up maps become tools of cultural resistance.</p>
+    </div>
+    <div class="timeline-card reveal reveal-delay-3">
+      <div class="timeline-arrow">&#x27F3;</div>
+      <div class="timeline-era">?</div>
+      <div class="timeline-period">Now &middot; You decide</div>
+      <div class="timeline-direction">No direction is "correct"</div>
+      <p class="timeline-reason">Earth is a sphere floating in space. There is no up. There is no down. There is only convention.</p>
+    </div>
+  </div>
+</section>
 
-<script type="module" src="/src/main.ts"></script>
+<!-- ==========================================
+     HISTORICAL MAP IMAGE BREAK
+     ========================================== -->
+<section class="map-image-break">
+  <div class="map-break-inner">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/d/db/Al-Idrisi%27s_world_map.JPG" alt="Al-Idrisi circular world map, 1154, south on top" class="historical-map-img spin-on-scroll" loading="lazy" />
+    <div class="map-break-caption reveal">
+      <span class="map-break-title">Al-Idrisi's World Map</span>
+      <span class="map-break-date">1154 CE</span>
+      <span class="map-break-note">South is on top. This was one of the most advanced maps in human history.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     ARTISTS
+     ========================================== -->
+<section class="artists-section section-dark">
+  <div class="container" style="padding-bottom: 2rem;">
+    <div class="section-label reveal" style="color: #c9a84c;">Counter-Cartographies</div>
+    <h2 class="big-statement reveal reveal-delay-1">Artists &amp; architects<br>who <em>flipped the script</em></h2>
+  </div>
+  <div class="artists-grid">
+    <div class="artist-card reveal" data-year="1943">
+      <h3 class="artist-name">Joaqu&iacute;n Torres Garc&iacute;a</h3>
+      <div class="artist-origin">Uruguay &middot; Painter &amp; Professor of Architecture</div>
+      <div class="artist-work">Am&eacute;rica Invertida (1943)</div>
+      <p class="artist-desc">Drew South America upside down as a decolonial manifesto. His rallying cry, "Our north is the south," became a call for Latin American cultural autonomy.</p>
+    </div>
+    <div class="artist-card reveal reveal-delay-1" data-year="1943">
+      <h3 class="artist-name">Buckminster Fuller</h3>
+      <div class="artist-origin">USA &middot; Architect &amp; Designer</div>
+      <div class="artist-work">Dymaxion Map (1943)</div>
+      <p class="artist-desc">Created a map projection with no right way up. It can be read from any orientation and rearranged in multiple configurations.</p>
+    </div>
+    <div class="artist-card reveal reveal-delay-2" data-year="1957">
+      <h3 class="artist-name">Guy Debord</h3>
+      <div class="artist-origin">France &middot; Situationist International</div>
+      <div class="artist-work">Psychogeographic Maps (1950s)</div>
+      <p class="artist-desc">Cut up maps of Paris and rearranged them based on emotional experience. Maps became tools for reimagining space.</p>
+    </div>
+    <div class="artist-card reveal" data-year="1979">
+      <h3 class="artist-name">Stuart McArthur</h3>
+      <div class="artist-origin">Australia &middot; Student, age 21</div>
+      <div class="artist-work">Universal Corrective Map (1979)</div>
+      <p class="artist-desc">Launched on Australia Day. Proclaimed: "The South lives. The South dominates." Sold hundreds of thousands of copies.</p>
+    </div>
+    <div class="artist-card reveal reveal-delay-1" data-year="2020">
+      <h3 class="artist-name">Cian Dayrit</h3>
+      <div class="artist-origin">Philippines &middot; Counter-Cartographer</div>
+      <div class="artist-work">Counter-Cartography Textiles</div>
+      <p class="artist-desc">Hand-sews large maps that subvert power structures, mapping colonial erasure and indigenous territories invisible on official maps.</p>
+    </div>
+    <div class="artist-card reveal reveal-delay-2" data-year="1964">
+      <h3 class="artist-name">Quino (Mafalda)</h3>
+      <div class="artist-origin">Argentina &middot; Cartoonist</div>
+      <div class="artist-work">Libertad Flips the Map</div>
+      <p class="artist-desc">"Earth is in space and space has no up or down. The idea that the North is 'above' is a psychological trick invented by those who believe they are on top."</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     PSYCHOLOGY
+     ========================================== -->
+<section class="psych-section">
+  <div class="container">
+    <div class="psych-grid">
+      <div>
+        <div class="section-label reveal">The Psychology</div>
+        <h2 class="big-statement reveal reveal-delay-1">When we say things <em>"went south,"</em> we mean they went wrong.</h2>
+        <p class="body-text reveal reveal-delay-2">
+          Research shows that people associate <strong>north positions on maps with wealth, prestige, and higher altitude</strong>,
+          while south positions are linked to poverty and lower status. The critical finding:
+          <strong>when participants were shown south-up maps, this bias completely disappeared.</strong>
+        </p>
+      </div>
+      <div class="reveal reveal-delay-2">
+        <ul class="idiom-list">
+          <li>"Heading <strong>up</strong> north" <span class="meaning">&rarr; going somewhere better</span></li>
+          <li>"Going <strong>down</strong> south" <span class="meaning">&rarr; going somewhere lesser</span></li>
+          <li>"<strong>Down Under</strong>" <span class="meaning">&rarr; under what, exactly?</span></li>
+          <li>"<strong>Top</strong> of the world" <span class="meaning">&rarr; success, achievement</span></li>
+          <li>"Things went <strong>south</strong>" <span class="meaning">&rarr; things went wrong</span></li>
+          <li>"<strong>Uptown</strong>" vs "<strong>Downtown</strong>" <span class="meaning">&rarr; rich vs. less rich</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     FINAL QUOTE
+     ========================================== -->
+<section class="quote-section section-accent">
+  <blockquote class="reveal">
+    <p>"When you flip a map, nothing about the geography changes. Everything about the psychology does."</p>
+  </blockquote>
+</section>
+
+<!-- ==========================================
+     CTA
+     ========================================== -->
+<section class="cta-section">
+  <div class="cta-content">
+    <h2 class="cta-title reveal">Flip your<br>world.</h2>
+    <p class="cta-body reveal reveal-delay-1">
+      This map loads at bearing 180&deg;. South is up. Your city looks unfamiliar.
+      Your country is in the wrong place. Press the arrow keys and the world snaps back to "normal."
+      But now you know: normal is just a convention. And conventions can be changed.
+    </p>
+    <a href="/map" class="cta-button reveal reveal-delay-2">Launch the Map &#x27F3;</a>
+  </div>
+</section>
+
+<!-- ==========================================
+     FOOTER
+     ========================================== -->
+<footer>
+  <p>Upside Down, a project by Gerardo Mart&iacute;n Carre&ntilde;o &middot; 2026</p>
+  <p style="margin-top: 0.5rem;">
+    Built with love from Clapton, East London,
+    a place that looks different at bearing 180&deg;
+  </p>
+  <a href="https://www.linkedin.com/in/gerardoezequielmc/" target="_blank" rel="noopener" class="linkedin-link">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+    <span>Connect on LinkedIn</span>
+  </a>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) entry.target.classList.add('visible');
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Map iframe scroll fix
+  const shield = document.querySelector('.hero-map-shield');
+  if (shield) {
+    shield.addEventListener('click', () => { shield.style.display = 'none'; });
+    document.getElementById('hero')?.addEventListener('mouseleave', () => { shield.style.display = ''; });
+  }
+
+  // Fun: Blue Marble spin on scroll — the "flip" animation
+  const marbleFlipped = document.querySelector('.marble-flipped');
+  if (marbleFlipped) {
+    const marbleObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          marbleFlipped.classList.add('do-flip');
+          marbleObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    marbleObs.observe(marbleFlipped);
+  }
+
+  // Fun: Al-Idrisi map slow rotation on scroll
+  const spinImg = document.querySelector('.spin-on-scroll');
+  if (spinImg) {
+    const spinObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) spinImg.classList.add('spinning');
+        else spinImg.classList.remove('spinning');
+      });
+    }, { threshold: 0.2 });
+    spinObs.observe(spinImg);
+  }
+
+  // Fun: Parallax floating elements on scroll
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        const scrollY = window.scrollY;
+        // Rotate the marble-rotate-arrow based on scroll
+        const arrow = document.querySelector('.marble-rotate-arrow');
+        if (arrow) arrow.style.transform = `rotate(${scrollY * 0.3}deg)`;
+
+        // Subtle parallax on section images
+        document.querySelectorAll('.torres-img').forEach(img => {
+          const rect = img.getBoundingClientRect();
+          if (rect.top < window.innerHeight && rect.bottom > 0) {
+            const offset = (rect.top - window.innerHeight / 2) * 0.05;
+            img.style.transform = `rotate(${-2 + offset * 0.3}deg)`;
+          }
+        });
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+
+  // Fun: Fact cards tilt on mouse move
+  document.querySelectorAll('.fact-card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      card.style.transform = `perspective(600px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+  });
+
+  // Fun: Timeline cards flip entrance
+  const timeObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('flip-in');
+        timeObs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+  document.querySelectorAll('.timeline-card').forEach(card => timeObs.observe(card));
+
+  // Fun: Idiom items cascade with staggered flip
+  const idiomObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const items = entry.target.querySelectorAll('li');
+        items.forEach((li, i) => {
+          setTimeout(() => li.classList.add('idiom-visible'), i * 150);
+        });
+        idiomObs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  const idiomList = document.querySelector('.idiom-list');
+  if (idiomList) idiomObs.observe(idiomList);
+</script>
 </body>
 </html>

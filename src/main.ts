@@ -88,10 +88,16 @@ function recolorStyle(style: maplibregl.StyleSpecification): maplibregl.StyleSpe
       continue;
     }
 
-    // Buildings → signature blue
+    // Buildings → signature riso-blue with zoom-dependent opacity + outline
     if (id === "buildings" && "paint" in layer) {
       (layer as any).paint["fill-color"] = PALETTE.buildings;
-      (layer as any).paint["fill-opacity"] = 0.6;
+      (layer as any).paint["fill-opacity"] = [
+        "interpolate", ["linear"], ["zoom"],
+        12, 0.4,
+        14, 0.65,
+        16, 0.75,
+      ];
+      (layer as any).paint["fill-outline-color"] = "rgba(122, 172, 194, 0.35)";
       continue;
     }
 
@@ -213,6 +219,50 @@ function recolorStyle(style: maplibregl.StyleSpecification): maplibregl.StyleSpe
       continue;
     }
 
+    // POIs — strip icons, text-only with risograph palette colors
+    if (id === "pois") {
+      const l = layer as any;
+      // Remove sprite icons entirely — text only
+      delete l.layout["icon-image"];
+      l.layout["text-offset"] = [0, 0];
+      l.layout["text-variable-anchor"] = ["center", "left", "right", "top", "bottom"];
+      l.layout["text-size"] = ["interpolate", ["linear"], ["zoom"], 14, 9, 18, 13];
+
+      // Palette-matched POI text colors
+      l.paint["text-color"] = [
+        "match", ["get", "kind"],
+        // Nature → coral (matching parks)
+        "park", PALETTE.park, "forest", PALETTE.park, "garden", PALETTE.park,
+        "beach", PALETTE.park, "zoo", PALETTE.zoo, "marina", PALETTE.waterLine,
+        // Transit → dark navy
+        "station", PALETTE.road, "bus_stop", PALETTE.roadMinor,
+        "ferry_terminal", PALETTE.waterLine, "aerodrome", PALETTE.roadMinor,
+        // Civic → muted rose (matching boundaries)
+        "university", PALETTE.boundary, "library", PALETTE.boundary,
+        "school", PALETTE.boundary, "townhall", PALETTE.boundary,
+        "post_office", PALETTE.boundary, "museum", PALETTE.boundary,
+        "theatre", PALETTE.boundary, "artwork", PALETTE.boundary,
+        // Default
+        PALETTE.roadMinor,
+      ];
+      l.paint["text-halo-color"] = PALETTE.labelHalo;
+      l.paint["text-halo-width"] = 1.2;
+      continue;
+    }
+
+    // Places locality — strip townspot/capital dot icons
+    if (id === "places_locality") {
+      const l = layer as any;
+      delete l.layout["icon-image"];
+      continue;
+    }
+
+    // Road shields — hide (too noisy for this aesthetic)
+    if (id === "roads_shields") {
+      (layer as any).layout = { visibility: "none" };
+      continue;
+    }
+
     // Labels — text color + halo
     if ("paint" in layer) {
       const p = (layer as any).paint;
@@ -237,16 +287,21 @@ interface ScaleConfig {
 }
 
 const scaleConfigs: ScaleConfig[] = [
-  { total: 100,    detail: 10,    dStep: 2,    mStep: 20 },
-  { total: 200,    detail: 20,    dStep: 5,    mStep: 50 },
-  { total: 500,    detail: 50,    dStep: 10,   mStep: 100 },
-  { total: 1000,   detail: 100,   dStep: 20,   mStep: 200 },
-  { total: 2000,   detail: 200,   dStep: 50,   mStep: 500 },
-  { total: 5000,   detail: 500,   dStep: 100,  mStep: 1000 },
-  { total: 10000,  detail: 1000,  dStep: 200,  mStep: 2000 },
-  { total: 20000,  detail: 2000,  dStep: 500,  mStep: 5000 },
-  { total: 50000,  detail: 5000,  dStep: 1000, mStep: 10000 },
-  { total: 100000, detail: 10000, dStep: 2000, mStep: 20000 },
+  { total: 100,      detail: 10,     dStep: 2,     mStep: 20 },
+  { total: 200,      detail: 20,     dStep: 5,     mStep: 50 },
+  { total: 500,      detail: 50,     dStep: 10,    mStep: 100 },
+  { total: 1000,     detail: 100,    dStep: 20,    mStep: 200 },
+  { total: 2000,     detail: 200,    dStep: 50,    mStep: 500 },
+  { total: 5000,     detail: 500,    dStep: 100,   mStep: 1000 },
+  { total: 10000,    detail: 1000,   dStep: 200,   mStep: 2000 },
+  { total: 20000,    detail: 2000,   dStep: 500,   mStep: 5000 },
+  { total: 50000,    detail: 5000,   dStep: 1000,  mStep: 10000 },
+  { total: 100000,   detail: 10000,  dStep: 2000,  mStep: 20000 },
+  { total: 200000,   detail: 20000,  dStep: 5000,  mStep: 50000 },
+  { total: 500000,   detail: 50000,  dStep: 10000, mStep: 100000 },
+  { total: 1000000,  detail: 100000, dStep: 20000, mStep: 200000 },
+  { total: 2000000,  detail: 200000, dStep: 50000, mStep: 500000 },
+  { total: 5000000,  detail: 500000, dStep: 100000,mStep: 1000000 },
 ];
 
 const niceRatios = [
@@ -268,7 +323,22 @@ function updateScaleBar(map: maplibregl.Map): void {
     else break;
   }
 
-  const totalPx = cfg.total / mpp;
+  let totalPx = cfg.total / mpp;
+
+  // Ensure minimum readable width at low zoom levels
+  if (totalPx < 80) {
+    // Pick a larger config that yields at least 80px
+    for (const c of scaleConfigs) {
+      const px = c.total / mpp;
+      if (px >= 80 && px <= 300) { cfg = c; totalPx = px; break; }
+    }
+    // Fallback: just use the largest config
+    if (totalPx < 80) {
+      cfg = scaleConfigs[scaleConfigs.length - 1];
+      totalPx = cfg.total / mpp;
+    }
+  }
+
   const ink = '#E87461';
   const svgH = 28;
   const baseline = svgH - 4;
@@ -372,7 +442,7 @@ function updateCityTitle(map: maplibregl.Map): void {
 
     // Only show place names at zoom >= 5
     if (z < 5) {
-      titleEl.textContent = 'The World, Corrected';
+      titleEl.textContent = 'Upside Down';
       return;
     }
 
@@ -391,6 +461,509 @@ function updateCityTitle(map: maplibregl.Map): void {
       // Silently fail — keep last known name
     }
   }, 800);
+}
+
+/* ── Orientation state ────────────────────────────────────── */
+type Orientation = 'upside-down' | 'normal' | 'mirrored';
+let orientation: Orientation = 'upside-down';
+
+const toastMessages: Record<Orientation, string[]> = {
+  'normal': [
+    "Wait... this feels wrong",
+    "Oh no, not this again",
+    "The boring way up",
+    "How conventional of you",
+    "You've been conditioned",
+    "This is just a convention, you know",
+    "North is a social construct",
+    "Comfortable? That's the problem",
+    "Welcome back to the Matrix",
+    "Your brain just sighed with relief",
+    "Plot twist: this is the weird one",
+    "Congratulations, you're normal again",
+  ],
+  'upside-down': [
+    "Ah, much better",
+    "Welcome back",
+    "Now we're talking",
+    "Home sweet upside down",
+    "This is the real world",
+    "Your GPS is confused",
+    "South is the new up",
+    "Wait, where's my country?",
+    "Earth has no opinion on the matter",
+    "Suddenly everything is unfamiliar",
+    "Try finding your house now",
+    "There is no up in space",
+  ],
+  'mirrored': [
+    "Through the looking glass",
+    "Everything is backwards now",
+    "Mirror, mirror on the wall...",
+    "East is west, west is east",
+    "The sun rises in the west now",
+    "Your mental map just broke",
+    "Try giving someone directions now",
+    "Left is right, right is wrong",
+    "Good luck navigating home",
+    "Your brain: does not compute",
+  ],
+};
+
+function showFlipToast(text: string): void {
+  const toast = document.getElementById('flip-toast');
+  if (!toast) return;
+  toast.textContent = text;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+function applyOrientation(map: maplibregl.Map, target: Orientation): void {
+  if (target === orientation) return;
+  const prev = orientation;
+  orientation = target;
+
+  const title = document.getElementById('city-title');
+  const sub = document.querySelector('.subtitle') as HTMLElement | null;
+  const arrow = document.getElementById('north-arrow');
+  const mapEl = document.getElementById('map');
+
+  // Handle bearing changes (upside-down vs normal/mirrored)
+  const needsBearingChange =
+    (prev === 'upside-down' && target !== 'upside-down') ||
+    (prev !== 'upside-down' && target === 'upside-down');
+
+  if (needsBearingChange) {
+    const targetBearing = target === 'upside-down' ? 180 : 0;
+    map.dragRotate.enable();
+    map.easeTo({
+      bearing: targetBearing,
+      duration: 1200,
+      easing: (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+    });
+    setTimeout(() => map.dragRotate.disable(), 1300);
+  }
+
+  // If coming from mirror or going to mirror, handle the CSS mirror
+  if (prev === 'mirrored' && target !== 'mirrored') {
+    mapEl?.classList.remove('mirrored');
+  }
+  if (target === 'mirrored' && prev !== 'mirrored') {
+    // If we were upside-down, first reset bearing to 0
+    if (prev === 'upside-down') {
+      map.dragRotate.enable();
+      map.easeTo({
+        bearing: 0,
+        duration: 1200,
+        easing: (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
+      });
+      setTimeout(() => {
+        map.dragRotate.disable();
+        mapEl?.classList.add('mirrored');
+      }, 1200);
+    } else {
+      mapEl?.classList.add('mirrored');
+    }
+  }
+
+  // Title classes
+  if (title) {
+    title.classList.remove('normal', 'mirrored');
+    if (target === 'normal') title.classList.add('normal');
+    else if (target === 'mirrored') title.classList.add('mirrored');
+    // default (upside-down) has no extra class → CSS rotates 180
+  }
+
+  // Subtitle
+  if (sub) {
+    if (target === 'upside-down') sub.style.transform = 'rotate(180deg)';
+    else if (target === 'mirrored') sub.style.transform = 'scaleX(-1)';
+    else sub.style.transform = 'rotate(0deg)';
+  }
+
+  // North arrow
+  if (arrow) {
+    arrow.classList.toggle('flipped', target === 'normal' || target === 'mirrored');
+  }
+
+  // Toast
+  const msgs = toastMessages[target];
+  showFlipToast(msgs[Math.floor(Math.random() * msgs.length)]);
+
+  // Hide hint
+  document.getElementById('flip-hint')?.classList.remove('visible');
+}
+
+function setupFlip(map: maplibregl.Map): void {
+  // Show hints after a delay
+  setTimeout(() => {
+    document.getElementById('flip-hint')?.classList.add('visible');
+  }, 4000);
+
+  // Show mobile touch controls after a longer delay (don't spoil the surprise)
+  setTimeout(() => {
+    document.getElementById('touch-controls')?.classList.add('visible');
+  }, 20000);
+
+  // Hide hint on first map interaction
+  const hideHint = () => {
+    document.getElementById('flip-hint')?.classList.remove('visible');
+    map.off('movestart', hideHint);
+  };
+  map.on('movestart', hideHint);
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.target as HTMLElement).tagName === 'INPUT') return;
+
+    switch (e.key) {
+      case 'ArrowUp':
+        applyOrientation(map, 'normal');
+        break;
+      case 'ArrowDown':
+        applyOrientation(map, 'upside-down');
+        break;
+      case 'ArrowRight':
+        applyOrientation(map, 'mirrored');
+        break;
+      case 'ArrowLeft':
+        applyOrientation(map, 'normal');
+        break;
+      default:
+        return;
+    }
+    e.preventDefault();
+  });
+
+  // ── Touch controls (mobile buttons) ──
+  function updateTouchButtons() {
+    document.querySelectorAll('.touch-btn').forEach(btn => {
+      const orient = (btn as HTMLElement).dataset.orient;
+      btn.classList.toggle('active', orient === orientation);
+    });
+  }
+
+  document.querySelectorAll('.touch-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const orient = (btn as HTMLElement).dataset.orient as Orientation;
+      if (orient) {
+        applyOrientation(map, orient);
+        updateTouchButtons();
+      }
+    });
+  });
+
+  // ── Swipe gestures (mobile) ──
+  let touchStartX = 0;
+  let touchStartY = 0;
+
+  const mapFrame = document.getElementById('map-frame');
+  if (mapFrame) {
+    mapFrame.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 2) {
+        touchStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        touchStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      }
+    }, { passive: true });
+
+    mapFrame.addEventListener('touchend', (e) => {
+      if (e.changedTouches.length === 2 || (touchStartX !== 0 && e.changedTouches.length > 0)) {
+        const endX = e.changedTouches[0].clientX;
+        const endY = e.changedTouches[0].clientY;
+        const dx = endX - touchStartX;
+        const dy = endY - touchStartY;
+
+        // Only trigger on significant two-finger swipes
+        if (Math.abs(dy) > 60 && Math.abs(dy) > Math.abs(dx)) {
+          if (dy < 0) applyOrientation(map, 'upside-down');
+          else applyOrientation(map, 'normal');
+          updateTouchButtons();
+        } else if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
+          applyOrientation(map, 'mirrored');
+          updateTouchButtons();
+        }
+        touchStartX = 0;
+        touchStartY = 0;
+      }
+    }, { passive: true });
+  }
+}
+
+/* ── Geocoder search ─────────────────────────────────────── */
+let searchTimeout: ReturnType<typeof setTimeout> | null = null;
+
+function setupGeocoder(map: maplibregl.Map): void {
+  const titleEl = document.getElementById('city-title')!;
+  const geocoderEl = document.getElementById('geocoder')!;
+  const inputEl = document.getElementById('geocoder-input') as HTMLInputElement;
+  const resultsEl = document.getElementById('geocoder-results')!;
+
+  function openGeocoder() {
+    titleEl.style.display = 'none';
+    geocoderEl.classList.add('open');
+    inputEl.value = '';
+    inputEl.focus();
+    resultsEl.innerHTML = '';
+    resultsEl.classList.remove('has-results');
+  }
+
+  function closeGeocoder() {
+    geocoderEl.classList.remove('open');
+    titleEl.style.display = '';
+    resultsEl.innerHTML = '';
+    resultsEl.classList.remove('has-results');
+    if (searchTimeout) clearTimeout(searchTimeout);
+  }
+
+  // Click title → open search
+  titleEl.addEventListener('click', openGeocoder);
+
+  // Escape → close
+  inputEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeGeocoder();
+  });
+
+  // Close when clicking outside
+  document.addEventListener('click', (e) => {
+    if (geocoderEl.classList.contains('open') &&
+        !geocoderEl.contains(e.target as Node) &&
+        e.target !== titleEl) {
+      closeGeocoder();
+    }
+  });
+
+  // Search on typing (debounced)
+  inputEl.addEventListener('input', () => {
+    const q = inputEl.value.trim();
+    if (searchTimeout) clearTimeout(searchTimeout);
+
+    if (q.length < 2) {
+      resultsEl.innerHTML = '';
+      resultsEl.classList.remove('has-results');
+      return;
+    }
+
+    searchTimeout = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=6&accept-language=en`,
+          { headers: { 'User-Agent': 'world-upside-down/1.0' } }
+        );
+        const results = await res.json();
+
+        resultsEl.innerHTML = '';
+        if (results.length === 0) {
+          resultsEl.classList.remove('has-results');
+          return;
+        }
+
+        resultsEl.classList.add('has-results');
+
+        for (const r of results) {
+          const item = document.createElement('div');
+          item.className = 'geocoder-result';
+
+          const parts = (r.display_name as string).split(', ');
+          const name = parts[0];
+          const detail = parts.slice(1).join(', ');
+
+          item.innerHTML = `
+            <span class="geocoder-result-name">${name}</span>
+            <span class="geocoder-result-detail">${detail}</span>
+          `;
+
+          item.addEventListener('click', () => {
+            const lat = parseFloat(r.lat);
+            const lon = parseFloat(r.lon);
+            const bbox = r.boundingbox;
+
+            // Fly to location
+            if (bbox) {
+              const sw: [number, number] = [parseFloat(bbox[2]), parseFloat(bbox[0])];
+              const ne: [number, number] = [parseFloat(bbox[3]), parseFloat(bbox[1])];
+              map.fitBounds([sw, ne], {
+                bearing: orientation === 'upside-down' ? 180 : 0,
+                padding: 60,
+                duration: 1800,
+                maxZoom: 14,
+              });
+            } else {
+              map.flyTo({
+                center: [lon, lat],
+                zoom: 12,
+                bearing: orientation === 'upside-down' ? 180 : 0,
+                duration: 1800,
+              });
+            }
+
+            // Update title to place name
+            titleEl.textContent = name;
+            closeGeocoder();
+          });
+
+          resultsEl.appendChild(item);
+        }
+      } catch {
+        // Silently fail
+      }
+    }, 350);
+  });
+
+  // Enter key → select first result
+  inputEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const first = resultsEl.querySelector('.geocoder-result') as HTMLElement | null;
+      if (first) first.click();
+    }
+  });
+}
+
+/* ── Dynamic Graticule ────────────────────────────────────── */
+function addGraticule(map: maplibregl.Map): void {
+  const GRAT_COLOR = 'rgba(107, 168, 189, 0.55)';  // light blue, OS-style
+  const LABEL_COLOR = '#5A9BB0';
+
+  function getInterval(zoom: number): number {
+    if (zoom >= 10) return 1;
+    if (zoom >= 7) return 2;
+    if (zoom >= 5) return 5;
+    if (zoom >= 3) return 10;
+    if (zoom >= 2) return 15;
+    return 30;
+  }
+
+  function buildGraticuleGeoJSON(interval: number): GeoJSON.FeatureCollection {
+    const features: GeoJSON.Feature[] = [];
+
+    // Meridians (longitude lines)
+    for (let lon = -180; lon <= 180; lon += interval) {
+      const coords: [number, number][] = [];
+      for (let lat = -85; lat <= 85; lat += 2) {
+        coords.push([lon, lat]);
+      }
+      features.push({
+        type: 'Feature',
+        properties: { type: 'line' },
+        geometry: { type: 'LineString', coordinates: coords },
+      });
+    }
+
+    // Parallels (latitude lines)
+    for (let lat = -80; lat <= 80; lat += interval) {
+      const coords: [number, number][] = [];
+      for (let lon = -180; lon <= 180; lon += 2) {
+        coords.push([lon, lat]);
+      }
+      features.push({
+        type: 'Feature',
+        properties: { type: 'line' },
+        geometry: { type: 'LineString', coordinates: coords },
+      });
+    }
+
+    return { type: 'FeatureCollection', features };
+  }
+
+  function buildLabelGeoJSON(interval: number): GeoJSON.FeatureCollection {
+    const features: GeoJSON.Feature[] = [];
+
+    // Latitude labels — placed at right edge of view
+    for (let lat = -80; lat <= 80; lat += interval) {
+      if (lat === 0) {
+        features.push({
+          type: 'Feature',
+          properties: { label: '0° Eq' },
+          geometry: { type: 'Point', coordinates: [0, 0] },
+        });
+      } else {
+        const dir = lat > 0 ? 'N' : 'S';
+        features.push({
+          type: 'Feature',
+          properties: { label: `${Math.abs(lat)}°${dir}` },
+          geometry: { type: 'Point', coordinates: [0, lat] },
+        });
+      }
+    }
+
+    // Longitude labels — placed at equator
+    for (let lon = -180; lon <= 180; lon += interval) {
+      if (lon === 0) continue; // skip duplicate at equator
+      const dir = lon > 0 ? 'E' : 'W';
+      features.push({
+        type: 'Feature',
+        properties: { label: `${Math.abs(lon)}°${dir}` },
+        geometry: { type: 'Point', coordinates: [lon, 0] },
+      });
+    }
+
+    return { type: 'FeatureCollection', features };
+  }
+
+  let currentInterval = getInterval(map.getZoom());
+
+  // Add source and layers
+  map.addSource('graticule', {
+    type: 'geojson',
+    data: buildGraticuleGeoJSON(currentInterval),
+  });
+
+  map.addSource('graticule-labels', {
+    type: 'geojson',
+    data: buildLabelGeoJSON(currentInterval),
+  });
+
+  map.addLayer({
+    id: 'graticule-lines',
+    type: 'line',
+    source: 'graticule',
+    paint: {
+      'line-color': GRAT_COLOR,
+      'line-width': [
+        'interpolate', ['linear'], ['zoom'],
+        1, 0.6,
+        5, 0.9,
+        10, 1.2,
+        14, 1.5,
+      ],
+    },
+  });
+
+  map.addLayer({
+    id: 'graticule-labels',
+    type: 'symbol',
+    source: 'graticule-labels',
+    layout: {
+      'text-field': ['get', 'label'],
+      'text-font': ['Noto Sans Regular'],
+      'text-size': [
+        'interpolate', ['linear'], ['zoom'],
+        1, 8,
+        5, 9,
+        10, 10,
+      ],
+      'text-anchor': 'center',
+      'text-allow-overlap': false,
+      'text-ignore-placement': false,
+      'text-padding': 4,
+    },
+    paint: {
+      'text-color': LABEL_COLOR,
+      'text-opacity': 0.85,
+      'text-halo-color': 'rgba(237, 232, 224, 0.85)',
+      'text-halo-width': 1.4,
+    },
+  });
+
+  // Update on zoom
+  map.on('zoomend', () => {
+    const newInterval = getInterval(map.getZoom());
+    if (newInterval !== currentInterval) {
+      currentInterval = newInterval;
+      const lineSource = map.getSource('graticule') as maplibregl.GeoJSONSource;
+      const labelSource = map.getSource('graticule-labels') as maplibregl.GeoJSONSource;
+      if (lineSource) lineSource.setData(buildGraticuleGeoJSON(currentInterval));
+      if (labelSource) labelSource.setData(buildLabelGeoJSON(currentInterval));
+    }
+  });
 }
 
 /* ── Init ──────────────────────────────────────────────────── */
@@ -420,30 +993,22 @@ async function init() {
   // Re-enable keyboard for zoom/pan only
   map.keyboard.enable();
 
-  // Navigation controls (zoom only)
-  map.addControl(
-    new maplibregl.NavigationControl({ showCompass: false }),
-    "top-right"
-  );
-
   // ── Wire up cartographic UI ──
   map.on('load', () => {
     // Initial render
     updateScaleBar(map);
     updateCoords(map);
     updateCityTitle(map);
+    setupGeocoder(map);
+    setupFlip(map);
 
-    // Show manifesto with a gentle fade-in
+    // Graticule
+    addGraticule(map);
+
+    // Show manifesto in top band with a gentle fade-in
     setTimeout(() => {
       document.getElementById('manifesto')?.classList.add('visible');
     }, 1200);
-
-    // Fade out manifesto when user starts interacting
-    const hideManifesto = () => {
-      document.getElementById('manifesto')?.classList.remove('visible');
-      map.off('movestart', hideManifesto);
-    };
-    map.on('movestart', hideManifesto);
   });
 
   // Live updates on zoom/move
