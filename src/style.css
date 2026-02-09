@@ -21,6 +21,7 @@ body {
   color: var(--dark);
   overflow: hidden;
   height: 100vh;
+  height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -33,6 +34,7 @@ body {
   position: relative;
   width: calc(100vw - 24px);
   height: calc(100vh - 24px);
+  height: calc(100dvh - 24px);
   background: var(--paper);
   box-shadow: 0 2px 24px rgba(0,0,0,0.06);
   display: grid;
@@ -572,10 +574,13 @@ body {
   #page {
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     box-shadow: none;
   }
 
   body {
+    height: 100vh;
+    height: 100dvh;
     padding: 0;
   }
 
@@ -633,22 +638,29 @@ body {
    RESPONSIVE — Phone
    ══════════════════════════════════════ */
 @media (max-width: 480px) {
+  body {
+    height: 100dvh;
+  }
+
   #page {
     width: 100vw;
-    height: 100dvh; /* dynamic viewport height for mobile browsers */
+    height: 100dvh;
   }
 
   #top-band {
     height: 36px;
     padding: 0 10px;
+    padding-top: env(safe-area-inset-top, 0px);
   }
 
   #city-title { font-size: 18px; }
 
   #geocoder-input {
     font-size: 18px;
-    width: 160px;
+    width: 140px;
   }
+
+  .geocoder-results { width: 220px; }
 
   #coords { font-size: 6.5px; }
   .coord-sep { display: none; }
@@ -657,6 +669,7 @@ body {
   #bot-band {
     height: 40px;
     padding: 0 10px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
     gap: 8px;
   }
 
@@ -669,9 +682,31 @@ body {
   #flip-toast {
     font-size: 16px;
     padding: 8px 16px;
+    max-width: 85vw;
   }
 
-  .touch-btn { font-size: 7px; padding: 5px 10px; }
+  .touch-controls {
+    bottom: 8px;
+  }
+
+  .touch-btn {
+    font-size: 7px;
+    padding: 5px 10px;
+  }
+}
+
+/* ── Very small phones (iPhone SE 1st gen, Galaxy Fold) ── */
+@media (max-width: 374px) {
+  #top-band { padding: 0 8px; }
+  #city-title { font-size: 16px; }
+  #geocoder-input { font-size: 16px; width: 120px; }
+  .geocoder-results { width: 200px; }
+  #coords { font-size: 6px; }
+  #bot-band { padding: 0 8px; gap: 6px; }
+  .north-arrow svg { width: 20px; height: 20px; }
+  .bot-link { font-size: 6px; }
+  #flip-toast { font-size: 14px; padding: 6px 12px; }
+  .touch-btn { font-size: 6px; padding: 4px 8px; }
 }
 
 /* ── Print ── */
