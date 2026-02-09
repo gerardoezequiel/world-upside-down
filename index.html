@@ -94,47 +94,57 @@
 <!-- ==========================================
      FACTS — Horizontal scroll (8 cards)
      ========================================== -->
-<section>
-  <div class="facts-scroll">
-    <div class="fact-card fact-dark">
-      <span class="fact-number">01</span>
-      <p class="fact-text">The word "orientation" comes from <em>oriens</em>, Latin for "east." Medieval European maps had east on top, toward Paradise and the rising sun.</p>
-      <span class="fact-source">Etymology</span>
+<section class="facts-section">
+  <div class="facts-nav">
+    <div class="facts-scroll">
+      <div class="fact-card fact-dark">
+        <span class="fact-number">01</span>
+        <p class="fact-text">The word "orientation" comes from <em>oriens</em>, Latin for "east." Medieval European maps had east on top, toward Paradise and the rising sun.</p>
+        <span class="fact-source">Etymology</span>
+      </div>
+      <div class="fact-card fact-accent">
+        <span class="fact-number">02</span>
+        <p class="fact-text">China invented the compass and called it the "south-pointing stone." Calling it "north-pointing" was a European choice.</p>
+        <span class="fact-source">History of Science</span>
+      </div>
+      <div class="fact-card fact-dark">
+        <span class="fact-number">03</span>
+        <p class="fact-text">Ancient Egyptian maps placed south on top because the Nile flows northward, downhill. South was the source. South was supreme.</p>
+        <span class="fact-source">Ancient Egypt</span>
+      </div>
+      <div class="fact-card fact-accent">
+        <span class="fact-number">04</span>
+        <p class="fact-text">Swiss maps were oriented with south on top for centuries. The Alps made a natural horizon to the south.</p>
+        <span class="fact-source">Alpine Cartography</span>
+      </div>
+      <div class="fact-card fact-dark">
+        <span class="fact-number">05</span>
+        <p class="fact-text">When participants were shown south-up maps, the measured psychological bias that equates "north = good, south = bad" completely disappeared.</p>
+        <span class="fact-source">Psychological Research</span>
+      </div>
+      <div class="fact-card fact-accent">
+        <span class="fact-number">06</span>
+        <p class="fact-text">North has only been "up" for about 500 years. For most of human history, east, south, or southeast was on top.</p>
+        <span class="fact-source">Cartographic History</span>
+      </div>
+      <div class="fact-card fact-dark">
+        <span class="fact-number">07</span>
+        <p class="fact-text">The Mercator projection makes Europe appear larger than South America. In reality, South America is nearly twice the size of Europe.</p>
+        <span class="fact-source">Projection Bias</span>
+      </div>
+      <div class="fact-card fact-accent">
+        <span class="fact-number">08</span>
+        <p class="fact-text">There is no physical reason for north to be up. In space, Earth has no top or bottom. Orientation is a psychological construct, not a geographic one.</p>
+        <span class="fact-source">Cognitive Science</span>
+      </div>
     </div>
-    <div class="fact-card fact-accent">
-      <span class="fact-number">02</span>
-      <p class="fact-text">China invented the compass and called it the "south-pointing stone." Calling it "north-pointing" was a European choice.</p>
-      <span class="fact-source">History of Science</span>
-    </div>
-    <div class="fact-card fact-dark">
-      <span class="fact-number">03</span>
-      <p class="fact-text">Ancient Egyptian maps placed south on top because the Nile flows northward, downhill. South was the source. South was supreme.</p>
-      <span class="fact-source">Ancient Egypt</span>
-    </div>
-    <div class="fact-card fact-accent">
-      <span class="fact-number">04</span>
-      <p class="fact-text">Swiss maps were oriented with south on top for centuries. The Alps made a natural horizon to the south.</p>
-      <span class="fact-source">Alpine Cartography</span>
-    </div>
-    <div class="fact-card fact-dark">
-      <span class="fact-number">05</span>
-      <p class="fact-text">When participants were shown south-up maps, the measured psychological bias that equates "north = good, south = bad" completely disappeared.</p>
-      <span class="fact-source">Psychological Research</span>
-    </div>
-    <div class="fact-card fact-accent">
-      <span class="fact-number">06</span>
-      <p class="fact-text">North has only been "up" for about 500 years. For most of human history, east, south, or southeast was on top.</p>
-      <span class="fact-source">Cartographic History</span>
-    </div>
-    <div class="fact-card fact-dark">
-      <span class="fact-number">07</span>
-      <p class="fact-text">The Mercator projection makes Europe appear larger than South America. In reality, South America is nearly twice the size of Europe.</p>
-      <span class="fact-source">Projection Bias</span>
-    </div>
-    <div class="fact-card fact-accent">
-      <span class="fact-number">08</span>
-      <p class="fact-text">There is no physical reason for north to be up. In space, Earth has no top or bottom. Orientation is a psychological construct, not a geographic one.</p>
-      <span class="fact-source">Cognitive Science</span>
+    <button class="facts-arrow facts-arrow-left" aria-label="Scroll left">&#8592;</button>
+    <button class="facts-arrow facts-arrow-right" aria-label="Scroll right">&#8594;</button>
+    <div class="facts-fade facts-fade-left"></div>
+    <div class="facts-fade facts-fade-right"></div>
+    <div class="facts-swipe-hint">
+      <span class="swipe-hand">&#9758;</span>
+      <span class="swipe-text">Swipe</span>
     </div>
   </div>
 </section>
@@ -402,6 +412,64 @@
       ticking = true;
     }
   });
+
+  // ─── Facts scroll navigation ───
+  const factsScroll = document.querySelector('.facts-scroll');
+  const arrowLeft = document.querySelector('.facts-arrow-left');
+  const arrowRight = document.querySelector('.facts-arrow-right');
+  const fadeLeft = document.querySelector('.facts-fade-left');
+  const fadeRight = document.querySelector('.facts-fade-right');
+  const swipeHint = document.querySelector('.facts-swipe-hint');
+
+  if (factsScroll) {
+    const updateFactsNav = () => {
+      const { scrollLeft, scrollWidth, clientWidth } = factsScroll;
+      const atStart = scrollLeft <= 10;
+      const atEnd = scrollLeft + clientWidth >= scrollWidth - 10;
+
+      if (arrowLeft) arrowLeft.classList.toggle('visible', !atStart);
+      if (arrowRight) arrowRight.classList.toggle('visible', !atEnd);
+      if (fadeLeft) fadeLeft.classList.toggle('visible', !atStart);
+      if (fadeRight) fadeRight.classList.toggle('visible', !atEnd);
+    };
+
+    // Scroll by one card width on arrow click
+    const scrollByCard = (direction) => {
+      const card = factsScroll.querySelector('.fact-card');
+      if (!card) return;
+      const distance = card.offsetWidth * direction;
+      factsScroll.scrollBy({ left: distance, behavior: 'smooth' });
+    };
+
+    if (arrowLeft) arrowLeft.addEventListener('click', () => scrollByCard(-1));
+    if (arrowRight) arrowRight.addEventListener('click', () => scrollByCard(1));
+
+    factsScroll.addEventListener('scroll', updateFactsNav, { passive: true });
+
+    // Show swipe hint on mobile when section enters viewport, dismiss on scroll
+    if (swipeHint) {
+      const hintObs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            swipeHint.classList.add('visible');
+            hintObs.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.5 });
+      hintObs.observe(factsScroll);
+
+      factsScroll.addEventListener('scroll', () => {
+        if (factsScroll.scrollLeft > 20) {
+          swipeHint.classList.remove('visible');
+        }
+      }, { passive: true });
+    }
+
+    // Initial state
+    updateFactsNav();
+    // Recheck after layout settles
+    requestAnimationFrame(updateFactsNav);
+  }
 
   // Fun: Fact cards tilt on mouse move
   document.querySelectorAll('.fact-card').forEach(card => {

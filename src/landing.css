@@ -555,6 +555,132 @@ body {
   color: rgba(250, 250, 246, 0.25);
 }
 
+/* ── Facts Navigation ── */
+.facts-section {
+  position: relative;
+}
+
+.facts-nav {
+  position: relative;
+}
+
+/* Arrow buttons — desktop */
+.facts-arrow {
+  display: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(250, 250, 246, 0.2);
+  background: rgba(26, 26, 46, 0.85);
+  backdrop-filter: blur(8px);
+  color: var(--paper);
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s, opacity 0.3s;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.facts-arrow:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
+.facts-arrow.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.facts-arrow-left { left: 16px; }
+.facts-arrow-right { right: 16px; }
+
+/* Edge fade gradients */
+.facts-fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 60px;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.facts-fade.visible { opacity: 1; }
+
+.facts-fade-left {
+  left: 0;
+  background: linear-gradient(to right, rgba(26, 26, 46, 0.7), transparent);
+}
+
+.facts-fade-right {
+  right: 0;
+  background: linear-gradient(to left, rgba(26, 26, 46, 0.7), transparent);
+}
+
+/* Mobile swipe hint */
+.facts-swipe-hint {
+  position: absolute;
+  bottom: 16px;
+  right: 24px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.5s;
+  pointer-events: none;
+}
+
+.facts-swipe-hint.visible {
+  opacity: 1;
+  animation: swipeHintPulse 2s ease-in-out 3;
+  animation-fill-mode: forwards;
+}
+
+.swipe-hand {
+  font-size: 20px;
+  color: var(--paper);
+  animation: swipeSlide 1.5s ease-in-out infinite;
+}
+
+.swipe-text {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(250, 250, 246, 0.5);
+}
+
+@keyframes swipeSlide {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(8px); }
+}
+
+@keyframes swipeHintPulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+/* Show arrows on desktop (hover-capable devices) */
+@media (hover: hover) and (min-width: 769px) {
+  .facts-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .facts-swipe-hint { display: none; }
+}
+
+/* Show swipe hint on touch/mobile only */
+@media (hover: none), (max-width: 768px) {
+  .facts-arrow { display: none !important; }
+  .facts-fade { width: 40px; }
+}
+
 /* ══════════════════════════════════════
    TIMELINE
    ══════════════════════════════════════ */
