@@ -1,0 +1,281 @@
+@import "maplibre-gl/dist/maplibre-gl.css";
+
+@page { size: landscape; margin: 0; }
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --paper:  #FAFAF6;
+  --cream:  #F5F2EC;
+  --bg:     #E2DFD8;
+  --ink:    #E87461;    /* coral — primary accent */
+  --dark:   #1A1A2E;    /* dark navy */
+  --mid:    #8A7E6E;    /* muted text */
+  --light:  #C4BAA8;    /* subtle elements */
+  --rule:   #E87461;    /* band borders */
+  --earth:  #EDE8E0;
+}
+
+body {
+  font-family: 'Space Mono', monospace;
+  background: var(--bg);
+  color: var(--dark);
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ══════════════════════════════════════
+   THE PAGE
+   ══════════════════════════════════════ */
+#page {
+  position: relative;
+  width: calc(100vw - 24px);
+  height: calc(100vh - 24px);
+  background: var(--paper);
+  box-shadow: 0 2px 24px rgba(0,0,0,0.06);
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "top"
+    "map"
+    "bot";
+}
+
+/* ── TOP BAND ── */
+#top-band {
+  grid-area: top;
+  padding: 12px 24px 8px 20px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--rule);
+  background: var(--paper);
+  z-index: 10;
+}
+
+.title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+
+#city-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 24px;
+  font-style: italic;
+  letter-spacing: -0.01em;
+  color: var(--dark);
+  line-height: 1;
+}
+
+.subtitle {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+/* ── COORDINATES ── */
+#coords {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  font-weight: 400;
+  color: var(--mid);
+  letter-spacing: 0.03em;
+}
+
+#coords span {
+  transition: color 0.15s;
+}
+
+.coord-sep {
+  opacity: 0.35;
+  font-size: 7px;
+}
+
+/* ── MAP FRAME ── */
+#map-frame {
+  grid-area: map;
+  position: relative;
+  overflow: hidden;
+}
+
+#map {
+  position: absolute;
+  inset: 0;
+}
+
+/* Hide default MapLibre controls inside map frame */
+.maplibregl-ctrl-attrib {
+  background: rgba(240, 237, 230, 0.7) !important;
+  font-size: 9px !important;
+  color: var(--mid) !important;
+  font-family: 'Space Mono', monospace !important;
+}
+
+.maplibregl-ctrl-logo {
+  display: none !important;
+}
+
+/* Hide built-in scale (we have a custom one) */
+.maplibregl-ctrl-scale {
+  display: none !important;
+}
+
+/* Navigation control styling */
+.maplibregl-ctrl-group {
+  background: var(--paper) !important;
+  border: 1px solid var(--light) !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.maplibregl-ctrl-group button {
+  border-bottom: 1px solid rgba(0,0,0,0.06) !important;
+}
+
+/* ── MANIFESTO OVERLAY ── */
+#manifesto {
+  position: absolute;
+  top: 16px;
+  right: 60px;
+  z-index: 5;
+  max-width: 220px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+#manifesto p {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--dark);
+  opacity: 0.5;
+  letter-spacing: 0.01em;
+}
+
+#manifesto.visible {
+  opacity: 1;
+}
+
+/* ── BOTTOM BAND ── */
+#bot-band {
+  grid-area: bot;
+  padding: 8px 24px 10px 20px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  border-top: 2px solid var(--rule);
+  background: var(--paper);
+  z-index: 10;
+  gap: 20px;
+}
+
+/* ── SCALE BAR ── */
+.scale-block {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+}
+
+.scale-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+#scale-svg {
+  display: block;
+}
+
+.scale-ratio {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  font-style: italic;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+  align-self: flex-end;
+  margin-bottom: 2px;
+  margin-left: 8px;
+}
+
+/* ── NORTH ARROW ── */
+.north-arrow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: -2px;
+  flex-shrink: 0;
+}
+
+/* ── LEGEND ── */
+.legend-block {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.legend-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 6.5px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 1px;
+}
+
+.legend-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.leg-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.leg-item svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.leg-item span {
+  font-family: 'Space Mono', monospace;
+  font-size: 7.5px;
+  font-weight: 400;
+  color: var(--dark);
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+/* ── SOURCE ── */
+.source-text {
+  font-family: 'Space Mono', monospace;
+  font-size: 6px;
+  color: var(--light);
+  text-align: right;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+
+/* ── Print ── */
+@media print {
+  body { background: white; }
+  #page { width: 100vw; height: 100vh; box-shadow: none; margin: 0; }
+  #manifesto { display: none; }
+}
