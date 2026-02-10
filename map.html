@@ -48,8 +48,31 @@
     <div id="toolbar">
       <button class="tb-btn" data-tool="locate" id="tool-locate" aria-label="Find me">&#x2316;</button>
       <button class="tb-btn" data-tool="title" id="tool-title" aria-label="Make it yours">T</button>
-      <button class="tb-btn" data-tool="download" id="tool-download" aria-label="Download">&darr;</button>
-      <button class="tb-btn" data-tool="share" id="tool-share" aria-label="Share">&nearr;</button>
+      <div class="tb-dropdown" id="download-dropdown">
+        <button class="tb-btn" data-tool="download" id="tool-download" aria-label="Download">&darr;</button>
+        <div class="tb-dropdown-menu" id="download-formats">
+          <button class="tb-dropdown-item" data-format="feed">
+            <span class="dl-ratio feed-ratio"></span>
+            <span>Feed <small>1080&times;1080</small></span>
+          </button>
+          <button class="tb-dropdown-item" data-format="reel">
+            <span class="dl-ratio reel-ratio"></span>
+            <span>Story / Reel <small>1080&times;1920</small></span>
+          </button>
+          <button class="tb-dropdown-item" data-format="poster">
+            <span class="dl-ratio poster-ratio"></span>
+            <span>Poster <small>3600&times;4800</small></span>
+          </button>
+        </div>
+      </div>
+      <div class="tb-dropdown" id="share-dropdown">
+        <button class="tb-btn" data-tool="share" id="tool-share" aria-label="Share">&nearr;</button>
+        <div class="tb-dropdown-menu" id="share-menu">
+          <button class="tb-dropdown-item" data-share="linkedin">LinkedIn</button>
+          <button class="tb-dropdown-item" data-share="x">X / Twitter</button>
+          <button class="tb-dropdown-item" data-share="copy">Copy link</button>
+        </div>
+      </div>
       <a href="/story" class="tb-btn" aria-label="The story">?</a>
     </div>
 
@@ -144,31 +167,6 @@
         </div>
       </div>
       <button class="export-close" id="export-close" aria-label="Close">&times;</button>
-    </div>
-
-    <!-- ── Download format picker ── -->
-    <div class="download-formats" id="download-formats">
-      <button class="dl-format" data-format="poster">
-        <span class="dl-format-preview poster-ratio"></span>
-        <span class="dl-format-info">
-          <span class="dl-format-name">Poster</span>
-          <span class="dl-format-size">3600 &times; 4800</span>
-        </span>
-      </button>
-      <button class="dl-format" data-format="reel">
-        <span class="dl-format-preview reel-ratio"></span>
-        <span class="dl-format-info">
-          <span class="dl-format-name">Story / Reel</span>
-          <span class="dl-format-size">1080 &times; 1920</span>
-        </span>
-      </button>
-      <button class="dl-format" data-format="feed">
-        <span class="dl-format-preview feed-ratio"></span>
-        <span class="dl-format-info">
-          <span class="dl-format-name">Feed</span>
-          <span class="dl-format-size">1080 &times; 1080</span>
-        </span>
-      </button>
     </div>
 
     <!-- ── Touch controls — two flip buttons ── -->

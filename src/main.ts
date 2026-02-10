@@ -360,9 +360,7 @@ function setMode(mode: Mode, map?: maplibregl.Map) {
 
   if (mode === 'explore') {
     root.style.setProperty('--overlay-transition', prev === 'poster' ? '1.2s cubic-bezier(0.4, 0, 0.2, 1)' : '0.6s ease');
-    // Zoom-based opacity
-    const zoom = map?.getZoom() ?? 11;
-    setOverlayOpacity(zoom > 16 ? 0 : zoom > 14 ? 0.04 : 0.08);
+    setOverlayOpacity(0);
     overlay?.classList.remove('poster-mode');
 
     // Staggered entrance
@@ -416,7 +414,7 @@ function resetIdleTimer(map?: maplibregl.Map) {
     if (currentOpacity > 0.08) {
       root.style.setProperty('--overlay-transition', '0.3s ease');
       const zoom = map?.getZoom() ?? 11;
-      setOverlayOpacity(zoom > 16 ? 0 : zoom > 14 ? 0.04 : 0.08);
+      setOverlayOpacity(0);
     }
     startIdleTimer(map);
   }
@@ -610,8 +608,7 @@ function applyOrientation(map: maplibregl.Map, target: Orientation): void {
       setTimeout(() => {
         if (currentMode === 'explore') {
           root.style.setProperty('--overlay-transition', '0.8s ease');
-          const zoom = map.getZoom();
-          setOverlayOpacity(zoom > 16 ? 0 : zoom > 14 ? 0.04 : 0.08);
+          setOverlayOpacity(0);
         }
       }, 1500);
     }
@@ -623,8 +620,7 @@ function applyOrientation(map: maplibregl.Map, target: Orientation): void {
       setTimeout(() => {
         if (currentMode === 'explore') {
           root.style.setProperty('--overlay-transition', '0.5s ease');
-          const zoom = map.getZoom();
-          setOverlayOpacity(zoom > 16 ? 0 : zoom > 14 ? 0.04 : 0.08);
+          setOverlayOpacity(0);
         }
       }, 800);
     }
@@ -1012,11 +1008,10 @@ function applyRisoMisregistration(map: maplibregl.Map): void {
 let formatsOpen = false;
 
 function closeAllPanels() {
-  const downloadFormats = document.getElementById('download-formats');
   const colorStrip = document.getElementById('color-strip');
   const exportPreview = document.getElementById('export-preview');
 
-  downloadFormats?.classList.remove('open');
+  closeAllDropdowns();
   colorStrip?.classList.remove('visible');
   exportPreview?.classList.remove('visible');
   formatsOpen = false;
@@ -1234,196 +1229,37 @@ function setupToolTitle(map: maplibregl.Map): void {
 /* ══════════════════════════════════════════════════════════════
    TOOL: ↓ DOWNLOAD
    ══════════════════════════════════════════════════════════════ */
+function closeAllDropdowns() {
+  document.querySelectorAll('.tb-dropdown-menu.open').forEach(el => el.classList.remove('open'));
+}
+
 function setupToolDownload(map: maplibregl.Map): void {
   const btn = document.getElementById('tool-download');
-  const downloadFormats = document.getElementById('download-formats');
-  if (!btn || !downloadFormats) return;
+  const menu = document.getElementById('download-formats');
+  if (!btn || !menu) return;
 
-  btn.addEventListener('click', () => {
-    // Toggle format picker
-    if (formatsOpen) {
-      downloadFormats.classList.remove('open');
-      formatsOpen = false;
-    } else {
-      closeAllPanels();
-      downloadFormats.classList.add('open');
-      formatsOpen = true;
-    }
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = menu.classList.contains('open');
+    closeAllDropdowns();
+    if (!isOpen) menu.classList.add('open');
   });
 
-  // Close format picker on click outside
-  document.addEventListener('click', (e) => {
-    if (formatsOpen && !downloadFormats.contains(e.target as Node) && e.target !== btn) {
-      downloadFormats.classList.remove('open');
-      formatsOpen = false;
-    }
-  });
-
-  // Format card clicks
-  downloadFormats.querySelectorAll('.dl-format').forEach(card => {
-    card.addEventListener('click', () => {
-      const format = (card as HTMLElement).dataset.format!;
-      closeAllPanels();
-      openExportPreview(map, format);
+  // Format item clicks → go straight to export
+  menu.querySelectorAll('.tb-dropdown-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const format = (item as HTMLElement).dataset.format!;
+      closeAllDropdowns();
+      captureAndExport(map, format, 'download');
     });
   });
+
+  // Close on click outside
+  document.addEventListener('click', () => closeAllDropdowns());
 }
 
-function openExportPreview(map: maplibregl.Map, format: string): void {
-  const preview = document.getElementById('export-preview');
-  const exportCanvas = document.getElementById('export-canvas');
-  const exportSubtitle = document.getElementById('export-subtitle') as HTMLInputElement;
-  const exportToggles = document.getElementById('export-toggles');
-  const exportColorStrip = document.getElementById('export-color-strip');
-  if (!preview || !exportCanvas) return;
-
-  // Set aspect ratio on preview canvas
-  const ratios: Record<string, { w: number; h: number }> = {
-    feed: { w: 1, h: 1 },
-    reel: { w: 9, h: 16 },
-    poster: { w: 3, h: 4 },
-  };
-
-  const ratio = ratios[format] || ratios.feed;
-  const maxH = window.innerHeight * 0.55;
-  const maxW = window.innerWidth * 0.7;
-  let h = maxH;
-  let w = h * (ratio.w / ratio.h);
-  if (w > maxW) { w = maxW; h = w * (ratio.h / ratio.w); }
-
-  exportCanvas.style.width = `${w}px`;
-  exportCanvas.style.height = `${h}px`;
-
-  // Render map snapshot into preview
-  const mapCanvas = map.getCanvas();
-  const previewCanvas = document.createElement('canvas');
-  previewCanvas.width = Math.round(w * 2);
-  previewCanvas.height = Math.round(h * 2);
-  const ctx = previewCanvas.getContext('2d')!;
-
-  // Crop map to aspect ratio
-  const srcW = mapCanvas.width;
-  const srcH = mapCanvas.height;
-  const targetRatio = ratio.w / ratio.h;
-  const srcRatio = srcW / srcH;
-
-  let cropX = 0, cropY = 0, cropW = srcW, cropH = srcH;
-  if (srcRatio > targetRatio) {
-    cropW = srcH * targetRatio;
-    cropX = (srcW - cropW) / 2;
-  } else {
-    cropH = srcW / targetRatio;
-    cropY = (srcH - cropH) / 2;
-  }
-
-  ctx.drawImage(mapCanvas, cropX, cropY, cropW, cropH, 0, 0, previewCanvas.width, previewCanvas.height);
-
-  // Draw screenprint text on preview
-  const spColor = getComputedStyle(root).getPropertyValue('--sp-color').trim();
-  const spShadow = getComputedStyle(root).getPropertyValue('--sp-shadow').trim();
-  const l1 = document.getElementById('screenprint-l1')?.textContent || '';
-  const l2 = document.getElementById('screenprint-l2')?.textContent || '';
-
-  const fontSize = previewCanvas.width * 0.14;
-  ctx.font = `400 ${fontSize}px Anton`;
-  ctx.textAlign = 'center';
-  ctx.globalCompositeOperation = 'multiply';
-
-  const cx = previewCanvas.width / 2;
-  const cy = previewCanvas.height / 2;
-
-  // Shadow pass
-  ctx.fillStyle = spShadow;
-  ctx.globalAlpha = 0.9;
-  ctx.fillText(l1, cx + 5, cy - fontSize * 0.1 + 4);
-  ctx.fillText(l2, cx + 5, cy + fontSize * 0.88 + 4);
-
-  // Main pass
-  ctx.fillStyle = spColor;
-  ctx.globalAlpha = 0.9;
-  ctx.fillText(l1, cx, cy - fontSize * 0.1);
-  ctx.fillText(l2, cx, cy + fontSize * 0.88);
-
-  ctx.globalCompositeOperation = 'source-over';
-  ctx.globalAlpha = 1;
-
-  previewCanvas.style.width = '100%';
-  previewCanvas.style.height = '100%';
-  exportCanvas.innerHTML = '';
-  exportCanvas.appendChild(previewCanvas);
-
-  // Pre-fill subtitle
-  if (exportSubtitle) {
-    const subtitleText = document.getElementById('subtitle-text');
-    exportSubtitle.value = subtitleText?.textContent || '';
-  }
-
-  // Show/hide toggles based on format
-  if (exportToggles) {
-    exportToggles.style.display = format === 'poster' ? 'none' : 'flex';
-  }
-
-  // Clone color dots for export color strip
-  if (exportColorStrip) {
-    const mainStrip = document.getElementById('color-strip');
-    if (mainStrip) {
-      exportColorStrip.innerHTML = mainStrip.innerHTML;
-      exportColorStrip.style.position = 'static';
-      exportColorStrip.style.transform = 'none';
-      exportColorStrip.style.opacity = '1';
-      exportColorStrip.style.pointerEvents = 'auto';
-
-      exportColorStrip.querySelectorAll('.color-dot').forEach(dot => {
-        dot.addEventListener('click', (e) => {
-          e.stopPropagation();
-          const el = dot as HTMLElement;
-          exportColorStrip.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
-          el.classList.add('active');
-          root.style.setProperty('--sp-color', el.dataset.color!);
-          root.style.setProperty('--sp-shadow', el.dataset.shadow!);
-        });
-      });
-    }
-  }
-
-  preview.classList.add('visible');
-  preview.dataset.format = format;
-
-  // Wire up export buttons
-  setupExportButtons(map, format);
-}
-
-function setupExportButtons(map: maplibregl.Map, format: string): void {
-  const downloadBtn = document.getElementById('export-download');
-  const copyBtn = document.getElementById('export-copy');
-  const closeBtn = document.getElementById('export-close');
-  const preview = document.getElementById('export-preview');
-
-  function closeExport() {
-    preview?.classList.remove('visible');
-    setMode('explore', map);
-  }
-
-  const handleDownload = () => { captureAndExport(map, format, 'download'); };
-  const handleCopy = () => { captureAndExport(map, format, 'copy'); };
-
-  // Remove old listeners by cloning
-  if (downloadBtn) {
-    const newBtn = downloadBtn.cloneNode(true) as HTMLElement;
-    downloadBtn.parentNode?.replaceChild(newBtn, downloadBtn);
-    newBtn.addEventListener('click', handleDownload);
-  }
-  if (copyBtn) {
-    const newBtn = copyBtn.cloneNode(true) as HTMLElement;
-    copyBtn.parentNode?.replaceChild(newBtn, copyBtn);
-    newBtn.addEventListener('click', handleCopy);
-  }
-  if (closeBtn) {
-    const newBtn = closeBtn.cloneNode(true) as HTMLElement;
-    closeBtn.parentNode?.replaceChild(newBtn, closeBtn);
-    newBtn.addEventListener('click', closeExport);
-  }
-}
+/* (Export preview removed — download goes straight to capture) */
 
 async function captureAndExport(map: maplibregl.Map, format: string, action: 'download' | 'copy'): Promise<void> {
   const resolutions: Record<string, { w: number; h: number }> = {
@@ -1433,10 +1269,7 @@ async function captureAndExport(map: maplibregl.Map, format: string, action: 'do
   };
 
   const res = resolutions[format] || resolutions.feed;
-  const exportSubtitle = (document.getElementById('export-subtitle') as HTMLInputElement)?.value || '';
-
-  // Close preview
-  document.getElementById('export-preview')?.classList.remove('visible');
+  const exportSubtitle = document.getElementById('subtitle-text')?.textContent || '';
 
   showFlipToast('Generating...');
 
@@ -1623,30 +1456,41 @@ async function exportCanvas(canvas: HTMLCanvasElement, format: string, action: '
 /* ══════════════════════════════════════════════════════════════
    TOOL: ⤴ SHARE
    ══════════════════════════════════════════════════════════════ */
-function setupToolShare(map: maplibregl.Map): void {
+function setupToolShare(_map: maplibregl.Map): void {
   const btn = document.getElementById('tool-share');
-  if (!btn) return;
+  const menu = document.getElementById('share-menu');
+  if (!btn || !menu) return;
 
-  btn.addEventListener('click', async () => {
-    closeAllPanels();
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = menu.classList.contains('open');
+    closeAllDropdowns();
+    if (!isOpen) menu.classList.add('open');
+  });
 
-    const url = window.location.href;
-    const text = "I flipped the world upside down.";
+  menu.querySelectorAll('.tb-dropdown-item').forEach(item => {
+    item.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      closeAllDropdowns();
 
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: 'Upside Down', text, url });
-      } catch {
-        // User cancelled
+      const platform = (item as HTMLElement).dataset.share;
+      const url = encodeURIComponent(window.location.href);
+      const text = encodeURIComponent("I flipped the world upside down. 🌍⬇️");
+      const title = encodeURIComponent("Upside Down — You've Been Holding the Map Wrong");
+
+      if (platform === 'linkedin') {
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank', 'width=600,height=500');
+      } else if (platform === 'x') {
+        window.open(`https://x.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=600,height=400');
+      } else if (platform === 'copy') {
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          showFlipToast('Link copied');
+        } catch {
+          showFlipToast('Copy the URL from your browser');
+        }
       }
-    } else {
-      try {
-        await navigator.clipboard.writeText(url);
-        showFlipToast('Link copied — spread the disorientation');
-      } catch {
-        showFlipToast('Copy the URL from your browser');
-      }
-    }
+    });
   });
 }
 
@@ -1799,15 +1643,6 @@ async function init() {
   map.on('zoomstart', () => {
     if (currentMode === 'poster') setMode('explore', map);
     resetIdleTimer(map);
-  });
-
-  // Zoom-based overlay opacity updates while in explore
-  map.on('zoom', () => {
-    if (currentMode === 'explore') {
-      const zoom = map.getZoom();
-      root.style.setProperty('--overlay-transition', '0.3s ease');
-      setOverlayOpacity(zoom > 16 ? 0 : zoom > 14 ? 0.04 : 0.08);
-    }
   });
 
   // Any interaction resets idle
