@@ -364,16 +364,14 @@ body {
 
 .screenprint-line {
   font-family: 'Anton', sans-serif;
-  font-size: 19vw;
+  font-size: 21vw;
   font-weight: 400;
   text-transform: uppercase;
-  line-height: 0.88;
-  letter-spacing: -0.02em;
+  line-height: 0.84;
+  letter-spacing: -0.04em;
   color: #F7FF00;
-  /* Two-drum riso: pink pass offset behind yellow pass */
-  text-shadow:
-    8px 8px 0 #FF48B0,
-    16px 16px 0 rgba(200, 25, 80, 0.7);
+  /* Single misregistration: pink pass offset behind yellow — tight, like a real screenprint */
+  text-shadow: 5px 4px 0 #FF48B0;
 }
 
 /* ── MANIFESTO TYPEWRITER (map overlay) ── */
