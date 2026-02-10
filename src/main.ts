@@ -1,6 +1,7 @@
 import maplibregl from "maplibre-gl";
 import { Protocol } from "pmtiles";
 import "./analytics";
+import { initDymaxion } from "./dymaxion";
 
 /* ── PMTiles protocol ─────────────────────────────────────── */
 const protocol = new Protocol();
@@ -1031,6 +1032,25 @@ async function init() {
         setTimeout(() => titleEl.classList.remove('hint-pulse'), 2000);
       }
     }, 12000);
+  });
+
+  // ── Dymaxion projection crossfade on zoom out ──
+  const mapFrame = document.getElementById('map-frame')!;
+  const mapEl = document.getElementById('map')!;
+  const dymaxionLabel = document.getElementById('dymaxion-label');
+  const gratLabels = document.getElementById('grat-edge-labels');
+
+  initDymaxion(mapFrame).then(dymaxion => {
+    function updateDymaxionTransition() {
+      const zoom = map.getZoom();
+      const t = Math.max(0, Math.min(1, 3 - zoom));
+      dymaxion.show(t);
+      mapEl.style.opacity = String(1 - t);
+      if (gratLabels) gratLabels.style.opacity = String(1 - t);
+      if (dymaxionLabel) dymaxionLabel.classList.toggle('visible', t > 0.9);
+    }
+    map.on('zoom', updateDymaxionTransition);
+    window.addEventListener('resize', () => dymaxion.resize());
   });
 
   // Live updates on zoom/move
