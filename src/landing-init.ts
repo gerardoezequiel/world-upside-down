@@ -170,10 +170,10 @@ function initOrientationAnimation(): void {
   observer.observe(list);
 }
 
-/* ── Scroll progress bar ── */
+/* ── Scroll progress — reveals ink strip colors ── */
 function initScrollProgress(): void {
-  const bar = document.getElementById('scroll-progress');
-  if (!bar) return;
+  const strip = document.querySelector('.ink-strip') as HTMLElement | null;
+  if (!strip) return;
   let ticking = false;
   window.addEventListener('scroll', () => {
     if (!ticking) {
@@ -181,7 +181,7 @@ function initScrollProgress(): void {
         const scrollTop = window.scrollY;
         const docHeight = document.documentElement.scrollHeight - window.innerHeight;
         const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-        bar.style.width = pct + '%';
+        strip.style.setProperty('--scroll-pct', pct + '%');
         ticking = false;
       });
       ticking = true;

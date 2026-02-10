@@ -171,6 +171,26 @@ a.link-underline:hover::after {
 .ink-strip-swatch {
   flex: 1;
   height: 100%;
+  opacity: 0.2;
+}
+
+/* Full-color reveal layer — clips to scroll progress */
+.ink-strip::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: var(--scroll-pct, 0%);
+  background: linear-gradient(90deg,
+    #000000 0%,    #000000 20%,
+    #88898A 20%,   #88898A 40%,
+    #00838A 40%,   #00838A 60%,
+    #0078BF 60%,   #0078BF 80%,
+    #FF48B0 80%,   #FF48B0 100%
+  );
+  z-index: 1;
+  transition: width 0.05s linear;
 }
 
 .ink-strip-label {
@@ -185,20 +205,7 @@ a.link-underline:hover::after {
   text-transform: uppercase;
   background: var(--paper);
   padding: 2px 6px;
-}
-
-/* Scroll progress bar — thin pink line below ink strip */
-.scroll-progress {
-  position: fixed;
-  top: 4px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: var(--ink-fluor-pink);
-  z-index: 9999;
-  pointer-events: none;
-  transition: width 0.05s linear;
-  box-shadow: 0 1px 0 0 rgba(0, 131, 138, 0.3);
+  z-index: 2;
 }
 
 /* Visible grid overlay — teal registration lines */
