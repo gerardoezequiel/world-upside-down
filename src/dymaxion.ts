@@ -60,34 +60,34 @@ export async function initDymaxion(container: HTMLElement): Promise<DymaxionCont
     const w = container.clientWidth;
     const h = container.clientHeight;
 
-    // Background — matches MapLibre ocean warm grey
-    ctx.fillStyle = '#C8C2B8';
+    // Background — matches MapLibre bold blue ocean
+    ctx.fillStyle = '#2838A8';
     ctx.fillRect(0, 0, w, h);
 
-    // Graticule (under land) — riso blue ink at low opacity
+    // Graticule (under land) — paper white at low opacity on blue
     ctx.beginPath();
     path(graticule);
-    ctx.strokeStyle = 'rgba(91, 158, 173, 0.18)';
+    ctx.strokeStyle = 'rgba(248, 244, 236, 0.12)';
     ctx.lineWidth = 0.4;
     ctx.stroke();
 
-    // Land fill — cream paper stock (matches MapLibre earth)
+    // Land fill — white paper stock (matches MapLibre earth)
     ctx.beginPath();
     path(land);
-    ctx.fillStyle = '#F2EDE4';
+    ctx.fillStyle = '#F8F4EC';
     ctx.fill();
 
-    // Country borders — coral ink at low opacity
+    // Country borders — crimson ink at low opacity
     ctx.beginPath();
     path(borders);
-    ctx.strokeStyle = 'rgba(232, 116, 97, 0.20)';
+    ctx.strokeStyle = 'rgba(200, 48, 64, 0.25)';
     ctx.lineWidth = 0.5;
     ctx.stroke();
 
-    // Icosahedron outline — coral ink (the signature riso accent)
+    // Icosahedron outline — crimson ink (the signature riso accent)
     ctx.beginPath();
     path({ type: 'Sphere' });
-    ctx.strokeStyle = 'rgba(232, 116, 97, 0.45)';
+    ctx.strokeStyle = 'rgba(200, 48, 64, 0.55)';
     ctx.lineWidth = 1.2;
     ctx.stroke();
 

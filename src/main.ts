@@ -7,52 +7,56 @@ import { initDymaxion } from "./dymaxion";
 const protocol = new Protocol();
 maplibregl.addProtocol("pmtiles", protocol.tile);
 
-/* ── Risograph palette — 3 inks on cream stock ────────────── */
-// Inspired by riso printing: limited inks, high contrast, tactile.
-// Ink 1: Navy (#1A1A2E) — roads, labels, structure
-// Ink 2: Riso Blue (#5B9EAD) — buildings, water, institutions
-// Ink 3: Coral (#E87461) — parks, nature, accents
-// Paper: Cream (#F2EDE4) — land, background warmth
+/* ── Risograph palette — 6 bold inks, architectural planning ── */
+// Inspired by urban planning maps & riso overprint: saturated,
+// layered, graphic. Each land use gets its own ink drum.
+// Ink 1: Navy (#1A1848) — structure, roads, rail
+// Ink 2: Cyan (#38BCD4) — buildings, dense urban
+// Ink 3: Hot Pink (#E848A0) — residential, suburban
+// Ink 4: Green (#3EA858) — parks, nature
+// Ink 5: Yellow (#E8D040) — farmland, open land
+// Ink 6: Crimson (#C83040) — boundaries, accents
+// Paper: White (#F8F4EC)
 const PALETTE = {
-  // Paper stock & ocean
-  bg:        "#C8C2B8",   // warm grey ocean — like unprinted paper edge
-  earth:     "#F2EDE4",   // cream paper stock — the "land"
-  // Ink 2: Riso Blue — urban, water, civic
-  buildings: "#5B9EAD",   // riso blue — the signature ink
-  urban:     "#D8E4E8",   // blue tint at 15% — urban areas
-  // Ink 3: Coral — nature, parks, highlights
-  park:      "#E87461",   // riso coral/fluorescent pink
-  parkAlt:   "#F09E8C",   // coral at 60% — secondary nature
-  // Water — desaturated blue-grey (riso overprint feel)
-  water:     "#8EA8AC",   // blue-grey — like blue ink on grey paper
-  waterLine: "#7A9498",   // darker blue-grey for rivers
-  // Ink 1: Navy — infrastructure, structure
-  road:      "#1A1A2E",   // full navy ink
-  roadMajor: "#2A2A3C",   // navy at 90%
-  roadMinor: "#7A7A8C",   // navy at 40%
-  roadCas:   "#E4E0D8",   // cream paper showing through
-  rail:      "#1A1A2E",   // full navy
-  // Boundaries — coral at reduced opacity
-  boundary:  "#D4948C",   // coral overprint — muted
+  // Paper & ocean
+  bg:        "#2838A8",   // bold blue ocean — like blue ink flood fill
+  earth:     "#F8F4EC",   // white paper stock
+  // Cyan ink — buildings, commercial
+  buildings: "#38BCD4",   // bright cyan — dense urban core
+  urban:     "#E8A0D0",   // pink tint — residential/suburban
+  // Green ink — parks, nature
+  park:      "#3EA858",   // vivid green
+  parkAlt:   "#68C078",   // lighter green
+  // Water — deep blue (matches ocean)
+  water:     "#2838A8",   // same as bg — ocean blue
+  waterLine: "#3040B8",   // slightly lighter blue for rivers
+  // Navy ink — infrastructure
+  road:      "#1A1848",   // dark navy-purple
+  roadMajor: "#282460",   // navy
+  roadMinor: "#6860A0",   // purple-grey
+  roadCas:   "#E8E4DC",   // paper showing through
+  rail:      "#1A1848",   // navy
+  // Crimson ink — boundaries
+  boundary:  "#C83040",   // bold crimson
   // Text — navy ink
-  label:     "#1A1A2E",   // full navy
-  labelHalo: "#F2EDE4",   // cream paper
-  // Landcover — very muted tints (like diluted ink washes)
-  grass:     "#E4E8D8",   // faintest sage wash
-  farmland:  "#ECE8DC",   // cream with warm tint
-  scrub:     "#DDE0D0",   // grey-sage wash
-  barren:    "#E8E2D4",   // sandy cream
-  glacier:   "#F4F4F0",   // near-white
-  // Special — single ink tints
-  hospital:  "#F0D4CC",   // coral at 20%
-  school:    "#D0D8E0",   // blue at 15%
-  industrial:"#D8D8DC",   // navy at 10%
-  beach:     "#F0E8D4",   // warm cream
-  zoo:       "#F0C8B4",   // coral at 30%
-  aerodrome: "#D8D4D0",   // neutral
-  pier:      "#DCD8D0",   // warm paper
-  pedestrian:"#EAE6DE",   // cream
-  runway:    "#B8B4AC",   // grey
+  label:     "#1A1848",   // navy
+  labelHalo: "#F8F4EC",   // white paper
+  // Landcover — bold ink washes
+  grass:     "#E8D040",   // bright yellow — open/farmland
+  farmland:  "#E8D040",   // yellow
+  scrub:     "#D0CC60",   // olive-yellow
+  barren:    "#E8D898",   // pale yellow
+  glacier:   "#F0F4F8",   // blue-white
+  // Special — overprint combinations
+  hospital:  "#F0B0B0",   // pink tint
+  school:    "#B0D8F0",   // cyan tint
+  industrial:"#D0C8E0",   // purple tint
+  beach:     "#F0E4C0",   // sandy yellow
+  zoo:       "#90D8A0",   // green tint
+  aerodrome: "#D8D0D0",   // neutral
+  pier:      "#D8D4CC",   // warm paper
+  pedestrian:"#F0ECE4",   // paper
+  runway:    "#B0A8A0",   // grey
 };
 
 /* ── Color replacement map ────────────────────────────────── */
@@ -104,7 +108,7 @@ function recolorStyle(style: maplibregl.StyleSpecification): maplibregl.StyleSpe
         14, 0.65,
         16, 0.75,
       ];
-      (layer as any).paint["fill-outline-color"] = "rgba(122, 172, 194, 0.35)";
+      (layer as any).paint["fill-outline-color"] = "rgba(40, 56, 168, 0.25)";
       continue;
     }
 
@@ -346,7 +350,7 @@ function updateScaleBar(map: maplibregl.Map): void {
     }
   }
 
-  const ink = '#E87461';
+  const ink = '#C83040';
   const svgH = 28;
   const baseline = svgH - 4;
   const tickMajor = 12;
@@ -794,7 +798,7 @@ function setupGeocoder(map: maplibregl.Map): void {
 
 /* ── Dynamic Graticule ────────────────────────────────────── */
 function addGraticule(map: maplibregl.Map): void {
-  const GRAT_COLOR = 'rgba(91, 158, 173, 0.45)';
+  const GRAT_COLOR = 'rgba(248, 244, 236, 0.30)';
 
   function getInterval(zoom: number): number {
     if (zoom >= 10) return 1;
