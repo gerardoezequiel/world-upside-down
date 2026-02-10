@@ -181,8 +181,10 @@ a.link-underline:hover::after {
   font-size: 0.5rem;
   letter-spacing: 0.15em;
   color: var(--ink-light-gray);
-  opacity: 0.5;
+  opacity: 0.7;
   text-transform: uppercase;
+  background: var(--paper);
+  padding: 2px 6px;
 }
 
 /* Visible grid overlay — teal registration lines */
@@ -372,6 +374,12 @@ a.link-underline:hover::after {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  color: var(--ink-black);
+  opacity: 0.5;
+  background: var(--paper);
+  padding: 8px 12px;
+  width: fit-content;
+  margin-left: auto;
 }
 
 .hero-title {
@@ -762,7 +770,7 @@ a.link-underline:hover::after {
 }
 
 .torres-img {
-  width: 200px;
+  width: clamp(280px, 30vw, 420px);
   height: auto;
   border: 3px solid var(--ink-black);
   flex-shrink: 0;
@@ -880,6 +888,22 @@ a.link-underline:hover::after {
   box-shadow: inset 0 0 0 1px rgba(0, 131, 138, 0.15);
 }
 
+.artist-thumb {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  margin-bottom: 1rem;
+  filter: grayscale(0.6) contrast(1.2);
+  mix-blend-mode: multiply;
+  transition: filter 0.3s;
+}
+
+.artist-card:hover .artist-thumb {
+  filter: grayscale(0.2) contrast(1.1);
+}
+
 .artist-card .heading-sm {
   position: relative;
   z-index: 1;
@@ -979,7 +1003,7 @@ a.link-underline:hover::after {
 }
 
 .idiom-list li strong {
-  color: var(--ink-fluor-pink);
+  color: #E03A95; /* fluor pink darkened for WCAG AA on cream */
   font-weight: 700;
   text-shadow: 1px 1px 0 rgba(0, 131, 138, 0.2); /* overprint ghost */
 }
@@ -1418,7 +1442,7 @@ a.link-underline:hover::after {
   }
 
   .torres-img {
-    width: 160px;
+    width: clamp(200px, 60vw, 300px);
   }
 
   /* Artists */
@@ -1512,7 +1536,7 @@ a.link-underline:hover::after {
   }
 
   .torres-img {
-    width: 130px;
+    width: clamp(180px, 55vw, 260px);
   }
 
   .cta-title {
