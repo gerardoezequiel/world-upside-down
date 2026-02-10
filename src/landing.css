@@ -413,17 +413,21 @@ a.link-underline:hover::after {
   grid-column: 1 / 6;
   grid-row: 3;
   font-family: var(--font-mono);
-  font-size: clamp(0.625rem, 0.8vw, 0.75rem);
-  letter-spacing: 0.05em;
+  font-size: clamp(0.6875rem, 0.9vw, 0.8125rem);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--ink-light-gray);
-  margin-top: 32px;
+  color: var(--ink-black);
+  margin-top: 24px;
+  padding: 6px 12px;
+  background: var(--paper);
+  width: fit-content;
+  border-left: 3px solid var(--ink-teal);
 }
 
 .hero-actions {
   grid-column: 1 / 6;
   grid-row: 4;
-  margin-top: 48px;
+  margin-top: 36px;
   display: flex;
   align-items: center;
   gap: 24px;
@@ -453,10 +457,12 @@ a.link-underline:hover::after {
 .hero-scroll-link {
   font-family: var(--font-mono);
   font-size: 0.625rem;
-  color: var(--text-faint);
+  color: var(--ink-light-gray);
   letter-spacing: 0.05em;
   text-transform: lowercase;
   transition: color 0.2s;
+  background: var(--paper);
+  padding: 4px 8px;
 }
 
 .hero-scroll-link:hover {
