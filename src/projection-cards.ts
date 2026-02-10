@@ -1,11 +1,13 @@
 /* ══════════════════════════════════════════════════════════════
-   Projection Cards — Bayer-dithered map projections
-   Renders each projection as halftone riso dots on card canvases.
+   Projection Cards — Two-layer map rendering
+   Layer 1: Subtle vector fill + thin coastline outlines
+   Layer 2: Bayer-dithered halftone dots in complementary color
    ══════════════════════════════════════════════════════════════ */
 
 import {
   geoPath,
   geoGraticule10,
+  geoMercator,
   geoEqualEarth,
   geoAzimuthalEquidistant,
   type GeoProjection,
@@ -13,10 +15,11 @@ import {
 import {
   geoCylindricalEqualArea,
   geoMollweide,
+  geoRobinson,
   geoInterruptedHomolosine,
   geoPolyhedralWaterman,
 } from 'd3-geo-projection';
-import { geoAirocean, geoImago } from 'd3-geo-polygon';
+import { geoAirocean } from 'd3-geo-polygon';
 import * as topojson from 'topojson-client';
 import type { Topology } from 'topojson-specification';
 
@@ -24,26 +27,79 @@ import type { Topology } from 'topojson-specification';
 
 interface ProjCardDef {
   id: string;
-  inkColor: string;
-  factory: (() => GeoProjection) | null; // null = abstract fallback
-  w: number;
-  h: number;
+  fill: string;
+  outline: string;
+  dither: string;
+  factory: () => GeoProjection;
 }
 
 const PROJ_DEFS: ProjCardDef[] = [
-  { id: 'gall-peters',   inkColor: '#00838A', factory: () => (geoCylindricalEqualArea().parallel(45) as unknown as GeoProjection).rotate([0, 0, 180]),   w: 512, h: 320 },
-  { id: 'equal-earth',   inkColor: '#0078BF', factory: () => geoEqualEarth().rotate([0, 0, 180]),       w: 512, h: 320 },
-  { id: 'spilhaus',      inkColor: '#FF48B0', factory: null,                                             w: 512, h: 320 },
-  { id: 'dymaxion',      inkColor: '#00838A', factory: () => geoAirocean() as unknown as GeoProjection,  w: 512, h: 320 },
-  { id: 'waterman',      inkColor: '#0078BF', factory: () => geoPolyhedralWaterman().rotate([0, 0, 180]) as unknown as GeoProjection, w: 512, h: 320 },
-  { id: 'hobo-dyer',     inkColor: '#00838A', factory: () => (geoCylindricalEqualArea().parallel(37.5) as unknown as GeoProjection).rotate([0, 0, 180]), w: 512, h: 320 },
-  { id: 'homolosine',    inkColor: '#0078BF', factory: () => geoInterruptedHomolosine().rotate([0, 0, 180]) as unknown as GeoProjection, w: 512, h: 320 },
-  { id: 'azimuthal',     inkColor: '#000000', factory: () => geoAzimuthalEquidistant().rotate([0, 0, 180]),  w: 400, h: 400 },
-  { id: 'authagraph',    inkColor: '#FF48B0', factory: () => geoImago() as unknown as GeoProjection,     w: 512, h: 320 },
-  { id: 'mollweide',     inkColor: '#00838A', factory: () => geoMollweide().rotate([0, 0, 180]),         w: 512, h: 320 },
+  {
+    id: 'mercator',
+    fill: 'rgba(0,131,138, 0.07)',
+    outline: 'rgba(0,131,138, 0.18)',
+    dither: '#C46B50',
+    factory: () => geoMercator().rotate([0, 0, 180]),
+  },
+  {
+    id: 'gall-peters',
+    fill: 'rgba(0,120,191, 0.07)',
+    outline: 'rgba(0,120,191, 0.18)',
+    dither: '#C4883A',
+    factory: () => (geoCylindricalEqualArea().parallel(45) as unknown as GeoProjection).rotate([0, 0, 180]),
+  },
+  {
+    id: 'equal-earth',
+    fill: 'rgba(0,131,138, 0.07)',
+    outline: 'rgba(0,131,138, 0.18)',
+    dither: '#C46B50',
+    factory: () => geoEqualEarth().rotate([0, 0, 180]),
+  },
+  {
+    id: 'robinson',
+    fill: 'rgba(90,75,60, 0.06)',
+    outline: 'rgba(90,75,60, 0.15)',
+    dither: '#5A7A8A',
+    factory: () => geoRobinson().rotate([0, 0, 180]) as unknown as GeoProjection,
+  },
+  {
+    id: 'mollweide',
+    fill: 'rgba(0,120,191, 0.07)',
+    outline: 'rgba(0,120,191, 0.18)',
+    dither: '#C4883A',
+    factory: () => geoMollweide().rotate([0, 0, 180]),
+  },
+  {
+    id: 'dymaxion',
+    fill: 'rgba(0,131,138, 0.07)',
+    outline: 'rgba(0,131,138, 0.18)',
+    dither: '#C46B50',
+    factory: () => geoAirocean() as unknown as GeoProjection,
+  },
+  {
+    id: 'waterman',
+    fill: 'rgba(0,120,191, 0.07)',
+    outline: 'rgba(0,120,191, 0.18)',
+    dither: '#C4883A',
+    factory: () => geoPolyhedralWaterman().rotate([0, 0, 180]) as unknown as GeoProjection,
+  },
+  {
+    id: 'homolosine',
+    fill: 'rgba(90,75,60, 0.06)',
+    outline: 'rgba(90,75,60, 0.15)',
+    dither: '#5A7A8A',
+    factory: () => geoInterruptedHomolosine().rotate([0, 0, 180]) as unknown as GeoProjection,
+  },
+  {
+    id: 'azimuthal',
+    fill: 'rgba(0,131,138, 0.07)',
+    outline: 'rgba(0,131,138, 0.18)',
+    dither: '#C46B50',
+    factory: () => geoAzimuthalEquidistant().rotate([0, 0, 180]),
+  },
 ];
 
-/* ── Bayer 8x8 dither matrix (normalized 0-1) ── */
+/* ── Bayer 8×8 dither matrix (normalized 0–1) ── */
 
 const BAYER_8 = [
   [ 0/64, 48/64, 12/64, 60/64,  3/64, 51/64, 15/64, 63/64],
@@ -74,165 +130,6 @@ function loadGeoData() {
   return geoDataPromise;
 }
 
-/* ── Render projection to grayscale offscreen canvas ── */
-
-function renderGrayscale(
-  proj: GeoProjection,
-  w: number,
-  h: number,
-  land: any,
-  borders: any,
-  graticule: any,
-): HTMLCanvasElement {
-  const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext('2d')!;
-
-  proj.fitSize([w * 0.92, h * 0.92], { type: 'Sphere' })
-    .translate([w / 2, h / 2]);
-
-  const path = geoPath(proj, ctx);
-
-  // Black background
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, w, h);
-
-  // Ocean sphere
-  ctx.beginPath();
-  path({ type: 'Sphere' });
-  ctx.fillStyle = 'rgb(20,20,20)';
-  ctx.fill();
-
-  // Graticule
-  ctx.beginPath();
-  path(graticule);
-  ctx.strokeStyle = 'rgb(50,50,50)';
-  ctx.lineWidth = 0.5;
-  ctx.stroke();
-
-  // Land
-  ctx.beginPath();
-  path(land);
-  ctx.fillStyle = 'rgb(180,180,180)';
-  ctx.fill();
-
-  // Borders
-  ctx.beginPath();
-  path(borders);
-  ctx.strokeStyle = 'rgb(80,80,80)';
-  ctx.lineWidth = 0.4;
-  ctx.stroke();
-
-  // Coastlines
-  ctx.beginPath();
-  path(land);
-  ctx.strokeStyle = 'rgb(220,220,220)';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-
-  // Sphere outline
-  ctx.beginPath();
-  path({ type: 'Sphere' });
-  ctx.strokeStyle = 'rgb(150,150,150)';
-  ctx.lineWidth = 1.0;
-  ctx.stroke();
-
-  return canvas;
-}
-
-/* ── Spilhaus abstract fallback ── */
-
-function renderSpilhausFallback(w: number, h: number): HTMLCanvasElement {
-  const canvas = document.createElement('canvas');
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext('2d')!;
-
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, w, h);
-
-  // Ocean-centric radial gradient
-  const cx = w * 0.45, cy = h * 0.5;
-  const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, w * 0.6);
-  grad.addColorStop(0, 'rgb(160,160,160)');
-  grad.addColorStop(0.4, 'rgb(120,120,120)');
-  grad.addColorStop(0.7, 'rgb(60,60,60)');
-  grad.addColorStop(1, 'rgb(15,15,15)');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, w, h);
-
-  // Concentric ellipses suggesting ocean currents
-  ctx.strokeStyle = 'rgb(100,100,100)';
-  ctx.lineWidth = 0.8;
-  for (let r = 30; r < w * 0.55; r += 35) {
-    ctx.beginPath();
-    ctx.ellipse(cx, cy, r * 1.3, r, -0.2, 0, Math.PI * 2);
-    ctx.stroke();
-  }
-
-  // Small scattered land fragments at edges
-  ctx.fillStyle = 'rgb(40,40,40)';
-  const seeds = [[0.1, 0.15], [0.85, 0.2], [0.05, 0.8], [0.9, 0.75], [0.5, 0.05], [0.45, 0.95]];
-  for (const [sx, sy] of seeds) {
-    ctx.beginPath();
-    ctx.ellipse(sx * w, sy * h, 15 + Math.random() * 20, 10 + Math.random() * 15, Math.random() * Math.PI, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  return canvas;
-}
-
-/* ── Bayer dither: grayscale canvas → colored halftone dots ── */
-
-function bayerDither(
-  grayscale: HTMLCanvasElement,
-  visible: HTMLCanvasElement,
-  inkColor: string,
-  cellSize: number,
-): void {
-  const gW = grayscale.width;
-  const gH = grayscale.height;
-  const gCtx = grayscale.getContext('2d')!;
-  const imageData = gCtx.getImageData(0, 0, gW, gH);
-  const pixels = imageData.data;
-
-  const vW = visible.width;
-  const vH = visible.height;
-  const vCtx = visible.getContext('2d')!;
-  vCtx.clearRect(0, 0, vW, vH);
-
-  const scaleX = gW / vW;
-  const scaleY = gH / vH;
-  const dotRadius = cellSize * 0.38;
-
-  vCtx.fillStyle = inkColor;
-
-  const cols = Math.floor(vW / cellSize);
-  const rows = Math.floor(vH / cellSize);
-
-  for (let gy = 0; gy < rows; gy++) {
-    for (let gx = 0; gx < cols; gx++) {
-      // Sample center of cell in grayscale canvas
-      const sx = Math.floor((gx * cellSize + cellSize / 2) * scaleX);
-      const sy = Math.floor((gy * cellSize + cellSize / 2) * scaleY);
-      const idx = (sy * gW + sx) * 4;
-      const brightness = pixels[idx] / 255;
-
-      // Bayer threshold
-      const threshold = BAYER_8[gy % 8][gx % 8];
-
-      if (brightness > threshold) {
-        const cx = gx * cellSize + cellSize / 2;
-        const cy = gy * cellSize + cellSize / 2;
-        vCtx.beginPath();
-        vCtx.arc(cx, cy, dotRadius, 0, Math.PI * 2);
-        vCtx.fill();
-      }
-    }
-  }
-}
-
 /* ── Render a single card ── */
 
 function renderCard(
@@ -248,36 +145,118 @@ function renderCard(
   const w = parent.offsetWidth;
   const h = parent.offsetHeight;
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const cw = Math.round(w * dpr);
+  const ch = Math.round(h * dpr);
 
-  canvas.width = w * dpr;
-  canvas.height = h * dpr;
+  canvas.width = cw;
+  canvas.height = ch;
   canvas.style.width = w + 'px';
   canvas.style.height = h + 'px';
 
-  const cellSize = 4 * dpr;
+  const ctx = canvas.getContext('2d')!;
 
-  // Stage 1: grayscale projection
-  let grayscale: HTMLCanvasElement;
-  if (def.factory) {
-    try {
-      const proj = def.factory();
-      grayscale = renderGrayscale(proj, def.w, def.h, land, borders, graticule);
-    } catch {
-      grayscale = renderSpilhausFallback(def.w, def.h);
+  // Configure projection to fit canvas
+  const proj = def.factory();
+  proj.fitSize([cw * 0.86, ch * 0.86], { type: 'Sphere' })
+    .translate([cw / 2, ch / 2]);
+
+  /* ── Layer 1: Subtle vector fill + thin outline ── */
+
+  const path = geoPath(proj, ctx);
+
+  // Land fill (very subtle)
+  ctx.beginPath();
+  path(land);
+  ctx.fillStyle = def.fill;
+  ctx.fill();
+
+  // Coastline outlines (thin)
+  ctx.beginPath();
+  path(land);
+  ctx.strokeStyle = def.outline;
+  ctx.lineWidth = 0.7 * dpr;
+  ctx.stroke();
+
+  /* ── Layer 2: Bayer dither from grayscale source ── */
+
+  // Offscreen grayscale at same pixel resolution
+  const offscreen = document.createElement('canvas');
+  offscreen.width = cw;
+  offscreen.height = ch;
+  const offCtx = offscreen.getContext('2d')!;
+  const offPath = geoPath(proj, offCtx);
+
+  offCtx.fillStyle = '#000';
+  offCtx.fillRect(0, 0, cw, ch);
+
+  // Ocean sphere
+  offCtx.beginPath();
+  offPath({ type: 'Sphere' });
+  offCtx.fillStyle = 'rgb(15,15,15)';
+  offCtx.fill();
+
+  // Graticule
+  offCtx.beginPath();
+  offPath(graticule);
+  offCtx.strokeStyle = 'rgb(40,40,40)';
+  offCtx.lineWidth = 0.4;
+  offCtx.stroke();
+
+  // Land
+  offCtx.beginPath();
+  offPath(land);
+  offCtx.fillStyle = 'rgb(190,190,190)';
+  offCtx.fill();
+
+  // Borders
+  offCtx.beginPath();
+  offPath(borders);
+  offCtx.strokeStyle = 'rgb(80,80,80)';
+  offCtx.lineWidth = 0.4;
+  offCtx.stroke();
+
+  // Coastlines
+  offCtx.beginPath();
+  offPath(land);
+  offCtx.strokeStyle = 'rgb(230,230,230)';
+  offCtx.lineWidth = 1.2;
+  offCtx.stroke();
+
+  // Sample offscreen → draw dither dots on visible canvas
+  const cellSize = 3 * dpr;
+  const imageData = offCtx.getImageData(0, 0, cw, ch);
+  const pixels = imageData.data;
+  const dotRadius = cellSize * 0.36;
+
+  ctx.fillStyle = def.dither;
+
+  const cols = Math.floor(cw / cellSize);
+  const rows = Math.floor(ch / cellSize);
+
+  for (let gy = 0; gy < rows; gy++) {
+    for (let gx = 0; gx < cols; gx++) {
+      const cx = gx * cellSize + cellSize / 2;
+      const cy = gy * cellSize + cellSize / 2;
+      const px = Math.floor(cx);
+      const py = Math.floor(cy);
+      const idx = (py * cw + px) * 4;
+      const brightness = pixels[idx] / 255;
+      const threshold = BAYER_8[gy % 8][gx % 8];
+
+      if (brightness > threshold) {
+        ctx.beginPath();
+        ctx.arc(cx, cy, dotRadius, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
-  } else {
-    grayscale = renderSpilhausFallback(def.w, def.h);
   }
-
-  // Stage 2+3: Bayer dither → colored dots
-  bayerDither(grayscale, canvas, def.inkColor, cellSize);
 }
 
 /* ── Build lookup from id → def ── */
 
 const PROJ_MAP = new Map(PROJ_DEFS.map(d => [d.id, d]));
 
-/* ── Setup breathing animation via IntersectionObserver ── */
+/* ── Setup dither drift animation via IntersectionObserver ── */
 
 function setupAnimation(): void {
   const observer = new IntersectionObserver((entries) => {

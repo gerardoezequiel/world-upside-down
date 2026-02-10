@@ -1055,21 +1055,8 @@ section, .section-divider, .pull-quote, footer.colophon {
   margin-bottom: 3rem;
 }
 
-/* ── Tier label ── */
-.proj-tier-label {
-  grid-column: 1 / -1;
-  padding: 1.5rem 0 0.5rem;
-  border-bottom: 1px solid var(--gray-20);
-  color: var(--ink-light-gray);
-}
-
-/* ── Card grids ── */
-.proj-grid--essential {
-  grid-template-columns: repeat(3, 1fr);
-  border-top: 1px solid var(--gray-20);
-}
-
-.proj-grid--supporting {
+/* ── Card grid — single 3×3 ── */
+.proj-grid {
   grid-template-columns: repeat(3, 1fr);
   border-top: 1px solid var(--gray-20);
 }
@@ -1081,35 +1068,37 @@ section, .section-divider, .pull-quote, footer.colophon {
   border-right: 1px solid var(--gray-20);
   border-bottom: 1px solid var(--gray-20);
   overflow: hidden;
-  min-height: 220px;
+  min-height: 240px;
+  background: var(--bg-paper);
 }
 
-.proj-grid--essential .proj-card:nth-child(3n) { border-right: none; }
-.proj-grid--supporting .proj-card:nth-child(3n) { border-right: none; }
+.proj-grid .proj-card:nth-child(3n) { border-right: none; }
 
-/* ── Canvas overlay ── */
+/* ── Canvas layer ── */
 .proj-card-canvas {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
-  opacity: 0.15;
-  transition: opacity 0.3s;
+  transform-origin: center center;
+  will-change: transform;
 }
 
-@keyframes projCardBreathe {
-  0%, 100% { transform: scale(1.0);   opacity: 0.15; }
-  50%      { transform: scale(1.015); opacity: 0.22; }
+@keyframes projCardDrift {
+  0%, 100% { transform: scale(1.0)   translate(0, 0); }
+  33%      { transform: scale(1.02)  translate(0.5px, -0.5px); }
+  66%      { transform: scale(1.015) translate(-0.5px, 0.5px); }
 }
 
 .proj-card-canvas.animating {
-  animation: projCardBreathe 5s ease-in-out infinite;
+  animation: projCardDrift 8s ease-in-out infinite;
 }
 
 .proj-card:hover .proj-card-canvas {
-  opacity: 0.35;
-  animation: none;
+  animation-play-state: paused;
+  transform: scale(1.03);
+  transition: transform 0.3s ease;
 }
 
 /* ── Card text ── */
@@ -1952,10 +1941,12 @@ section, .section-divider, .pull-quote, footer.colophon {
   }
 
   /* Projections */
-  .proj-grid--essential,
-  .proj-grid--supporting {
+  .proj-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .proj-grid .proj-card:nth-child(3n) { border-right: 1px solid var(--gray-20); }
+  .proj-grid .proj-card:nth-child(2n) { border-right: none; }
 }
 
 /* ══════════════════════════════════════
@@ -2229,10 +2220,12 @@ section, .section-divider, .pull-quote, footer.colophon {
   }
 
   /* Projections */
-  .proj-grid--essential,
-  .proj-grid--supporting {
+  .proj-grid {
     grid-template-columns: 1fr;
   }
+
+  .proj-grid .proj-card:nth-child(3n),
+  .proj-grid .proj-card:nth-child(2n) { border-right: none; }
 
   .proj-card {
     min-height: 200px;

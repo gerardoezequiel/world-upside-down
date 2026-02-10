@@ -311,85 +311,68 @@ North.">
   <div class="page-grid">
     <div class="section-header">
       <span class="meta reveal">Beyond Mercator</span>
-      <h2 class="heading-lg reveal reveal-d1">Every projection is a compromise. These are the better ones.</h2>
+      <h2 class="heading-lg reveal reveal-d1">Every projection is a compromise. Here&rsquo;s what the compromise looks like.</h2>
     </div>
     <div class="projections-intro body reveal reveal-d2">
-      <p>No flat map can perfectly represent a sphere. But some projections prioritise fairness
-      over familiarity. These ten alternatives preserve area, eliminate hierarchy, or reimagine
-      the map altogether.</p>
+      <p>No flat map can perfectly represent a sphere. Mercator became the default through empire,
+      not merit. These nine projections show the range of what&rsquo;s possible when you question the frame.</p>
     </div>
   </div>
 
-  <!-- Essentials -->
-  <div class="proj-grid proj-grid--essential page-grid">
-    <div class="proj-card reveal" data-proj="gall-peters">
+  <div class="proj-grid page-grid">
+    <div class="proj-card reveal" data-proj="mercator">
+      <canvas class="proj-card-canvas" aria-hidden="true"></canvas>
+      <h3 class="heading-sm">Mercator</h3>
+      <span class="proj-card-meta meta">Cylindrical Conformal &middot; 1569</span>
+      <p class="body">The one everyone knows. The one that lies. Greenland appears the size of Africa. Europe sits at centre. Five centuries of colonial cartography baked into every classroom wall.</p>
+    </div>
+    <div class="proj-card reveal reveal-d1" data-proj="gall-peters">
       <canvas class="proj-card-canvas" aria-hidden="true"></canvas>
       <h3 class="heading-sm">Gall-Peters</h3>
       <span class="proj-card-meta meta">Equal-Area Cylindrical &middot; 1855</span>
-      <p class="body">The one that started the culture war. Ugly on purpose. Every stretched, distorted continent is an accusation. UNESCO adopted it. Nebraska made it law. You can&rsquo;t unsee it.</p>
+      <p class="body">The one that started the culture war. Ugly on purpose. Every stretched, distorted continent is an accusation. UNESCO adopted it. Nebraska made it law.</p>
     </div>
-    <div class="proj-card reveal reveal-d1" data-proj="equal-earth">
+    <div class="proj-card reveal reveal-d2" data-proj="equal-earth">
       <canvas class="proj-card-canvas" aria-hidden="true"></canvas>
       <h3 class="heading-sm">Equal Earth</h3>
       <span class="proj-card-meta meta">Pseudocylindrical &middot; 2018</span>
       <p class="body">The modern replacement. Equal-area like Peters but actually beautiful. If you&rsquo;re making one map for a dissertation or presentation, this is it.</p>
     </div>
-    <div class="proj-card reveal reveal-d1" data-proj="spilhaus">
+    <div class="proj-card reveal" data-proj="robinson">
       <canvas class="proj-card-canvas" aria-hidden="true"></canvas>
-      <h3 class="heading-sm">Spilhaus</h3>
-      <span class="proj-card-meta meta">Ocean-Centric &middot; 1942</span>
-      <p class="body">The most radical recentering possible. Land becomes margin, ocean becomes subject. One connected body of water. Recently installed floor-to-ceiling at the National Maritime Museum in Greenwich. Devastating for climate narratives.</p>
+      <h3 class="heading-sm">Robinson</h3>
+      <span class="proj-card-meta meta">Pseudocylindrical &middot; 1963</span>
+      <p class="body">The compromise projection. Neither equal-area nor conformal, but it looks right. National Geographic adopted it, then abandoned it. The acceptable middle ground.</p>
+    </div>
+    <div class="proj-card reveal reveal-d1" data-proj="mollweide">
+      <canvas class="proj-card-canvas" aria-hidden="true"></canvas>
+      <h3 class="heading-sm">Mollweide</h3>
+      <span class="proj-card-meta meta">Pseudocylindrical &middot; 1805</span>
+      <p class="body">The soft ellipse. Two centuries old, still the best shape for thematic data viz. Its oval frame quietly insists the world isn&rsquo;t a rectangle.</p>
     </div>
     <div class="proj-card reveal reveal-d2" data-proj="dymaxion">
       <canvas class="proj-card-canvas" aria-hidden="true"></canvas>
       <h3 class="heading-sm">Dymaxion</h3>
       <span class="proj-card-meta meta">Icosahedral &middot; Buckminster Fuller &middot; 1954</span>
-      <p class="body">No up, no down, no centre. An icosahedron unfolded. Fuller&rsquo;s argument: there is no north in space. Jasper Johns painted it. Uber&rsquo;s H3 grid uses its orientation. The triangles can be rearranged to tell different stories.</p>
+      <p class="body">No up, no down, no centre. An icosahedron unfolded. Fuller&rsquo;s argument: there is no north in space. Jasper Johns painted it. The triangles can be rearranged to tell different stories.</p>
     </div>
-    <div class="proj-card reveal reveal-d2" data-proj="waterman">
+    <div class="proj-card reveal" data-proj="waterman">
       <canvas class="proj-card-canvas" aria-hidden="true"></canvas>
       <h3 class="heading-sm">Waterman Butterfly</h3>
       <span class="proj-card-meta meta">Polyhedral &middot; Steve Waterman &middot; 1996</span>
-      <p class="body">The most beautiful projection, full stop. A truncated octahedron unfolded into a butterfly shape. Minimal distortion everywhere. The map as aesthetic provocation: why must the world be a rectangle?</p>
+      <p class="body">The most beautiful projection, full stop. A truncated octahedron unfolded into a butterfly shape. Minimal distortion everywhere. The map as aesthetic provocation.</p>
     </div>
-  </div>
-
-  <!-- Tier label -->
-  <div class="page-grid">
-    <div class="proj-tier-label meta reveal">The Supporting Cast</div>
-  </div>
-
-  <!-- Supporting Cast -->
-  <div class="proj-grid proj-grid--supporting page-grid">
-    <div class="proj-card proj-card--sm reveal" data-proj="hobo-dyer">
-      <canvas class="proj-card-canvas" aria-hidden="true"></canvas>
-      <h3 class="heading-sm">Hobo-Dyer</h3>
-      <span class="proj-card-meta meta">Equal-Area Cylindrical &middot; 2002</span>
-      <p class="body">Born south-up. Designed explicitly as a consciousness-raising tool. Distributed by ODT Maps for classrooms.</p>
-    </div>
-    <div class="proj-card proj-card--sm reveal reveal-d1" data-proj="homolosine">
+    <div class="proj-card reveal reveal-d1" data-proj="homolosine">
       <canvas class="proj-card-canvas" aria-hidden="true"></canvas>
       <h3 class="heading-sm">Goode&rsquo;s Homolosine</h3>
       <span class="proj-card-meta meta">Interrupted &middot; 1923</span>
       <p class="body">The globe peeled like an orange. The interruptions are the message: every projection involves cutting, and where you cut reveals what you value.</p>
     </div>
-    <div class="proj-card proj-card--sm reveal reveal-d1" data-proj="azimuthal">
+    <div class="proj-card reveal reveal-d2" data-proj="azimuthal">
       <canvas class="proj-card-canvas" aria-hidden="true"></canvas>
       <h3 class="heading-sm">Azimuthal Equidistant</h3>
       <span class="proj-card-meta meta">Azimuthal &middot; c. 1000 CE</span>
       <p class="body">The counter-mapping weapon. Centre it on any community and the world radiates outward from their perspective. Used on the UN flag and in Indigenous cartography.</p>
-    </div>
-    <div class="proj-card proj-card--sm reveal reveal-d2" data-proj="authagraph">
-      <canvas class="proj-card-canvas" aria-hidden="true"></canvas>
-      <h3 class="heading-sm">AuthaGraph</h3>
-      <span class="proj-card-meta meta">Tetrahedral &middot; Hajime Narukawa &middot; 1999</span>
-      <p class="body">No centre, near-equal-area, infinitely tileable. Won Japan&rsquo;s Good Design Award. The world with no edges and no hierarchy.</p>
-    </div>
-    <div class="proj-card proj-card--sm reveal reveal-d2" data-proj="mollweide">
-      <canvas class="proj-card-canvas" aria-hidden="true"></canvas>
-      <h3 class="heading-sm">Mollweide</h3>
-      <span class="proj-card-meta meta">Pseudocylindrical &middot; 1805</span>
-      <p class="body">The soft ellipse. Two centuries old, still the best shape for thematic data viz. Its oval frame quietly insists the world isn&rsquo;t a rectangle.</p>
     </div>
   </div>
 </section>
