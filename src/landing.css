@@ -1081,19 +1081,25 @@ section, .section-divider, .pull-quote, footer.colophon {
 
 .proj-grid .proj-card:nth-child(3n) { border-right: none; }
 
-/* ── Text readability gradient — sits between canvas and text ── */
+/* ── Hover gradient — reveals on interaction ── */
 .proj-card::before {
   content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(248,246,241, 0.15) 0%,
-    rgba(248,246,241, 0.55) 30%,
-    rgba(248,246,241, 0.85) 55%
+    transparent 0%,
+    rgba(248,246,241, 0.65) 30%,
+    rgba(248,246,241, 0.93) 55%
   );
   z-index: 1;
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.proj-card:hover::before {
+  opacity: 1;
 }
 
 /* ── Canvas layer ── */
@@ -1130,6 +1136,10 @@ section, .section-divider, .pull-quote, footer.colophon {
   position: relative;
   z-index: 2;
   margin-bottom: 4px;
+  text-shadow:
+    0 0 10px var(--paper),
+    0 0 20px var(--paper),
+    0 0 30px var(--paper);
 }
 
 .proj-card-meta {
@@ -1137,6 +1147,9 @@ section, .section-divider, .pull-quote, footer.colophon {
   z-index: 2;
   display: block;
   margin-bottom: 1rem;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.3s ease 0.05s, transform 0.3s ease 0.05s;
 }
 
 .proj-card .body {
@@ -1144,6 +1157,15 @@ section, .section-divider, .pull-quote, footer.colophon {
   z-index: 2;
   font-size: 0.8125rem;
   line-height: 1.55;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.3s ease 0.12s, transform 0.3s ease 0.12s;
+}
+
+.proj-card:hover .proj-card-meta,
+.proj-card:hover .body {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* ══════════════════════════════════════
@@ -2253,6 +2275,14 @@ section, .section-divider, .pull-quote, footer.colophon {
 
   .proj-card {
     min-height: 200px;
+  }
+
+  /* No hover on mobile — show all text */
+  .proj-card::before { opacity: 1; }
+  .proj-card-meta,
+  .proj-card .body {
+    opacity: 1;
+    transform: none;
   }
 
   /* Colophon */
