@@ -1076,10 +1076,25 @@ section, .section-divider, .pull-quote, footer.colophon {
   border-bottom: 1px solid var(--gray-20);
   overflow: hidden;
   min-height: 240px;
-  background: var(--bg-paper);
+  background: var(--paper);
 }
 
 .proj-grid .proj-card:nth-child(3n) { border-right: none; }
+
+/* ── Text readability gradient — sits between canvas and text ── */
+.proj-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(248,246,241, 0.15) 0%,
+    rgba(248,246,241, 0.55) 30%,
+    rgba(248,246,241, 0.85) 55%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
 
 /* ── Canvas layer ── */
 .proj-card-canvas {
@@ -1088,18 +1103,20 @@ section, .section-divider, .pull-quote, footer.colophon {
   width: 100%;
   height: 100%;
   pointer-events: none;
+  z-index: 0;
   transform-origin: center center;
   will-change: transform;
 }
 
 @keyframes projCardDrift {
   0%, 100% { transform: scale(1.0)   translate(0, 0); }
-  33%      { transform: scale(1.02)  translate(0.5px, -0.5px); }
-  66%      { transform: scale(1.015) translate(-0.5px, 0.5px); }
+  25%      { transform: scale(1.02)  translate(0.8px, -0.5px); }
+  50%      { transform: scale(1.01)  translate(-0.3px, 0.8px); }
+  75%      { transform: scale(1.025) translate(-0.6px, -0.3px); }
 }
 
 .proj-card-canvas.animating {
-  animation: projCardDrift 8s ease-in-out infinite;
+  animation: projCardDrift 7s ease-in-out infinite;
 }
 
 .proj-card:hover .proj-card-canvas {
@@ -1111,20 +1128,20 @@ section, .section-divider, .pull-quote, footer.colophon {
 /* ── Card text ── */
 .proj-card .heading-sm {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   margin-bottom: 4px;
 }
 
 .proj-card-meta {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: block;
   margin-bottom: 1rem;
 }
 
 .proj-card .body {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   font-size: 0.8125rem;
   line-height: 1.55;
 }

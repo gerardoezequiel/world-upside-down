@@ -227,6 +227,8 @@ function renderCard(
   const imageData = offCtx.getImageData(0, 0, cw, ch);
   const pixels = imageData.data;
   const dotRadius = cellSize * 0.36;
+  const offX = 1.5 * dpr;   // riso misregistration offset
+  const offY = 1.0 * dpr;
 
   ctx.fillStyle = def.dither;
 
@@ -244,12 +246,21 @@ function renderCard(
       const threshold = BAYER_8[gy % 8][gx % 8];
 
       if (brightness > threshold) {
+        // Misregistered echo (drawn first, behind main dot)
+        ctx.globalAlpha = 0.25;
+        ctx.beginPath();
+        ctx.arc(cx + offX, cy + offY, dotRadius * 0.85, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Main dither dot
+        ctx.globalAlpha = 1.0;
         ctx.beginPath();
         ctx.arc(cx, cy, dotRadius, 0, Math.PI * 2);
         ctx.fill();
       }
     }
   }
+  ctx.globalAlpha = 1.0;
 }
 
 /* ── Build lookup from id → def ── */
