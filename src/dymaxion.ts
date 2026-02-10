@@ -101,7 +101,7 @@ export async function initDymaxion(container: HTMLElement): Promise<DymaxionCont
       canvas.style.display = 'none';
       return;
     }
-    canvas.style.display = '';
+    canvas.style.display = 'block';
     canvas.style.opacity = String(t);
     if (!rendered) {
       sizeCanvas();
