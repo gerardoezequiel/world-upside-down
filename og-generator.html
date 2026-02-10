@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OG Image — Upside Down</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Mono:wght@0,400;0,700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: sans-serif;
+  }
+
+  .og {
+    width: 1200px;
+    height: 630px;
+    background: #1A1A2E;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── Risograph halftone texture ── */
+  .og::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(250, 250, 246, 0.03) 1px, transparent 1px);
+    background-size: 4px 4px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ── Subtle paper grain ── */
+  .og::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.025;
+    background-image:
+      repeating-linear-gradient(
+        0deg,
+        transparent, transparent 2px,
+        rgba(139, 125, 107, 0.4) 2px,
+        rgba(139, 125, 107, 0.4) 3px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        transparent, transparent 3px,
+        rgba(139, 125, 107, 0.3) 3px,
+        rgba(139, 125, 107, 0.3) 4px
+      );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .og-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* ── Main title ── */
+  .og-title {
+    font-family: 'Instrument Serif', serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 128px;
+    line-height: 0.88;
+    color: #FAFAF6;
+    letter-spacing: -0.02em;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .og-title .word-upside {
+    display: block;
+  }
+
+  .og-title .word-down {
+    display: inline-block;
+    transform: rotate(180deg);
+    color: #E87461;
+  }
+
+  /* ── Subtitle ── */
+  .og-subtitle {
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: #8A7E6E;
+    margin-top: 36px;
+    font-variant: small-caps;
+  }
+
+  /* ── Tagline ── */
+  .og-tagline {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 400;
+    color: rgba(250, 250, 246, 0.5);
+    margin-top: 20px;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── Compass rose ── */
+  .compass {
+    position: absolute;
+    bottom: 44px;
+    right: 64px;
+    z-index: 2;
+    opacity: 0.8;
+  }
+
+  .compass svg {
+    width: 64px;
+    height: 64px;
+  }
+
+  /* ── Decorative lines ── */
+  .rule-top, .rule-bottom {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #E87461;
+    z-index: 2;
+  }
+
+  .rule-top { top: 0; }
+  .rule-bottom { bottom: 0; }
+
+  /* ── Corner marks (cartographic registration marks) ── */
+  .corner-mark {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    z-index: 2;
+  }
+
+  .corner-mark::before,
+  .corner-mark::after {
+    content: '';
+    position: absolute;
+    background: rgba(232, 116, 97, 0.35);
+  }
+
+  .corner-mark::before {
+    width: 1px;
+    height: 20px;
+    top: 0;
+  }
+
+  .corner-mark::after {
+    width: 20px;
+    height: 1px;
+    left: 0;
+  }
+
+  .corner-tl { top: 24px; left: 24px; }
+  .corner-tl::before { left: 0; }
+  .corner-tl::after { top: 0; }
+
+  .corner-tr { top: 24px; right: 24px; }
+  .corner-tr::before { right: 0; }
+  .corner-tr::after { right: 0; }
+
+  .corner-bl { bottom: 24px; left: 24px; }
+  .corner-bl::before { left: 0; bottom: 0; top: auto; }
+  .corner-bl::after { bottom: 0; }
+
+  .corner-br { bottom: 24px; right: 24px; }
+  .corner-br::before { right: 0; bottom: 0; top: auto; }
+  .corner-br::after { right: 0; bottom: 0; }
+
+  /* ── Overline label ── */
+  .og-overline {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #E87461;
+    margin-bottom: 32px;
+    opacity: 0.7;
+  }
+
+  /* ── Bottom left attribution ── */
+  .og-attribution {
+    position: absolute;
+    bottom: 28px;
+    left: 40px;
+    z-index: 2;
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(138, 126, 110, 0.5);
+  }
+</style>
+</head>
+<body>
+
+<div class="og">
+  <!-- Coral border lines -->
+  <div class="rule-top"></div>
+  <div class="rule-bottom"></div>
+
+  <!-- Cartographic registration marks -->
+  <div class="corner-mark corner-tl"></div>
+  <div class="corner-mark corner-tr"></div>
+  <div class="corner-mark corner-bl"></div>
+  <div class="corner-mark corner-br"></div>
+
+  <!-- Content -->
+  <div class="og-content">
+    <div class="og-overline">A Cartographic Provocation</div>
+
+    <div class="og-title">
+      <span class="word-upside">UPSIDE</span>
+      <span class="word-down">DOWN</span>
+    </div>
+
+    <div class="og-subtitle">A South-Up World Map</div>
+
+    <div class="og-tagline">The world looks different from here. That's the point.</div>
+  </div>
+
+  <!-- Compass rose -->
+  <div class="compass">
+    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Outer ring -->
+      <circle cx="32" cy="32" r="28" stroke="#E87461" stroke-width="0.75" opacity="0.3"/>
+      <circle cx="32" cy="32" r="22" stroke="#E87461" stroke-width="0.5" opacity="0.15"/>
+
+      <!-- Cross hairs (thin) -->
+      <line x1="32" y1="2" x2="32" y2="14" stroke="#8A7E6E" stroke-width="0.5" opacity="0.3"/>
+      <line x1="32" y1="50" x2="32" y2="62" stroke="#8A7E6E" stroke-width="0.5" opacity="0.3"/>
+      <line x1="2" y1="32" x2="14" y2="32" stroke="#8A7E6E" stroke-width="0.5" opacity="0.3"/>
+      <line x1="50" y1="32" x2="62" y2="32" stroke="#8A7E6E" stroke-width="0.5" opacity="0.3"/>
+
+      <!-- Main arrow — south points UP (flipped compass) -->
+      <!-- South arrow (pointing up, filled coral) -->
+      <polygon points="32,6 35,26 32,24 29,26" fill="#E87461" opacity="0.9"/>
+      <!-- North arrow (pointing down, outline only) -->
+      <polygon points="32,58 35,38 32,40 29,38" fill="none" stroke="#FAFAF6" stroke-width="0.75" opacity="0.35"/>
+
+      <!-- East/West small ticks -->
+      <polygon points="58,32 38,35 40,32 38,29" fill="none" stroke="#8A7E6E" stroke-width="0.5" opacity="0.25"/>
+      <polygon points="6,32 26,35 24,32 26,29" fill="none" stroke="#8A7E6E" stroke-width="0.5" opacity="0.25"/>
+
+      <!-- S label at top (south is up!) -->
+      <text x="32" y="13" text-anchor="middle" font-family="'Space Mono', monospace" font-size="5" font-weight="700" fill="#E87461" letter-spacing="0.05em" opacity="0.8">S</text>
+      <!-- N label at bottom -->
+      <text x="32" y="56" text-anchor="middle" font-family="'Space Mono', monospace" font-size="5" font-weight="700" fill="#FAFAF6" letter-spacing="0.05em" opacity="0.3">N</text>
+    </svg>
+  </div>
+
+  <!-- Attribution -->
+  <div class="og-attribution">world-upside-down.vercel.app</div>
+</div>
+
+</body>
+</html>

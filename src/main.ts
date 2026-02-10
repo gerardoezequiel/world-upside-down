@@ -466,6 +466,7 @@ function updateCityTitle(map: maplibregl.Map): void {
 /* ── Orientation state ────────────────────────────────────── */
 type Orientation = 'upside-down' | 'normal' | 'mirrored';
 let orientation: Orientation = 'upside-down';
+let bearingLocked = true; // disable during programmatic orientation changes
 
 const toastMessages: Record<Orientation, string[]> = {
   'normal': [
@@ -535,13 +536,13 @@ function applyOrientation(map: maplibregl.Map, target: Orientation): void {
 
   if (needsBearingChange) {
     const targetBearing = target === 'upside-down' ? 180 : 0;
-    map.dragRotate.enable();
+    bearingLocked = false; // allow animation
     map.easeTo({
       bearing: targetBearing,
       duration: 1200,
       easing: (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
     });
-    setTimeout(() => map.dragRotate.disable(), 1300);
+    setTimeout(() => { bearingLocked = true; }, 1300);
   }
 
   // If coming from mirror or going to mirror, handle the CSS mirror
@@ -551,14 +552,14 @@ function applyOrientation(map: maplibregl.Map, target: Orientation): void {
   if (target === 'mirrored' && prev !== 'mirrored') {
     // If we were upside-down, first reset bearing to 0
     if (prev === 'upside-down') {
-      map.dragRotate.enable();
+      bearingLocked = false;
       map.easeTo({
         bearing: 0,
         duration: 1200,
         easing: (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
       });
       setTimeout(() => {
-        map.dragRotate.disable();
+        bearingLocked = true;
         mapEl?.classList.add('mirrored');
       }, 1200);
     } else {
@@ -643,7 +644,9 @@ function setupFlip(map: maplibregl.Map): void {
     btn.addEventListener('click', () => {
       const orient = (btn as HTMLElement).dataset.orient as Orientation;
       if (orient) {
-        applyOrientation(map, orient);
+        // Toggle: if already in this orientation, go back to upside-down
+        const target = orientation === orient ? 'upside-down' : orient;
+        applyOrientation(map, target);
         updateFlipButtons();
       }
     });
@@ -952,11 +955,15 @@ async function init() {
 
   // Lock bearing so user can't accidentally rotate back
   map.dragRotate.disable();
-  map.keyboard.disable();
-  map.touchZoomRotate.disableRotation();
 
-  // Re-enable keyboard for zoom/pan only
-  map.keyboard.enable();
+  // Lock rotation via bearing snap (keeps pinch zoom working properly)
+  map.on('rotate', () => {
+    if (!bearingLocked) return;
+    const expected = orientation === 'upside-down' ? 180 : 0;
+    if (orientation !== 'mirrored' && Math.abs(map.getBearing() - expected) > 0.5) {
+      map.setBearing(expected);
+    }
+  });
 
   // ── Wire up cartographic UI ──
   map.on('load', () => {
@@ -1007,11 +1014,34 @@ async function init() {
     setTimeout(async () => {
       if (searchHintCancelled || !twEl || !twText) return;
 
-      const messages = [
-        { text: 'Did you get lost?', pause: 1800 },
-        { text: "That's normal.", pause: 1600 },
-        { text: 'Tap the title to search.', pause: 3000 },
+      const sequences = [
+        [
+          { text: 'Did you get lost?', pause: 1800 },
+          { text: "Good. That's the whole point.", pause: 2000 },
+          { text: 'Tap the title to search.', pause: 3000 },
+        ],
+        [
+          { text: 'Nothing looks familiar?', pause: 1800 },
+          { text: 'Congratulations, you broke your brain.', pause: 2200 },
+          { text: 'Tap the title to find yourself.', pause: 3000 },
+        ],
+        [
+          { text: "Where's your country?", pause: 1800 },
+          { text: 'Exactly.', pause: 1600 },
+          { text: 'Tap the title to search.', pause: 3000 },
+        ],
+        [
+          { text: 'Feeling disoriented?', pause: 1800 },
+          { text: 'Fun fact: "orient" means east, not north.', pause: 2400 },
+          { text: 'Tap the title to search.', pause: 3000 },
+        ],
+        [
+          { text: 'Lost already?', pause: 1600 },
+          { text: "Your GPS is having an existential crisis too.", pause: 2200 },
+          { text: 'Tap the title to search.', pause: 3000 },
+        ],
       ];
+      const messages = sequences[Math.floor(Math.random() * sequences.length)];
 
       for (const msg of messages) {
         if (searchHintCancelled) return;

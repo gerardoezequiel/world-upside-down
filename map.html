@@ -3,7 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Upside Down</title>
+  <title>Upside Down — A South-Up World Map</title>
+  <meta name="description" content="The world looks different from here. An interactive south-up map that questions why north is always on top." />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Upside Down — A South-Up World Map" />
+  <meta property="og:description" content="North is not a fact. It is a decision. Explore the world with south on top." />
+  <meta property="og:image" content="/og-image.png" />
+  <meta property="og:url" content="https://world-upside-down.vercel.app/map" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Upside Down — A South-Up World Map" />
+  <meta name="twitter:description" content="North is not a fact. It is a decision. Explore the world with south on top." />
+  <meta name="twitter:image" content="/og-image.png" />
+
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/src/style.css" />
 </head>
@@ -43,25 +58,19 @@
     <!-- ── Typewriter search hint ── -->
     <div id="search-typewriter"><span id="typewriter-text"></span></div>
 
-    <!-- ── Flip hint (desktop) ── -->
-    <div id="flip-hint">
-      <kbd>&uarr;</kbd>
-      <span>normal</span>
-      <span class="coord-sep">&middot;</span>
-      <kbd>&darr;</kbd>
-      <span>upside down</span>
-      <span class="coord-sep">&middot;</span>
-      <kbd>&rarr;</kbd>
-      <span>mirror</span>
+    <!-- ── Map attribution overlay ── -->
+    <div id="map-attribution">
+      South-up Mercator projection<br>
+      Protomaps &middot; OpenStreetMap
     </div>
 
     <!-- ── Touch controls (mobile) — two flip buttons ── -->
     <div class="touch-controls" id="touch-controls">
-      <button class="flip-btn" data-orient="upside-down" aria-label="Upside down">
-        <span class="flip-btn-arrow">&#8595;</span>
-      </button>
       <button class="flip-btn" data-orient="normal" aria-label="Normal orientation">
         <span class="flip-btn-arrow">&#8593;</span>
+      </button>
+      <button class="flip-btn" data-orient="mirrored" aria-label="Mirror">
+        <span class="flip-btn-arrow">&#8594;</span>
       </button>
     </div>
   </div>
@@ -124,10 +133,16 @@
       </div>
     </div>
 
-    <!-- Source -->
-    <div class="source-text">
-      South-up Mercator projection<br>
-      Protomaps &middot; OpenStreetMap
+    <!-- Flip hint (desktop) — in bottom band -->
+    <div id="flip-hint">
+      <kbd>&uarr;</kbd>
+      <span>normal</span>
+      <span class="coord-sep">&middot;</span>
+      <kbd>&darr;</kbd>
+      <span>upside down</span>
+      <span class="coord-sep">&middot;</span>
+      <kbd>&rarr;</kbd>
+      <span>mirror</span>
     </div>
 
     <!-- Links -->
