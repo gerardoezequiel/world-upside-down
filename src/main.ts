@@ -787,8 +787,7 @@ function setupGeocoder(map: maplibregl.Map): void {
 
 /* ── Dynamic Graticule ────────────────────────────────────── */
 function addGraticule(map: maplibregl.Map): void {
-  const GRAT_COLOR = 'rgba(107, 168, 189, 0.55)';  // light blue, OS-style
-  const LABEL_COLOR = '#5A9BB0';
+  const GRAT_COLOR = 'rgba(107, 168, 189, 0.55)';
 
   function getInterval(zoom: number): number {
     if (zoom >= 10) return 1;
@@ -802,65 +801,16 @@ function addGraticule(map: maplibregl.Map): void {
   function buildGraticuleGeoJSON(interval: number): GeoJSON.FeatureCollection {
     const features: GeoJSON.Feature[] = [];
 
-    // Meridians (longitude lines)
     for (let lon = -180; lon <= 180; lon += interval) {
       const coords: [number, number][] = [];
-      for (let lat = -85; lat <= 85; lat += 2) {
-        coords.push([lon, lat]);
-      }
-      features.push({
-        type: 'Feature',
-        properties: { type: 'line' },
-        geometry: { type: 'LineString', coordinates: coords },
-      });
+      for (let lat = -85; lat <= 85; lat += 2) coords.push([lon, lat]);
+      features.push({ type: 'Feature', properties: { type: 'line' }, geometry: { type: 'LineString', coordinates: coords } });
     }
 
-    // Parallels (latitude lines)
     for (let lat = -80; lat <= 80; lat += interval) {
       const coords: [number, number][] = [];
-      for (let lon = -180; lon <= 180; lon += 2) {
-        coords.push([lon, lat]);
-      }
-      features.push({
-        type: 'Feature',
-        properties: { type: 'line' },
-        geometry: { type: 'LineString', coordinates: coords },
-      });
-    }
-
-    return { type: 'FeatureCollection', features };
-  }
-
-  function buildLabelGeoJSON(interval: number): GeoJSON.FeatureCollection {
-    const features: GeoJSON.Feature[] = [];
-
-    // Latitude labels — placed at right edge of view
-    for (let lat = -80; lat <= 80; lat += interval) {
-      if (lat === 0) {
-        features.push({
-          type: 'Feature',
-          properties: { label: '0° Eq' },
-          geometry: { type: 'Point', coordinates: [0, 0] },
-        });
-      } else {
-        const dir = lat > 0 ? 'N' : 'S';
-        features.push({
-          type: 'Feature',
-          properties: { label: `${Math.abs(lat)}°${dir}` },
-          geometry: { type: 'Point', coordinates: [0, lat] },
-        });
-      }
-    }
-
-    // Longitude labels — placed at equator
-    for (let lon = -180; lon <= 180; lon += interval) {
-      if (lon === 0) continue; // skip duplicate at equator
-      const dir = lon > 0 ? 'E' : 'W';
-      features.push({
-        type: 'Feature',
-        properties: { label: `${Math.abs(lon)}°${dir}` },
-        geometry: { type: 'Point', coordinates: [lon, 0] },
-      });
+      for (let lon = -180; lon <= 180; lon += 2) coords.push([lon, lat]);
+      features.push({ type: 'Feature', properties: { type: 'line' }, geometry: { type: 'LineString', coordinates: coords } });
     }
 
     return { type: 'FeatureCollection', features };
@@ -868,15 +818,10 @@ function addGraticule(map: maplibregl.Map): void {
 
   let currentInterval = getInterval(map.getZoom());
 
-  // Add source and layers
+  // ── Graticule lines (MapLibre layer) ──
   map.addSource('graticule', {
     type: 'geojson',
     data: buildGraticuleGeoJSON(currentInterval),
-  });
-
-  map.addSource('graticule-labels', {
-    type: 'geojson',
-    data: buildLabelGeoJSON(currentInterval),
   });
 
   map.addLayer({
@@ -887,51 +832,76 @@ function addGraticule(map: maplibregl.Map): void {
       'line-color': GRAT_COLOR,
       'line-width': [
         'interpolate', ['linear'], ['zoom'],
-        1, 0.6,
-        5, 0.9,
-        10, 1.2,
-        14, 1.5,
+        1, 0.6, 5, 0.9, 10, 1.2, 14, 1.5,
       ],
     },
   });
 
-  map.addLayer({
-    id: 'graticule-labels',
-    type: 'symbol',
-    source: 'graticule-labels',
-    layout: {
-      'text-field': ['get', 'label'],
-      'text-font': ['Noto Sans Regular'],
-      'text-size': [
-        'interpolate', ['linear'], ['zoom'],
-        1, 8,
-        5, 9,
-        10, 10,
-      ],
-      'text-anchor': 'center',
-      'text-allow-overlap': false,
-      'text-ignore-placement': false,
-      'text-padding': 4,
-    },
-    paint: {
-      'text-color': LABEL_COLOR,
-      'text-opacity': 0.85,
-      'text-halo-color': 'rgba(237, 232, 224, 0.85)',
-      'text-halo-width': 1.4,
-    },
-  });
-
-  // Update on zoom
+  // Update line density on zoom
   map.on('zoomend', () => {
     const newInterval = getInterval(map.getZoom());
     if (newInterval !== currentInterval) {
       currentInterval = newInterval;
-      const lineSource = map.getSource('graticule') as maplibregl.GeoJSONSource;
-      const labelSource = map.getSource('graticule-labels') as maplibregl.GeoJSONSource;
-      if (lineSource) lineSource.setData(buildGraticuleGeoJSON(currentInterval));
-      if (labelSource) labelSource.setData(buildLabelGeoJSON(currentInterval));
+      const src = map.getSource('graticule') as maplibregl.GeoJSONSource;
+      if (src) src.setData(buildGraticuleGeoJSON(currentInterval));
     }
   });
+
+  // ── Edge labels (HTML overlay — nautical chart style) ──
+  const labelContainer = document.getElementById('grat-edge-labels');
+  let rafId = 0;
+
+  function updateEdgeLabels() {
+    if (!labelContainer) return;
+
+    const interval = getInterval(map.getZoom());
+    const bounds = map.getBounds();
+    const center = map.getCenter();
+    const el = map.getContainer();
+    const w = el.clientWidth;
+    const h = el.clientHeight;
+    const PAD = 6;
+
+    let html = '';
+
+    // Longitude labels along top & bottom edges
+    const lonW = bounds.getWest();
+    const lonE = bounds.getEast();
+    const lonStart = Math.ceil(lonW / interval) * interval;
+    const lonEnd = Math.floor(lonE / interval) * interval;
+
+    for (let lon = lonStart; lon <= lonEnd; lon += interval) {
+      const px = map.project([lon, center.lat]);
+      if (px.x < 36 || px.x > w - 36) continue;
+      const label = lon === 0 ? '0°' : `${Math.abs(lon)}°${lon > 0 ? 'E' : 'W'}`;
+      html += `<span class="grat-label grat-lon" style="left:${px.x}px;top:${PAD}px">${label}</span>`;
+      html += `<span class="grat-label grat-lon" style="left:${px.x}px;bottom:${PAD}px">${label}</span>`;
+    }
+
+    // Latitude labels along left & right edges
+    const latMin = Math.min(bounds.getSouth(), bounds.getNorth());
+    const latMax = Math.max(bounds.getSouth(), bounds.getNorth());
+    const latStart = Math.ceil(latMin / interval) * interval;
+    const latEnd = Math.floor(latMax / interval) * interval;
+
+    for (let lat = latStart; lat <= latEnd; lat += interval) {
+      if (lat < -85 || lat > 85) continue;
+      const px = map.project([center.lng, lat]);
+      if (px.y < 18 || px.y > h - 18) continue;
+      const label = lat === 0 ? '0°' : `${Math.abs(lat)}°${lat > 0 ? 'N' : 'S'}`;
+      html += `<span class="grat-label grat-lat" style="top:${px.y}px;left:${PAD}px">${label}</span>`;
+      html += `<span class="grat-label grat-lat" style="top:${px.y}px;right:${PAD}px">${label}</span>`;
+    }
+
+    labelContainer.innerHTML = html;
+  }
+
+  map.on('move', () => {
+    cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(updateEdgeLabels);
+  });
+
+  updateEdgeLabels();
 }
 
 /* ── Init ──────────────────────────────────────────────────── */
@@ -956,12 +926,12 @@ async function init() {
   // Lock bearing so user can't accidentally rotate back
   map.dragRotate.disable();
 
-  // Lock rotation via bearing snap (keeps pinch zoom working properly)
-  map.on('rotate', () => {
+  // Snap bearing back AFTER gestures complete (not during — so pinch zoom works)
+  map.on('moveend', () => {
     if (!bearingLocked) return;
     const expected = orientation === 'upside-down' ? 180 : 0;
-    if (orientation !== 'mirrored' && Math.abs(map.getBearing() - expected) > 0.5) {
-      map.setBearing(expected);
+    if (orientation !== 'mirrored' && Math.abs(map.getBearing() - expected) > 0.1) {
+      map.easeTo({ bearing: expected, duration: 200 });
     }
   });
 
