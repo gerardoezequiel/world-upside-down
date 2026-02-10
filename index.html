@@ -47,12 +47,12 @@
 
 <!-- ── Page index — fixed right-side nav with riso ink colors ── -->
 <nav class="page-index" aria-label="Page sections">
-  <a href="#orientation" class="page-index-item" data-section="orientation" data-ink="black">
-    <span class="page-index-label">Orientation</span>
-    <span class="page-index-dot"></span>
-  </a>
   <a href="#scandal" class="page-index-item" data-section="scandal" data-ink="blue">
     <span class="page-index-label">Blue Marble</span>
+    <span class="page-index-dot"></span>
+  </a>
+  <a href="#orientation" class="page-index-item" data-section="orientation" data-ink="black">
+    <span class="page-index-label">Orientation</span>
     <span class="page-index-dot"></span>
   </a>
   <a href="#mercator" class="page-index-item" data-section="mercator" data-ink="teal">
@@ -77,6 +77,10 @@
   </a>
   <a href="#psychology" class="page-index-item" data-section="psychology" data-ink="gray">
     <span class="page-index-label">Psychology</span>
+    <span class="page-index-dot"></span>
+  </a>
+  <a href="#voices" class="page-index-item" data-section="voices" data-ink="teal">
+    <span class="page-index-label">Voices</span>
     <span class="page-index-dot"></span>
   </a>
   <a href="#movement" class="page-index-item" data-section="movement" data-ink="black">
@@ -128,6 +132,49 @@ North.">
 <div class="section-divider"></div>
 
 <!-- ==========================================
+     BLUE MARBLE — The photograph that was flipped
+     ========================================== -->
+<section class="marble-section" id="scandal">
+  <div class="page-grid">
+    <div class="section-header">
+      <span class="meta reveal">The Blue Marble</span>
+      <h2 class="heading-lg reveal reveal-d1">The most famous photograph of Earth was taken upside down.</h2>
+    </div>
+
+    <div class="marble-body body reveal reveal-d1">
+      <p>
+        On 7 December 1972, the crew of Apollo 17 photographed the whole Earth
+        from 29,400 km. In the original frame, Antarctica gleams white at the top.
+        Africa stretches to the right. A cyclone churns in the Indian Ocean.
+        This is what Earth actually looks like from that angle.
+      </p>
+      <p>
+        NASA rotated the image 180&deg; before releasing it. South-up felt &ldquo;wrong.&rdquo;
+        The planet itself had to be corrected to match our maps.
+      </p>
+      <p>
+        No one has been far enough from Earth to take this photograph since.
+      </p>
+    </div>
+
+    <div class="marble-pair reveal reveal-d2">
+      <div class="marble-item">
+        <img src="/maps/blue-marble-original.jpg" alt="Blue Marble original orientation, south on top" class="marble-img" loading="lazy" />
+        <span class="meta">Original photograph &middot; AS17-148-22727</span>
+      </div>
+      <div class="marble-arrow" aria-hidden="true">&#x27F3;</div>
+      <div class="marble-item">
+        <img src="/maps/blue-marble-nasa.jpg" alt="Blue Marble NASA version, north on top" class="marble-img marble-flipped" loading="lazy" />
+        <span class="meta">&ldquo;Corrected&rdquo; by NASA</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Divider ── -->
+<div class="section-divider"></div>
+
+<!-- ==========================================
      MAP PREVIEW — Framed within the grid
      ========================================== -->
 <section class="map-section" id="map-section">
@@ -157,6 +204,7 @@ North.">
     <blockquote class="pull-quote-text heading-lg reveal">
       <div class="pull-quote-bar"></div>
       &ldquo;There is no north or south in space. Only closer and further from the sun.&rdquo;
+      <cite class="pull-quote-cite meta">Buckminster Fuller</cite>
     </blockquote>
   </div>
 </div>
@@ -229,49 +277,6 @@ North.">
 <div class="section-divider"></div>
 
 <!-- ==========================================
-     BLUE MARBLE — The photograph that was flipped
-     ========================================== -->
-<section class="marble-section" id="scandal">
-  <div class="page-grid">
-    <div class="section-header">
-      <span class="meta reveal">The Blue Marble</span>
-      <h2 class="heading-lg reveal reveal-d1">The most famous photograph of Earth was taken upside down.</h2>
-    </div>
-
-    <div class="marble-body body reveal reveal-d1">
-      <p>
-        On 7 December 1972, the crew of Apollo 17 photographed the whole Earth
-        from 29,400 km. In the original frame, Antarctica gleams white at the top.
-        Africa stretches to the right. A cyclone churns in the Indian Ocean.
-        This is what Earth actually looks like from that angle.
-      </p>
-      <p>
-        NASA rotated the image 180&deg; before releasing it. South-up felt &ldquo;wrong.&rdquo;
-        The planet itself had to be corrected to match our maps.
-      </p>
-      <p>
-        No one has been far enough from Earth to take this photograph since.
-      </p>
-    </div>
-
-    <div class="marble-pair reveal reveal-d2">
-      <div class="marble-item">
-        <img src="/maps/blue-marble-original.jpg" alt="Blue Marble original orientation, south on top" class="marble-img" loading="lazy" />
-        <span class="meta">Original photograph &middot; AS17-148-22727</span>
-      </div>
-      <div class="marble-arrow" aria-hidden="true">&#x27F3;</div>
-      <div class="marble-item">
-        <img src="/maps/blue-marble-nasa.jpg" alt="Blue Marble NASA version, north on top" class="marble-img marble-flipped" loading="lazy" />
-        <span class="meta">&ldquo;Corrected&rdquo; by NASA</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ── Divider ── -->
-<div class="section-divider"></div>
-
-<!-- ==========================================
      THE MERCATOR PROBLEM
      ========================================== -->
 <section class="mercator-section" id="mercator">
@@ -295,6 +300,9 @@ North.">
       </p>
       <p>
         Every projection distorts something. But not every distortion has been so convenient for power.
+        As Arno Peters argued&thinsp;&mdash;&thinsp;his equal-area projection sold over 80 million copies&thinsp;&mdash;&thinsp;&ldquo;the
+        debate over my map was in reality not a struggle about a projection as such but about a world picture.
+        Clearly, ideology had entered the struggle.&rdquo;
       </p>
     </div>
 
@@ -428,7 +436,8 @@ North.">
         <p class="heading-lg">&ldquo;Nuestro norte es el Sur.&rdquo;</p>
         <p class="body quote-translation">&ldquo;Our north is the South. There should be no north for us, except in opposition to our South.
         That is why we now turn the map upside down.&rdquo;</p>
-        <cite class="meta">Joaqu&iacute;n Torres Garc&iacute;a &middot; Universalismo Constructivo &middot; 1935</cite>
+        <cite class="meta">Joaqu&iacute;n Torres Garc&iacute;a &middot; Uruguayan artist and theorist &middot; Universalismo Constructivo &middot; 1935</cite>
+        <p class="body reveal reveal-d2" style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.8125rem;">Torres Garc&iacute;a was an artist and teacher in Montevideo who argued that Latin America should stop looking to Europe for cultural validation. His ink drawing <em>Am&eacute;rica Invertida</em> became a rallying cry for an entire continent&rsquo;s intellectual independence.</p>
       </blockquote>
     </div>
   </div>
@@ -506,11 +515,11 @@ North.">
   <div class="artists-grid page-grid">
     <div class="artist-card reveal" data-pattern="grid" data-ink="teal">
       <canvas class="card-pattern" aria-hidden="true"></canvas>
-      <img src="/artists/torres-garcia.jpg" alt="Am&eacute;rica Invertida" class="artist-thumb" loading="lazy" />
-      <h3 class="heading-sm">Joaqu&iacute;n Torres Garc&iacute;a</h3>
-      <div class="artist-meta meta">Uruguay &middot; 1943</div>
-      <p class="body">Drew South America upside down and declared &ldquo;our north is the south.&rdquo; A single ink drawing became a rallying cry for Latin American cultural autonomy.</p>
-      <div class="artist-work meta">Am&eacute;rica Invertida</div>
+      <img src="/artists/kentridge.jpg" alt="Drawing for Projection by William Kentridge" class="artist-thumb" loading="lazy" />
+      <h3 class="heading-sm">Guy Debord</h3>
+      <div class="artist-meta meta">France &middot; 1957</div>
+      <p class="body">Cut the map of Paris into fragments and reassembled them based on emotion, not geography. His psychogeographic maps of the d&eacute;rive dismantled the planner&rsquo;s claim to objectivity.</p>
+      <div class="artist-work meta">The Naked City</div>
     </div>
 
     <div class="artist-card reveal reveal-d1" data-pattern="stochastic" data-ink="blue">
@@ -576,8 +585,18 @@ North.">
     <div class="psych-body body reveal reveal-d2">
       <p>
         Research shows that people associate north positions on maps with wealth, prestige, and higher altitude,
-        while south positions are linked to poverty and lower status. The critical finding:
-        when participants were shown south-up maps, this bias completely disappeared.
+        while south positions are linked to poverty and lower status. Brian Meier at Gettysburg College
+        proved the critical finding: when participants were shown south-up maps, the bias <strong>completely disappeared</strong>.
+        The preference isn&rsquo;t cognitive&thinsp;&mdash;&thinsp;it&rsquo;s cultural, learned through the deep metaphorical chain
+        linking <em>north</em> to <em>up</em> to <em>good</em> to <em>powerful</em>.
+        <span class="meta" style="display:block; margin-top:0.5rem;">(Meier et al., &ldquo;A metaphor-enriched social cognition,&rdquo; <em>Cognition</em>, 2011)</span>
+      </p>
+      <p>
+        Thomas Saarinen collected 3,568 freehand world maps from students in 52 countries. 79% were Eurocentric&thinsp;&mdash;&thinsp;even
+        students in Africa, Asia, and Latin America drew Europe at the centre and Africa diminished.
+        His most devastating observation: students from formerly colonised countries drew maps with the colonial
+        power at centre, illustrating &ldquo;the idea that the centre lies elsewhere.&rdquo;
+        <span class="meta" style="display:block; margin-top:0.5rem;">(Saarinen, &ldquo;Centering of Mental Maps of the World,&rdquo; <em>National Geographic Research</em>, 1987)</span>
       </p>
     </div>
 
@@ -589,6 +608,166 @@ North.">
       <li>&ldquo;Things went <strong>south</strong>&rdquo; <span class="idiom-meaning meta">&rarr; things went wrong</span></li>
       <li>&ldquo;<strong>Developing</strong> world&rdquo; <span class="idiom-meaning meta">&rarr; almost always south of the equator</span></li>
     </ul>
+  </div>
+</section>
+
+<!-- ── Pull Quote ── -->
+<div class="pull-quote">
+  <div class="page-grid">
+    <blockquote class="pull-quote-text heading-lg reveal">
+      <div class="pull-quote-bar"></div>
+      &ldquo;The map is not a picture. It is an argument.&rdquo;
+      <cite class="pull-quote-cite meta">Denis Wood &middot; The Power of Maps &middot; 1992</cite>
+    </blockquote>
+  </div>
+</div>
+
+<!-- ── Divider ── -->
+<div class="section-divider"></div>
+
+<!-- ==========================================
+     VOICES — Nine disciplinary perspectives
+     ========================================== -->
+<section class="voices-section" id="voices">
+  <div class="page-grid">
+    <div class="section-header">
+      <span class="meta reveal">Voices</span>
+      <h2 class="heading-lg reveal reveal-d1">Nine ways of saying the same thing: maps are not neutral.</h2>
+    </div>
+    <div class="voices-intro body reveal reveal-d2">
+      <p>From courtrooms to classrooms, from poetry to code, people across disciplines have challenged the map on the wall. What emerges is a chorus&thinsp;&mdash;&thinsp;politicians, philosophers, poets, hackers, and twelve-year-olds, all arriving at the same conclusion: how we orient the world on paper shapes how we inhabit it.</p>
+    </div>
+  </div>
+
+  <div class="voices-grid page-grid">
+
+    <!-- Voice 1: Politicians -->
+    <div class="voice-card reveal" data-ink="teal">
+      <span class="voice-discipline meta">Politicians &amp; Policymakers</span>
+      <blockquote class="voice-quote">
+        <p>&ldquo;Eighty-six percent of our students are students of color and many have parents from places on the map that are underscale or distorted. It only seems right that we would present them with an accurate view of themselves.&rdquo;</p>
+      </blockquote>
+      <cite class="voice-cite">Hayden Frederick-Clarke &middot; Boston Public Schools &middot; 2017</cite>
+      <p class="voice-context body">Boston became the first US district to adopt the Gall-Peters projection. 600 classrooms. 57,000 students. Cost: $12,000.</p>
+    </div>
+
+    <!-- Voice 2: Urbanists -->
+    <div class="voice-card reveal reveal-d1" data-ink="blue">
+      <span class="voice-discipline meta">Urbanists</span>
+      <blockquote class="voice-quote">
+        <p>&ldquo;The reduction of three-dimensional realities to two dimensions has conferred a redoubtable power&thinsp;&mdash;&thinsp;a violence intrinsic to abstraction.&rdquo;</p>
+      </blockquote>
+      <cite class="voice-cite">Henri Lefebvre &middot; The Production of Space &middot; 1974</cite>
+      <p class="voice-context body">David Harvey documented the cost: in Mumbai, slum dwellers live &ldquo;without legal title&thinsp;&mdash;&thinsp;the places they live are left blank on all maps of the city.&rdquo;</p>
+    </div>
+
+    <!-- Voice 3: Communities -->
+    <div class="voice-card reveal reveal-d2" data-ink="pink">
+      <span class="voice-discipline meta">Communities</span>
+      <blockquote class="voice-quote">
+        <p>&ldquo;Our map shows all of the things that don&rsquo;t have a price. Building it we also build our communities.&rdquo;</p>
+      </blockquote>
+      <cite class="voice-cite">Opi Nenquimo &middot; Waorani leader &middot; Ecuador &middot; 2019</cite>
+      <p class="voice-context body">The Waorani used open-source mapping tools to chart their territory and sued the government for drilling without consent. They won.</p>
+    </div>
+
+    <!-- Voice 4: Educators -->
+    <div class="voice-card reveal" data-ink="teal">
+      <span class="voice-discipline meta">Educators</span>
+      <blockquote class="voice-quote">
+        <p>&ldquo;Yeah, but you can&rsquo;t do that.&rdquo; &mdash; &ldquo;Why not?&rdquo; &mdash; &ldquo;Because it&rsquo;s freaking me out.&rdquo;</p>
+      </blockquote>
+      <cite class="voice-cite">The West Wing &middot; Season 2, Episode 16 &middot; 2001</cite>
+      <p class="voice-context body">18 million viewers watched a fictional cartography group flip the map south-up on network television. The scene became a classroom staple.</p>
+    </div>
+
+    <!-- Voice 5: Philosophers -->
+    <div class="voice-card reveal reveal-d1" data-ink="black">
+      <span class="voice-discipline meta">Philosophers</span>
+      <blockquote class="voice-quote">
+        <p>&ldquo;Make a map, not a tracing. The map is entirely oriented toward experimentation in contact with the real. It can be torn, reversed, adapted, reworked by an individual, group, or social formation.&rdquo;</p>
+      </blockquote>
+      <cite class="voice-cite">Deleuze &amp; Guattari &middot; A Thousand Plateaus &middot; 1980</cite>
+      <p class="voice-context body">Foucault argued &ldquo;space is fundamental in any exercise of power.&rdquo; Said coined &ldquo;imaginative geography.&rdquo; Mignolo showed how colonial maps erased indigenous spatial knowledge.</p>
+    </div>
+
+    <!-- Voice 6: Technologists -->
+    <div class="voice-card reveal reveal-d2" data-ink="blue">
+      <span class="voice-discipline meta">Technologists &amp; Hackers</span>
+      <blockquote class="voice-quote">
+        <p>&ldquo;There&rsquo;s a blindness that arises from thinking of data as objective, unambiguous and interpretation free.&rdquo;</p>
+      </blockquote>
+      <cite class="voice-cite">Simon Weckert &middot; Google Maps Hacks &middot; 2020</cite>
+      <p class="voice-context body">Weckert loaded 99 smartphones into a handcart and walked past Google HQ, turning every street red on Google Maps and diverting real traffic.</p>
+    </div>
+
+    <!-- Voice 7: Cartographers -->
+    <div class="voice-card reveal" data-ink="pink">
+      <span class="voice-discipline meta">Cartographers</span>
+      <blockquote class="voice-quote">
+        <p>&ldquo;Much of the power of the map is that it operates behind a mask of a seemingly neutral science. It hides and denies its social dimensions at the same time as it legitimates.&rdquo;</p>
+      </blockquote>
+      <cite class="voice-cite">J.B. Harley &middot; Deconstructing the Map &middot; 1989</cite>
+      <p class="voice-context body">The most cited essay in critical cartography. Harley&rsquo;s verdict: &ldquo;To those who have strength in the world shall be added strength in the map.&rdquo;</p>
+    </div>
+
+    <!-- Voice 8: Poets -->
+    <div class="voice-card reveal reveal-d1" data-ink="teal">
+      <span class="voice-discipline meta">Poets</span>
+      <blockquote class="voice-quote">
+        <p>&ldquo;I like maps, because they lie. Because they give no access to the vicious truth. Because great-heartedly, good-naturedly they spread before me a world not of this world.&rdquo;</p>
+      </blockquote>
+      <cite class="voice-cite">Wis&lstrok;awa Szymborska &middot; Map (final poem) &middot; 2012</cite>
+      <p class="voice-context body">The Polish Nobel laureate was working on this poem when she died. Bishop, Borges, Walcott, Glissant&thinsp;&mdash;&thinsp;poets have always known maps are fictions.</p>
+    </div>
+
+    <!-- Voice 9: Children -->
+    <div class="voice-card reveal reveal-d2" data-ink="black">
+      <span class="voice-discipline meta">Children</span>
+      <blockquote class="voice-quote">
+        <p>&ldquo;The southern hemisphere is so undeveloped because the ideas fall off.&rdquo;</p>
+      </blockquote>
+      <cite class="voice-cite">Mafalda (Quino) &middot; Argentina</cite>
+      <p class="voice-context body">When university students across 52 countries drew freehand world maps, 79% produced Eurocentric images&thinsp;&mdash;&thinsp;even students in Africa, Asia, and Latin America. Europe was always exaggerated. Africa was always diminished.</p>
+    </div>
+
+  </div>
+
+  <!-- Expanded voices detail — key data points -->
+  <div class="page-grid">
+    <div class="voices-data reveal">
+      <div class="data-block voices-data-block">
+        <div class="data-block-title meta">Key Data</div>
+        <div class="data-row">
+          <span class="data-label">Peters Projection</span>
+          <span class="data-value">80M+ copies sold</span>
+        </div>
+        <div class="data-row">
+          <span class="data-label">Saarinen Study</span>
+          <span class="data-value">3,568 maps &middot; 52 countries</span>
+        </div>
+        <div class="data-row">
+          <span class="data-label">Map Kibera</span>
+          <span class="data-value">~1M people mapped visible</span>
+        </div>
+        <div class="data-row">
+          <span class="data-label">Missing Maps</span>
+          <span class="data-value">105M+ edits &middot; 185K contributors</span>
+        </div>
+        <div class="data-row">
+          <span class="data-label">HOT</span>
+          <span class="data-value">94 countries &middot; 170K+ mappers</span>
+        </div>
+        <div class="data-row">
+          <span class="data-label">Meier et al.</span>
+          <span class="data-value">Reverse the map &rarr; bias vanishes</span>
+        </div>
+        <div class="data-row">
+          <span class="data-label">North-Up Convention</span>
+          <span class="data-value">&lt; 500 years old</span>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -654,6 +833,16 @@ North.">
         <p class="body">Women and non-binary mappers closing the gender gap in OpenStreetMap. Mapping femicides, safe spaces, and invisible labour across Latin America.</p>
         <span class="meta">Latin America / Global</span>
       </div>
+      <div class="movement-card reveal reveal-d1">
+        <h3 class="heading-sm">Map Kibera</h3>
+        <p class="body">Thirteen young Nairobians trained with GPS and OpenStreetMap to map Africa&rsquo;s largest informal settlement&thinsp;&mdash;&thinsp;a complete blank spot on official maps. Making the invisible visible.</p>
+        <span class="meta">Nairobi, 2009</span>
+      </div>
+      <div class="movement-card reveal reveal-d2">
+        <h3 class="heading-sm">Ushahidi</h3>
+        <p class="body">Crowdsourced crisis-mapping born from Kenya&rsquo;s 2007 disputed election. Deployed in 160+ countries with over 50 million reports. Testimony as technology.</p>
+        <span class="meta">Kenya / Global</span>
+      </div>
     </div>
   </div>
 </section>
@@ -712,6 +901,26 @@ North.">
         <span class="reading-author body">Jeremy W. Crampton</span>
         <span class="reading-note meta">Wiley-Blackwell, 2010</span>
       </li>
+      <li class="reading-item reveal reveal-d3">
+        <span class="reading-title heading-sm">Deconstructing the Map</span>
+        <span class="reading-author body">J.B. Harley</span>
+        <span class="reading-note meta">Cartographica, 1989</span>
+      </li>
+      <li class="reading-item reveal">
+        <span class="reading-title heading-sm">Close Up at a Distance</span>
+        <span class="reading-author body">Laura Kurgan</span>
+        <span class="reading-note meta">Zone Books, 2013</span>
+      </li>
+      <li class="reading-item reveal reveal-d1">
+        <span class="reading-title heading-sm">Blank Spots on the Map</span>
+        <span class="reading-author body">Trevor Paglen</span>
+        <span class="reading-note meta">Dutton, 2009</span>
+      </li>
+      <li class="reading-item reveal reveal-d1">
+        <span class="reading-title heading-sm">Radical Cartography</span>
+        <span class="reading-author body">Bill Rankin</span>
+        <span class="reading-note meta">MIT Press, 2025</span>
+      </li>
     </ul>
   </div>
 </section>
@@ -721,7 +930,8 @@ North.">
   <div class="page-grid">
     <blockquote class="pull-quote-text heading-lg reveal">
       <div class="pull-quote-bar"></div>
-      &ldquo;The map is not the territory. But the territory is shaped by the map.&rdquo;
+      &ldquo;In the universe there is no &lsquo;up&rsquo; and &lsquo;down&rsquo;, or &lsquo;north&rsquo; and &lsquo;south&rsquo;: only &lsquo;in&rsquo; and &lsquo;out&rsquo;.&rdquo;
+      <cite class="pull-quote-cite meta">Buckminster Fuller</cite>
     </blockquote>
   </div>
 </div>
@@ -747,6 +957,7 @@ again.">Look<br>again.</h2>
     </p>
 
     <a href="/map" class="cta-button reveal reveal-d2">Launch the Map &#x27F3;</a>
+    <a href="/story" class="cta-story-link reveal reveal-d2">or read the full story &rarr;</a>
   </div>
 </section>
 
@@ -797,7 +1008,7 @@ again.">Look<br>again.</h2>
               </div>
               <div class="card-col">
                 <span class="card-sublabel">Paper Stock</span>
-                <div class="ink-row"><div class="ink-swatch" style="--swatch: #F2EDE4"></div><span class="data-value">#F2EDE4 &middot; warm uncoated cream</span></div>
+                <div class="ink-row"><div class="ink-swatch" style="--swatch: #FAFAF8"></div><span class="data-value">#FAFAF8 &middot; light stock</span></div>
 
                 <span class="card-sublabel" style="margin-top: 1rem;">Print Order</span>
                 <ol class="card-list-ordered">

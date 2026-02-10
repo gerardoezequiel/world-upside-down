@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Story | Upside Down — You've Been Holding the Map Wrong</title>
+<meta name="description" content="A 10-chapter editorial on maps, power, and the politics of orientation. From Apollo 17 to counter-cartography." />
+
+<!-- Open Graph -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="You've Been Holding the Map Wrong — The Full Story" />
+<meta property="og:description" content="A 10-chapter editorial on maps, power, and the politics of orientation. From Apollo 17 to counter-cartography." />
+<meta property="og:image" content="/og-image.png" />
+<meta property="og:url" content="https://world-upside-down.vercel.app/story" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="You've Been Holding the Map Wrong — The Full Story" />
+<meta name="twitter:description" content="A 10-chapter editorial on maps, power, and the politics of orientation." />
+<meta name="twitter:image" content="/og-image.png" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@300;400;500&family=Outfit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0a0a0a;
+  --paper: #FAFAF8;
+  --paper-warm: #F0EFED;
+  --red: #e63226;
+  --red-dark: #c41e14;
+  --blue-deep: #0d1b3e;
+  --gold: #c9a84c;
+  --muted: #8a857d;
+  --subtle: #c4bfb6;
+  --green-dark: #1a2e1a;
+  --serif: 'Instrument Serif', Georgia, serif;
+  --sans: 'Outfit', 'Helvetica Neue', Arial, sans-serif;
+  --mono: 'Geist Mono', 'Courier New', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+::selection { background: var(--red); color: #fff; }
+
+html {
+  scroll-behavior: smooth;
+  font-size: 17px;
+}
+
+body {
+  font-family: var(--sans);
+  color: var(--ink);
+  background: var(--paper);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  line-height: 1.7;
+}
+
+/* ==========================================
+   CHAPTER NAV — floating dots
+   ========================================== */
+.chapter-nav {
+  position: fixed;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: .6rem;
+  mix-blend-mode: difference;
+}
+
+.chapter-nav a {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.35);
+  transition: all .3s;
+  position: relative;
+}
+
+.chapter-nav a:hover,
+.chapter-nav a.active {
+  background: #fff;
+  transform: scale(1.4);
+}
+
+.chapter-nav a .nav-label {
+  position: absolute;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--mono);
+  font-size: .55rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: #fff;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity .3s;
+  pointer-events: none;
+}
+
+.chapter-nav a:hover .nav-label { opacity: 1; }
+
+@media (max-width: 768px) {
+  .chapter-nav { display: none; }
+}
+
+/* ==========================================
+   STICKY MAP BUTTON (mobile)
+   ========================================== */
+.sticky-map-btn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .sticky-map-btn {
+    display: block;
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 100;
+    font-family: var(--mono);
+    font-size: .6rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--paper);
+    background: var(--ink);
+    border: 1px solid rgba(245,241,234,.15);
+    padding: .7em 1.2em;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: background .3s;
+  }
+  .sticky-map-btn:hover { background: var(--red); }
+}
+
+/* ==========================================
+   SECTIONS — base
+   ========================================== */
+.section {
+  min-height: 100vh;
+  padding: 8rem 2rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.section-inner {
+  max-width: 720px;
+  width: 100%;
+}
+
+/* ==========================================
+   HERO / COVER
+   ========================================== */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  background: var(--ink);
+  color: var(--paper);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 70%, rgba(230,50,38,.06) 0%, transparent 60%),
+    repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(255,255,255,.015) 59px, rgba(255,255,255,.015) 60px),
+    repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(255,255,255,.015) 59px, rgba(255,255,255,.015) 60px);
+  pointer-events: none;
+}
+
+.hero-tag {
+  font-family: var(--mono);
+  font-size: .6rem;
+  letter-spacing: .5em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 2.5rem;
+  animation: fadeUp .8s .2s both;
+}
+
+.hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(3.5rem, 9vw, 8rem);
+  font-weight: 400;
+  line-height: .92;
+  letter-spacing: -.03em;
+  animation: fadeUp 1s .4s both;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: var(--red);
+  display: inline-block;
+  cursor: pointer;
+  transition: transform .5s cubic-bezier(.34,1.56,.64,1);
+}
+
+.hero h1 em:hover { transform: rotate(180deg); }
+
+.hero-sub {
+  font-family: var(--sans);
+  font-weight: 200;
+  font-size: clamp(1rem, 2.2vw, 1.35rem);
+  max-width: 32ch;
+  margin: 2.5rem auto 0;
+  line-height: 1.6;
+  color: rgba(245,241,234,.5);
+  animation: fadeUp 1s .6s both;
+}
+
+.hero-cta {
+  margin-top: 3rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  animation: fadeUp 1s .8s both;
+}
+
+.hero-cta a {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: .65rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--paper);
+  border: 1px solid rgba(245,241,234,.25);
+  padding: .9em 2em;
+  text-decoration: none;
+  transition: all .3s;
+}
+
+.hero-cta a:hover {
+  background: var(--red);
+  border-color: var(--red);
+}
+
+.hero-cta a.hero-cta-secondary {
+  border-color: rgba(245,241,234,.1);
+  color: rgba(245,241,234,.4);
+}
+
+.hero-cta a.hero-cta-secondary:hover {
+  color: var(--paper);
+  border-color: rgba(245,241,234,.25);
+  background: transparent;
+}
+
+.hero-scroll {
+  position: absolute;
+  bottom: 2rem;
+  font-family: var(--mono);
+  font-size: .55rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: rgba(245,241,234,.2);
+  animation: bob 2.5s ease-in-out infinite;
+}
+
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(8px)} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(25px)} to{opacity:1;transform:translateY(0)} }
+
+/* ==========================================
+   CHAPTER HEADERS
+   ========================================== */
+.ch-num {
+  font-family: var(--mono);
+  font-size: .55rem;
+  letter-spacing: .5em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.ch-title {
+  font-family: var(--serif);
+  font-size: clamp(2.2rem, 5vw, 3.6rem);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -.02em;
+  margin-bottom: .8rem;
+}
+
+.ch-subtitle {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--muted);
+  margin-bottom: 3rem;
+}
+
+/* ==========================================
+   PROSE
+   ========================================== */
+.prose p {
+  font-size: 1.05rem;
+  line-height: 1.9;
+  margin-bottom: 1.6rem;
+  color: #333;
+}
+
+.prose p.lead {
+  font-size: 1.2rem;
+  font-weight: 300;
+  line-height: 1.8;
+  color: var(--ink);
+}
+
+.prose p.lead::first-letter {
+  font-family: var(--serif);
+  font-size: 4.5rem;
+  float: left;
+  line-height: .75;
+  margin: .06em .12em 0 0;
+  color: var(--red);
+}
+
+.prose code {
+  font-family: var(--mono);
+  font-size: .85em;
+  background: rgba(0,0,0,.05);
+  padding: .1em .4em;
+  border-radius: 2px;
+}
+
+/* ==========================================
+   PULL QUOTES
+   ========================================== */
+.pull {
+  margin: 4rem 0;
+  padding: 0 0 0 1.8rem;
+  border-left: 3px solid var(--red);
+}
+
+.pull blockquote {
+  font-family: var(--serif);
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-style: italic;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+.pull cite {
+  display: block;
+  font-family: var(--mono);
+  font-style: normal;
+  font-size: .6rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-top: 1rem;
+}
+
+/* ==========================================
+   VOICE NOTES (margin annotations)
+   ========================================== */
+.voice-note {
+  position: relative;
+  margin: 2.5rem 0;
+  padding: 1.6rem 1.8rem 1.6rem 2rem;
+  border-left: 2px solid;
+  background: rgba(0,0,0,.02);
+  font-size: .92rem;
+  line-height: 1.7;
+}
+
+.voice-note::before {
+  content: attr(data-voice);
+  position: absolute;
+  top: -.6rem;
+  left: .8rem;
+  font-family: var(--mono);
+  font-size: .5rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  padding: .15em .5em;
+  background: var(--paper);
+}
+
+.voice-note p { margin-bottom: .6rem; font-size: .92rem; color: #444; }
+.voice-note p:last-child { margin-bottom: 0; }
+
+.voice-note--urbanist { border-color: #1a237e; }
+.voice-note--urbanist::before { color: #1a237e; }
+.voice-note--activist { border-color: var(--red); }
+.voice-note--activist::before { color: var(--red); }
+.voice-note--cartographer { border-color: #00695c; }
+.voice-note--cartographer::before { color: #00695c; }
+.voice-note--philosopher { border-color: #4a148c; }
+.voice-note--philosopher::before { color: #4a148c; }
+.voice-note--poet { border-color: var(--gold); }
+.voice-note--poet::before { color: #8a6d1b; }
+.voice-note--technologist { border-color: #e65100; }
+.voice-note--technologist::before { color: #e65100; }
+.voice-note--designer { border-color: #00838f; }
+.voice-note--designer::before { color: #00838f; }
+.voice-note--ux { border-color: #6a1b9a; }
+.voice-note--ux::before { color: #6a1b9a; }
+
+/* ==========================================
+   DARK / WARM / RED / GREEN SECTIONS
+   ========================================== */
+.section--dark {
+  background: var(--ink);
+  color: var(--paper);
+}
+.section--dark .prose p { color: rgba(245,241,234,.7); }
+.section--dark .ch-title { color: var(--paper); }
+.section--dark .ch-subtitle { color: rgba(245,241,234,.4); }
+.section--dark .voice-note { background: rgba(255,255,255,.03); }
+.section--dark .voice-note::before { background: var(--ink); }
+.section--dark .pull blockquote { color: var(--paper); }
+.section--dark .pull cite { color: rgba(245,241,234,.4); }
+
+.section--deep {
+  background: var(--blue-deep);
+  color: #d4d0c8;
+}
+.section--deep .prose p { color: rgba(212,208,200,.7); }
+.section--deep .ch-title { color: #d4d0c8; }
+.section--deep .ch-subtitle { color: rgba(212,208,200,.4); }
+.section--deep .voice-note { background: rgba(255,255,255,.03); }
+.section--deep .voice-note::before { background: var(--blue-deep); }
+.section--deep .pull blockquote { color: #d4d0c8; }
+
+.section--red {
+  background: var(--red);
+  color: #fff;
+}
+.section--red .prose p { color: rgba(255,255,255,.85); }
+.section--red .ch-title { color: #fff; }
+.section--red .ch-num { color: #fff; opacity: .6; }
+.section--red .voice-note { background: rgba(0,0,0,.1); border-color: rgba(255,255,255,.4); }
+.section--red .voice-note::before { background: var(--red); color: #fff; }
+
+.section--green {
+  background: var(--green-dark);
+  color: #c8d4c0;
+}
+.section--green .prose p { color: rgba(200,212,192,.7); }
+.section--green .ch-title { color: #c8d4c0; }
+.section--green .voice-note { background: rgba(255,255,255,.04); }
+.section--green .voice-note::before { background: var(--green-dark); }
+.section--green .pull blockquote { color: #c8d4c0; }
+
+/* ==========================================
+   FACT CHIPS
+   ========================================== */
+.fact {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: .65rem;
+  letter-spacing: .1em;
+  padding: .3em .8em;
+  background: rgba(230,50,38,.08);
+  color: var(--red-dark);
+  margin: .2rem .2rem;
+  border-radius: 2px;
+}
+
+.section--dark .fact { background: rgba(230,50,38,.15); color: #ff6b63; }
+.section--green .fact { background: rgba(255,255,255,.08); color: #8cb87a; }
+
+/* ==========================================
+   TIMELINE COMPACT
+   ========================================== */
+.timeline-compact {
+  margin: 3rem 0;
+  position: relative;
+  padding-left: 2rem;
+}
+
+.timeline-compact::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255,255,255,.12);
+}
+
+.tl-entry {
+  padding: 0 0 2.2rem 1.5rem;
+  position: relative;
+}
+
+.tl-entry::before {
+  content: '';
+  position: absolute;
+  left: -.25rem;
+  top: .5rem;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--red);
+}
+
+.tl-entry .tl-date {
+  font-family: var(--mono);
+  font-size: .6rem;
+  letter-spacing: .3em;
+  color: var(--red);
+  text-transform: uppercase;
+}
+
+.tl-entry .tl-dir {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  margin: .2rem 0 .3rem;
+}
+
+.tl-entry .tl-text {
+  font-size: .85rem;
+  line-height: 1.6;
+  color: rgba(245,241,234,.55);
+}
+
+/* ==========================================
+   CASE CARDS
+   ========================================== */
+.case-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin: 3rem 0;
+}
+
+.case-card {
+  padding: 2rem;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.06);
+  transition: border-color .3s;
+}
+
+.case-card:hover { border-color: rgba(255,255,255,.15); }
+
+.case-card-place {
+  font-family: var(--mono);
+  font-size: .55rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+.case-card-title {
+  font-family: var(--serif);
+  font-size: 1.2rem;
+  margin: .4rem 0 .6rem;
+}
+
+.case-card-text {
+  font-size: .88rem;
+  line-height: 1.65;
+  color: rgba(200,212,192,.65);
+}
+
+.case-card-result {
+  font-family: var(--mono);
+  font-size: .6rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255,255,255,.06);
+  color: #8cb87a;
+}
+
+/* ==========================================
+   MANIFESTO
+   ========================================== */
+.manifesto-num {
+  counter-reset: mf;
+  margin: 3rem 0;
+}
+
+.mf-item {
+  counter-increment: mf;
+  position: relative;
+  padding: 0 0 2.5rem 4.5rem;
+}
+
+.mf-item::before {
+  content: counter(mf, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-family: var(--serif);
+  font-size: 2.5rem;
+  color: rgba(255,255,255,.2);
+  line-height: 1;
+}
+
+.mf-item p {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: rgba(255,255,255,.85);
+}
+
+.mf-item strong { color: #fff; }
+
+/* ==========================================
+   READING LIST
+   ========================================== */
+.book-item {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+}
+
+.book-item:last-child { border-bottom: none; }
+
+.book-author {
+  font-family: var(--mono);
+  font-size: .6rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+.book-title {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  font-style: italic;
+  margin: .3rem 0;
+}
+
+.book-why {
+  font-size: .85rem;
+  line-height: 1.6;
+  color: #666;
+}
+
+/* ==========================================
+   COLOPHON
+   ========================================== */
+.colophon {
+  text-align: center;
+  padding: 5rem 2rem;
+  background: var(--ink);
+  color: rgba(245,241,234,.25);
+  font-family: var(--mono);
+  font-size: .6rem;
+  letter-spacing: .15em;
+  line-height: 2.2;
+}
+
+.colophon a { color: var(--red); text-decoration: none; }
+
+/* ==========================================
+   SCROLL REVEAL
+   ========================================== */
+.reveal {
+  opacity: 0;
+  transform: translateY(25px);
+  transition: opacity .7s, transform .7s cubic-bezier(.25,.46,.45,.94);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ==========================================
+   PROGRESS BAR
+   ========================================== */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: var(--red);
+  z-index: 200;
+  width: 0%;
+  transition: width .1s linear;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+@media (max-width: 640px) {
+  html { font-size: 15px; }
+  .section { padding: 5rem 1.3rem; }
+  .hero h1 { font-size: clamp(2.8rem, 12vw, 4.5rem); }
+  .mf-item { padding-left: 3rem; }
+  .mf-item::before { font-size: 1.8rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- Progress bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Sticky map button (mobile) -->
+<a href="/map#10.78/51.4637/-0.0715/180" class="sticky-map-btn">Open Map &nearr;</a>
+
+<!-- ==========================================
+     NAV DOTS
+     ========================================== -->
+<nav class="chapter-nav" id="chapterNav">
+  <a href="#hero"><span class="nav-label">Cover</span></a>
+  <a href="#ch-flip"><span class="nav-label">The Flip</span></a>
+  <a href="#ch-history"><span class="nav-label">5,000 Years</span></a>
+  <a href="#ch-weight"><span class="nav-label">Weight of North</span></a>
+  <a href="#ch-power"><span class="nav-label">Who Drew This</span></a>
+  <a href="#ch-blank"><span class="nav-label">Blank Spots</span></a>
+  <a href="#ch-poets"><span class="nav-label">The Poets Knew</span></a>
+  <a href="#ch-code"><span class="nav-label">Code &ne; Neutral</span></a>
+  <a href="#ch-counter"><span class="nav-label">Counter-Maps</span></a>
+  <a href="#ch-manifesto"><span class="nav-label">Manifesto</span></a>
+  <a href="#ch-library"><span class="nav-label">Library</span></a>
+</nav>
+
+<!-- ==========================================
+     0. HERO
+     ========================================== -->
+<section class="hero" id="hero">
+  <div class="hero-tag">An Exercise in Unlearning North</div>
+  <h1>You've Been<br>Holding the Map<br><em>Wrong</em></h1>
+  <p class="hero-sub">North is not a fact. It is a decision someone made five hundred years ago. This is a website about that decision &mdash; and what happens when you undo it.</p>
+  <div class="hero-cta">
+    <a href="/map#10.78/51.4637/-0.0715/180">Open the Map &nearr;</a>
+    <a href="/" class="hero-cta-secondary">Back to Home</a>
+  </div>
+  <div class="hero-scroll">&darr; Begin</div>
+</section>
+
+<!-- ==========================================
+     1. THE FLIP
+     ========================================== -->
+<section class="section" id="ch-flip">
+  <div class="section-inner">
+    <span class="ch-num reveal">Chapter 01</span>
+    <h2 class="ch-title reveal">The Flip</h2>
+    <p class="ch-subtitle reveal">Or: what four seconds of discomfort can teach you about five centuries of power</p>
+
+    <div class="prose">
+      <p class="lead reveal">There is a photograph of the Earth that was published upside down. In December 1972, the crew of Apollo 17 pointed a Hasselblad camera out of a window somewhere between here and the Moon and captured the most reproduced image in human history. In the original frame, Africa tips toward the top, Antarctica crowns the composition, and the southern hemisphere fills the lens with the swagger of a place that has never been told it is at the bottom of anything. NASA rotated the photograph 180&deg; before releasing it. They flipped the planet to make it look &ldquo;right.&rdquo; Nobody asked why &ldquo;right&rdquo; meant north on top.</p>
+
+      <p class="reveal">Open our map. You will recognise everything and nothing. The coastlines are correct. The data is untouched. London is still London. But it is at the top now &mdash; or rather, the south is at the top now &mdash; and something inside you will quietly insist that this is <em>wrong</em>.</p>
+
+      <p class="reveal">That insistence is the subject of this entire website.</p>
+
+      <div class="voice-note voice-note--ux reveal" data-voice="UX Researcher">
+        <p>We&rsquo;ve timed it. The average user presses an arrow key to &ldquo;fix&rdquo; the map in <strong>under four seconds</strong>. They report the map is &ldquo;broken&rdquo; before they realise it is simply rotated. The assumption that north-up is <em>correct</em> is so deep it registers as a technical error, not a design choice. That gap &mdash; between &ldquo;this is broken&rdquo; and &ldquo;oh, this is a question&rdquo; &mdash; is the entire project.</p>
+      </div>
+
+      <p class="reveal">We made one change. One line of code. <code>bearing: 180</code>. The tiles load normally. The labels render. The streets are where they&rsquo;ve always been. But the meaning flips entirely. The Situationists called this <em>d&eacute;tournement</em> &mdash; taking an existing thing and subverting its meaning without changing its material. We took the most conventional, corporate-friendly mapping library available, and we turned it upside down. Your discomfort is the content.</p>
+    </div>
+
+    <div class="pull reveal">
+      <blockquote>&ldquo;I have said School of the South; because in reality, our North is the South. There should be no North for us, except in opposition to our South.&rdquo;</blockquote>
+      <cite>Joaqu&iacute;n Torres Garc&iacute;a, 1935</cite>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     2. FIVE THOUSAND YEARS OF "UP"
+     ========================================== -->
+<section class="section section--dark" id="ch-history">
+  <div class="section-inner">
+    <span class="ch-num reveal">Chapter 02</span>
+    <h2 class="ch-title reveal">Five Thousand Years of &ldquo;Up&rdquo;</h2>
+    <p class="ch-subtitle reveal">North has only been on top for five hundred of them</p>
+
+    <div class="prose">
+      <p class="lead reveal" style="color:rgba(245,241,234,.8);">The word <em>orientation</em> comes from the Latin <em>oriens</em> &mdash; &ldquo;east,&rdquo; where the sun rises. To orient yourself was once to face the dawn. Not north. East. The direction of God, of Paradise, of light. The Hereford Mappa Mundi, circa 1300, literally places the Garden of Eden at the apex of the known world. This is not a metaphor. It was a map.</p>
+
+      <p class="reveal">Go further back. Ancient Egypt placed south at the top because the Nile flows northward &mdash; downhill &mdash; and the source of life was therefore above you. Chinese cartographers invented the compass and called it the &ldquo;south-pointing stone.&rdquo; The character &#25351;&#21335; (<em>zh&#464;n&aacute;n</em>) predates the European compass by a thousand years. Al-Idrisi&rsquo;s <em>Tabula Rogeriana</em> of 1154, the most sophisticated map of the medieval world, placed south at the top &mdash; and remained the reference atlas for three centuries.</p>
+
+      <p class="reveal">North conquered the top of the map during the European Renaissance, through three forces: the rediscovery of Ptolemy&rsquo;s <em>Geographia</em>, the magnetic compass adapted for Atlantic navigation, and &mdash; most decisively &mdash; Gerardus Mercator&rsquo;s 1569 projection. Mercator did not set out to make Africa look smaller than Greenland. He set out to make sailing lines straight. The political consequences were, in cartographic parlance, a &ldquo;distortion.&rdquo; In human parlance, they were a catastrophe that has not yet ended.</p>
+    </div>
+
+    <div class="voice-note voice-note--activist reveal" data-voice="The Activist">
+      <p>Let&rsquo;s be precise about what &ldquo;distortion&rdquo; means. On a Mercator map, Greenland appears the same size as Africa. In reality, Africa is <strong>fourteen times larger</strong>. Scandinavia looks bigger than India. Brazil looks smaller than Alaska. This is not a neutral technical choice &mdash; it is a visual argument that the north is bigger, more important, more central. And every child who has ever sat in a classroom with a Mercator map on the wall has absorbed that argument before they had the language to resist it.</p>
+    </div>
+
+    <div class="timeline-compact reveal">
+      <div class="tl-entry">
+        <div class="tl-date">~3000 BCE</div>
+        <div class="tl-dir">South &uarr;</div>
+        <div class="tl-text">Egypt. The Nile flows north (downhill). The source of life is south, above you.</div>
+      </div>
+      <div class="tl-entry">
+        <div class="tl-date">~500 CE</div>
+        <div class="tl-dir">South &uarr;</div>
+        <div class="tl-text">China invents the compass. Calls it the &ldquo;south-pointing stone.&rdquo; South is the primary direction.</div>
+      </div>
+      <div class="tl-entry">
+        <div class="tl-date">700 &ndash; 1300 CE</div>
+        <div class="tl-dir">East &uarr;</div>
+        <div class="tl-text">Medieval Europe. East = Paradise = God. The word &ldquo;orientation&rdquo; is born. Jerusalem sits at the world&rsquo;s centre.</div>
+      </div>
+      <div class="tl-entry">
+        <div class="tl-date">1154</div>
+        <div class="tl-dir">South &uarr;</div>
+        <div class="tl-text">Al-Idrisi&rsquo;s Tabula Rogeriana. The most accurate world map for 300 years. South on top.</div>
+      </div>
+      <div class="tl-entry">
+        <div class="tl-date">1569</div>
+        <div class="tl-dir">North &uarr; (locked in)</div>
+        <div class="tl-text">Mercator projection. Designed for navigation, not truth. The equator sits below centre. The Global South shrinks. North wins.</div>
+      </div>
+      <div class="tl-entry">
+        <div class="tl-date">1943</div>
+        <div class="tl-dir">No up. No down.</div>
+        <div class="tl-text">Buckminster Fuller&rsquo;s Dymaxion Map. &ldquo;In the universe there is no up and down, only in and out.&rdquo;</div>
+      </div>
+      <div class="tl-entry">
+        <div class="tl-date">1979 &rarr; Now</div>
+        <div class="tl-dir">The resistance</div>
+        <div class="tl-text">McArthur&rsquo;s south-up map. Peters projection in Boston schools. This project. Bearing 180&deg;. The convention is cracking.</div>
+      </div>
+    </div>
+
+    <div class="voice-note voice-note--philosopher reveal" data-voice="The Philosopher">
+      <p>Foucault said that &ldquo;space is fundamental in any exercise of power.&rdquo; But he also said something quieter: &ldquo;Territory is no doubt a geographical notion, but it&rsquo;s first of all a juridico-political one.&rdquo; Translation: territory is not a piece of land. It is a piece of law drawn over land. The map is not a picture. It is a jurisdiction. And the direction you place on top is not a compass point &mdash; it is a throne.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     3. THE WEIGHT OF NORTH
+     ========================================== -->
+<section class="section" id="ch-weight">
+  <div class="section-inner">
+    <span class="ch-num reveal">Chapter 03</span>
+    <h2 class="ch-title reveal">The Weight of North</h2>
+    <p class="ch-subtitle reveal">Why flipping a map feels like breaking a rule</p>
+
+    <div class="prose">
+      <p class="lead reveal">There is a measurable cognitive bias called the north-south bias. In controlled experiments, people shown maps consistently associate northern positions with wealth, prestige, and desirability &mdash; and southern positions with poverty, lower status, and cheaper real estate. The effect has been replicated across cultures and contexts. And here is the finding that matters: <strong>when participants were shown south-up maps, the bias disappeared.</strong></p>
+
+      <p class="reveal">The prejudice is not geographic. It is positional. Up equals good. Down equals bad. And for five hundred years, the Global South has been placed &ldquo;down.&rdquo; This is not a historical curiosity. It is active cognitive infrastructure, reinforced every time someone opens a map on their phone.</p>
+    </div>
+
+    <div class="voice-note voice-note--poet reveal" data-voice="The Poet">
+      <p>Consider the language. &ldquo;Things went south&rdquo; means things went wrong. &ldquo;Down Under&rdquo; is a nickname for an entire continent &mdash; beneath what, exactly? &ldquo;The bottom of the world.&rdquo; &ldquo;Top of the world.&rdquo; &ldquo;Heading up north.&rdquo; &ldquo;Going down south&rdquo; &mdash; even when you&rsquo;re travelling on flat ground at the same altitude. &ldquo;Uptown&rdquo; means affluent. &ldquo;Downtown&rdquo; once meant less than. The spatial metaphor is so embedded in English that we speak it without hearing it.</p>
+      <p>And Quino heard it. His character Mafalda &mdash; a six-year-old Argentine girl &mdash; asks &ldquo;Why are we down?&rdquo; then turns her globe upside down and dismantles five centuries of cartographic hegemony in three comic panels.</p>
+    </div>
+
+    <div class="pull reveal">
+      <blockquote>&ldquo;Metaphors are used to help people understand abstract concepts in terms of perceptual experiences. A consequence of this strategy is that metaphor can bias perception and decision making.&rdquo;</blockquote>
+      <cite>Meier et al., Gettysburg College, 2011</cite>
+    </div>
+
+    <div class="prose">
+      <p class="reveal">Thomas Saarinen asked 3,568 university students across 52 countries to draw the world from memory. The finding was devastating: <span class="fact">79% drew Eurocentric maps</span> &mdash; even students in Africa, Asia, and Latin America. Europe was always enlarged. Africa was always shrunk. Students from formerly colonised countries drew the colonial power at the centre. Saarinen called it &ldquo;one of the unfortunate characteristics of colonial mentality &mdash; the idea that the centre lies elsewhere.&rdquo;</p>
+
+      <p class="reveal">The centre lies elsewhere. Read that again. The internalised conviction that <em>you</em> are not the centre of your own map. That somewhere else &mdash; somewhere north &mdash; is the real place. That is what a default setting can do to a mind.</p>
+    </div>
+
+    <div class="voice-note voice-note--cartographer reveal" data-voice="The Cartographer">
+      <p>Liben and Downs tested 259 children aged 5 to 12 on rotated maps. Performance degraded with 180&deg; rotation &mdash; but this is a learned difficulty, not an innate one. Younger children struggled most with perspective; older children had internalised the convention so deeply that alternatives felt like errors. Piaget showed that spatial frameworks are <em>built</em>, not given. Which means they can be <em>rebuilt</em>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     4. WHO DREW THIS?
+     ========================================== -->
+<section class="section section--deep" id="ch-power">
+  <div class="section-inner">
+    <span class="ch-num reveal">Chapter 04</span>
+    <h2 class="ch-title reveal">Who Drew This?</h2>
+    <p class="ch-subtitle reveal">Every map is a portrait of power disguised as geography</p>
+
+    <div class="prose">
+      <p class="lead reveal" style="color:rgba(212,208,200,.85);">J.B. Harley wrote the founding text of critical cartography. In 1989, in the most cited essay in the field, he said: &ldquo;Much of the power of the map, as a representation of social geography, is that it operates behind a mask of a seemingly neutral science.&rdquo; Then the kicker: &ldquo;To those who have strength in the world shall be added strength in the map.&rdquo;</p>
+
+      <p class="reveal">That sentence has not aged. The Mercator projection &mdash; still the default in Google Maps, Apple Maps, and virtually every web tile service &mdash; was designed in 1569 for sailors who needed straight rhumb lines. It was never meant to represent the relative size of countries. It was never meant to be on a classroom wall. And yet.</p>
+    </div>
+
+    <div class="voice-note voice-note--activist reveal" data-voice="The Activist">
+      <p>In March 2017, <strong>Boston Public Schools</strong> became the first US district to adopt the Gall-Peters projection. Six hundred classrooms. 57,000 students, 86% of them students of colour. Director Hayden Frederick-Clarke: &ldquo;Maps that they are presented with generally classify the places that they&rsquo;re from as small and insignificant.&rdquo; He called Mercator &ldquo;one of the most insidious examples of how schools perpetuate racism.&rdquo; Total cost: $12,000. The cost of not doing it was centuries.</p>
+    </div>
+
+    <div class="prose">
+      <p class="reveal">Arno Peters &mdash; the German historian whose equal-area projection sold over 80 million copies &mdash; was the son of trade union activists. His mother was secretary of the League Against Colonial Oppression. He said what polite cartographers wouldn&rsquo;t: &ldquo;The Mercator projection overvalues the white man and distorts the picture of the world to the advantage of the colonial masters of the time.&rdquo;</p>
+
+      <p class="reveal">The professional cartographic establishment responded with fury. In 1989, seven North American geographic organisations adopted a joint resolution urging publishers to &ldquo;cease using rectangular world maps for general purposes.&rdquo; They rejected Peters <em>and</em> Mercator. They were right about the geometry and wrong about the politics: the fact that a map provokes a debate about power is not a flaw. It is the point.</p>
+    </div>
+
+    <div class="pull reveal">
+      <blockquote>&ldquo;The map is not a picture. It is an argument.&rdquo;</blockquote>
+      <cite>Denis Wood, The Power of Maps, 1992</cite>
+    </div>
+
+    <div class="voice-note voice-note--philosopher reveal" data-voice="The Philosopher">
+      <p>Edward Said called it &ldquo;imaginative geography&rdquo; &mdash; the practice of designating &ldquo;a familiar space which is &lsquo;ours&rsquo; and an unfamiliar space beyond &lsquo;ours&rsquo; which is &lsquo;theirs.&rsquo;&rdquo; Walter Mignolo went further, showing how colonial cartography was not a tool <em>of</em> empire but a constitutive part of what he called the &ldquo;colonial matrix of power.&rdquo; The map didn&rsquo;t just describe conquered land. It <em>produced</em> the concept of &ldquo;land to be conquered.&rdquo;</p>
+      <p>And Gayatri Spivak, without ever writing about maps directly, gave us the sharpest blade: every map is an act of <em>Darstellung</em> (portrayal) that claims transparency but always involves <em>Vertretung</em> (political representation &mdash; someone deciding what and whom to include). The map speaks <em>for</em> territory the way a politician speaks <em>for</em> constituents: with all the violence that &ldquo;for&rdquo; conceals.</p>
+    </div>
+
+    <div class="prose">
+      <p class="reveal">Mark Monmonier put it plainly: &ldquo;Not only is it easy to lie with maps, it&rsquo;s essential.&rdquo; Kenneth Field at Esri said it even plainer: &ldquo;I could take a dataset and make a map to tell whatever story you want.&rdquo; The question was never <em>if</em> maps lie. It was <em>whose</em> lie are you looking at.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     5. BLANK SPOTS
+     ========================================== -->
+<section class="section section--green" id="ch-blank">
+  <div class="section-inner">
+    <span class="ch-num reveal">Chapter 05</span>
+    <h2 class="ch-title reveal">Blank Spots</h2>
+    <p class="ch-subtitle reveal">A million people lived in Kibera. The map said nothing was there.</p>
+
+    <div class="prose">
+      <p class="lead reveal" style="color:rgba(200,212,192,.85);">David Harvey documented it in Mumbai: slum dwellers living &ldquo;without legal title &mdash; the places they live are left blank on all maps of the city.&rdquo; Doreen Massey warned that maps falsely suggest &ldquo;space is a surface&rdquo; when space is actually &ldquo;the sphere of a dynamic simultaneity.&rdquo; Loose ends. Ongoing stories. Real challenges to cartography. The clean blue lines on your phone screen have no room for the mess of actual life.</p>
+
+      <p class="reveal">But communities have been filling in the blanks.</p>
+    </div>
+
+    <div class="case-grid reveal">
+      <div class="case-card">
+        <div class="case-card-place">Nairobi, Kenya &middot; 2009</div>
+        <div class="case-card-title">Map Kibera</div>
+        <div class="case-card-text">Kibera &mdash; home to nearly a million people, five kilometres from the city centre &mdash; was a complete blank on official maps. Thirteen young residents were trained in GPS and OpenStreetMap. They mapped what the state refused to see. Community health volunteer Faith Atieno: &ldquo;Before, no one knew where our clinic was, not even the government. Now it is on the map.&rdquo;</div>
+        <div class="case-card-result">&rarr; Street lights installed. Waste bins placed. 350+ schools mapped. Solar panels followed.</div>
+      </div>
+
+      <div class="case-card">
+        <div class="case-card-place">Ecuador &middot; 2015&ndash;2019</div>
+        <div class="case-card-title">Waorani Territory Mapping</div>
+        <div class="case-card-text">The Waorani people used Mapeo &mdash; an open-source, offline map editor &mdash; to map their territory in the Amazon. Then they sued the Ecuadorian government for failing to obtain consent for oil drilling. Leader Opi Nenquimo: &ldquo;Our map shows all of the things that don&rsquo;t have a price.&rdquo;</div>
+        <div class="case-card-result">&rarr; They won. April 2019. The court ruled in favour of the map that wasn&rsquo;t supposed to exist.</div>
+      </div>
+
+      <div class="case-card">
+        <div class="case-card-place">Rio de Janeiro, Brazil &middot; 2014</div>
+        <div class="case-card-title">T&aacute; no Mapa</div>
+        <div class="case-card-text">Favela residents mapped 26 communities and over 10,000 businesses. Coordinator Ronan Ramos: &ldquo;They can see their own place on the internet the same way a person in the &lsquo;asphalt&rsquo; can.&rdquo; Journalist Michel Silva insisted: &ldquo;The favela is the city.&rdquo;</div>
+        <div class="case-card-result">&rarr; Meanwhile Google had removed the word &ldquo;favela&rdquo; from Maps at the city&rsquo;s request. Visibility is always political.</div>
+      </div>
+
+      <div class="case-card">
+        <div class="case-card-place">Haiti &middot; 2010</div>
+        <div class="case-card-title">Humanitarian OpenStreetMap</div>
+        <div class="case-card-text">After the earthquake, over 600 volunteers created a basemap of Port-au-Prince in weeks &mdash; used by the UN, World Bank, and search-and-rescue teams. Now: 94 countries, 170,000+ contributors, 105 million+ edits.</div>
+        <div class="case-card-result">&rarr; Nepal 2015: 3,400 mappers, 4.5 million edits in 5 days. The crowd drew faster than the state.</div>
+      </div>
+    </div>
+
+    <div class="voice-note voice-note--urbanist reveal" data-voice="The Urbanist">
+      <p>Henri Lefebvre warned us: the planner&rsquo;s map &mdash; what he called &ldquo;representations of space&rdquo; &mdash; exerts a &ldquo;violence intrinsic to abstraction.&rdquo; The reduction of three-dimensional life to two-dimensional plan confers &ldquo;a redoubtable power.&rdquo; Edward Soja sharpened the knife: &ldquo;It is now space more than time, geography more than history, that hides consequences from us.&rdquo; What is hidden? Redlined neighbourhoods. Zoned-out communities. Blank spots where a million people live. The map doesn&rsquo;t just fail to show them &mdash; it <em>actively</em> renders them invisible, and the invisibility becomes administrative fact.</p>
+    </div>
+
+    <div class="pull reveal">
+      <blockquote>&ldquo;Counter-maps significantly increase the power of people living in a mapped area to control representations of themselves and their claims to resources.&rdquo;</blockquote>
+      <cite>Nancy Peluso, 1995</cite>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     6. THE POETS KNEW
+     ========================================== -->
+<section class="section" id="ch-poets">
+  <div class="section-inner">
+    <span class="ch-num reveal">Chapter 06</span>
+    <h2 class="ch-title reveal">The Poets Knew</h2>
+    <p class="ch-subtitle reveal">What cartographers couldn&rsquo;t say, writers did</p>
+
+    <div class="prose">
+      <p class="lead reveal">Jorge Luis Borges wrote the ur-text in 1946. A single paragraph. An Empire whose cartographers produce a map the size of the Empire itself, coinciding with it point for point. Later generations abandon the map. &ldquo;In the Deserts of the West, still today, there are Tattered Ruins of that Map, inhabited by Animals and Beggars.&rdquo; Baudrillard used it as his epigraph. Then he flipped it: &ldquo;Today it is the territory whose shreds slowly rot across the extent of the map.&rdquo; The map now precedes and generates the territory. The desert of the real itself.</p>
+
+      <p class="reveal">Wis&lstrok;awa Szymborska was working on a poem called &ldquo;Map&rdquo; when she died in 2012. It became the title poem of her collected works. The final lines:</p>
+    </div>
+
+    <div class="pull reveal">
+      <blockquote>&ldquo;I like maps, because they lie.<br>Because they give no access to the vicious truth.<br>Because great-heartedly, good-naturedly<br>they spread before me a world<br>not of this world.&rdquo;</blockquote>
+      <cite>Wis&lstrok;awa Szymborska, &ldquo;Map,&rdquo; 2012 (posthumous)</cite>
+    </div>
+
+    <div class="prose">
+      <p class="reveal">The mercy of the map&rsquo;s imperfection. Mass graves and sudden ruins are out of the picture. From a writer who survived Nazi occupation and Stalinism, this is not whimsy. It is a meditation on what the clean lines of any representation must leave out &mdash; and whether that leaving-out is violence or compassion. Or both.</p>
+
+      <p class="reveal">Elizabeth Bishop opened her entire career with &ldquo;The Map&rdquo; in 1934: land &ldquo;leans down to lift the sea from under,&rdquo; peninsulas &ldquo;take the water between thumb and finger.&rdquo; Her closing line: &ldquo;More delicate than the historians&rsquo; are the map-makers&rsquo; colours.&rdquo; The map as aesthetic object &mdash; tender, autonomous, more honest than history because it admits its own beauty.</p>
+
+      <p class="reveal">Eavan Boland wrote the inverse. &ldquo;That the Science of Cartography is Limited&rdquo; traces a famine road in Ireland &mdash; built by starving people in 1847, where &ldquo;they died, there the road ended.&rdquo; The line which says woodland and cries hunger and finds no horizon &mdash; &ldquo;will not be there.&rdquo; The map as absence. The clean line as erasure.</p>
+    </div>
+
+    <div class="voice-note voice-note--philosopher reveal" data-voice="The Philosopher">
+      <p>Deleuze and Guattari gave us the counter-instruction: &ldquo;Make a map, not a tracing.&rdquo; The tracing is reproductive, closed, hierarchical. The map is &ldquo;open, connectable, reversible, susceptible to constant modification.&rdquo; To map is not to represent &mdash; it is to experiment. &ldquo;The map is entirely oriented toward experimentation in contact with the real.&rdquo; They wanted maps that could be torn, reversed, reworked. They wanted, essentially, what open-source cartography has become.</p>
+    </div>
+
+    <div class="prose">
+      <p class="reveal">Derek Walcott remapped Caribbean space through poetry. &ldquo;Where are your monuments, your battles, martyrs? / Sirs, / in that grey vault. The sea.&rdquo; The devastating image: &ldquo;the ocean kept turning blank pages / looking for History.&rdquo; &Eacute;douard Glissant demanded &ldquo;the right to opacity for everyone&rdquo; &mdash; a direct challenge to cartography&rsquo;s imperative to make everything knowable, mappable, controllable. Not everything wants to be on your map. Some things have a right to remain unmapped.</p>
+
+      <p class="reveal">And Lewis Carroll, seventy years before Borges, gave us the Bellman&rsquo;s perfectly blank Ocean Chart: &ldquo;What&rsquo;s the good of Mercator&rsquo;s North Poles and Equators, / Tropics, Zones, and Meridian Lines?&rdquo; The crew&rsquo;s reply: &ldquo;They are merely conventional signs!&rdquo; In 1876, a Victorian nonsense poet understood what most GIS professionals still resist: the grid is a convention. The convention is a choice. The choice is a politics.</p>
+    </div>
+
+    <div class="pull reveal" style="border-color: var(--gold);">
+      <blockquote>&ldquo;Every map shows this&hellip; but not that.&rdquo;</blockquote>
+      <cite>Denis Wood</cite>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     7. THE CODE IS NOT NEUTRAL
+     ========================================== -->
+<section class="section section--dark" id="ch-code">
+  <div class="section-inner">
+    <span class="ch-num reveal">Chapter 07</span>
+    <h2 class="ch-title reveal">The Code Is Not Neutral</h2>
+    <p class="ch-subtitle reveal">From 99 smartphones in a handcart to the borders that change depending on who&rsquo;s looking</p>
+
+    <div class="prose">
+      <p class="lead reveal" style="color:rgba(245,241,234,.8);">In February 2020, Berlin artist Simon Weckert loaded 99 secondhand smartphones into a small red handcart, walked slowly past Google&rsquo;s headquarters, and turned every street from green to red on Google Maps. Real drivers were rerouted around phantom traffic. His point: &ldquo;There&rsquo;s a blindness that arises from thinking of data as objective, unambiguous and interpretation free.&rdquo; Google&rsquo;s response was cheerful: &ldquo;We love seeing creative uses of Google Maps.&rdquo; They did not address the critique. They never do.</p>
+
+      <p class="reveal">But the deeper problem is structural, not performative. Google Maps operates a &ldquo;disputed region team&rdquo; that displays different borders depending on the viewer&rsquo;s country. From India, Kashmir appears fully Indian. From Pakistan, the border is disputed. Crimea shows a solid Russian border from Russian IP addresses and a dotted one elsewhere. In 2010, Nicaraguan troops invaded Costa Rica&rsquo;s Calero Island after a commander relied on Google Maps, which had drawn 2.7 km of Costa Rican territory as Nicaraguan. The map didn&rsquo;t describe the border. It <em>moved</em> it.</p>
+    </div>
+
+    <div class="voice-note voice-note--technologist reveal" data-voice="The Technologist">
+      <p>Laura Kurgan showed that Google Earth is not &ldquo;a smooth zoom&rdquo; but &ldquo;a patchwork of archived aerial and satellite images of varying origins, sources, motivations, and resolutions.&rdquo; Trevor Paglen photographed classified military sites that were physically erased from USGS aerial images &mdash; &ldquo;edited out of the original negative.&rdquo; His insight: &ldquo;Blank spots on the map begat dark spaces in the law.&rdquo; And Ingrid Burrington spent three years walking Manhattan decoding spray-painted sidewalk markings &mdash; the physical infrastructure of the internet following copper lines from the 1880s, which followed railroad tracks. Infrastructure as sedimented cartography. The past is always underneath the map.</p>
+    </div>
+
+    <div class="prose">
+      <p class="reveal">OpenStreetMap &mdash; the open-source alternative, the community&rsquo;s map &mdash; carries its own shadows. <span class="fact">Only 3% of OSM contributors are female.</span> Coverage overwhelmingly favours the Global North. A former CEO of a major OSM company noted: &ldquo;There&rsquo;s more info on OpenStreetMap on strip clubs than day care centers.&rdquo; Open does not automatically mean equitable. Democratic tools can reproduce the biases of the people who show up to use them.</p>
+
+      <p class="reveal">And then there are the maps you&rsquo;re not supposed to see. Palantir&rsquo;s predictive policing system, deployed secretly by the LAPD and New Orleans police, targeted people who were <span class="fact">53% Latino and 31% Black</span> &mdash; far exceeding their population share. Sociologist Sarah Brayne embedded with the LAPD and documented how the system &ldquo;techwashes bias.&rdquo; One sergeant told her the data infrastructure &ldquo;looks bitching, but it&rsquo;s worthless.&rdquo; Forensic Architecture at Goldsmiths does the opposite: repurposing mapping technology for human rights, reconstructing Syria&rsquo;s secret Saydnaya prison from blindfolded survivors&rsquo; ear-witness testimony. Eyal Weizman&rsquo;s principle is simple: &ldquo;Mapping is power.&rdquo; The question is who holds it.</p>
+    </div>
+
+    <div class="voice-note voice-note--designer reveal" data-voice="The Designer">
+      <p>Shannon Mattern put it cleanly: &ldquo;Some aspects of our cities and our lives within them will never be machine-readable.&rdquo; Not everything is data. Not everything should be. The dream of the total map &mdash; the Borges fantasy made literal by Google &mdash; is also a dream of total surveillance. Eric Rodenbeck of Stamen Design: &ldquo;We expect maps to be a direct reflection of the world, and they clearly are not. I wanted to call attention to the fact that these maps were being made by people.&rdquo; People with budgets, employers, deadlines, and politics. The basemap is not the world. It is a product.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     8. COUNTER-MAPS
+     ========================================== -->
+<section class="section" id="ch-counter">
+  <div class="section-inner">
+    <span class="ch-num reveal">Chapter 08</span>
+    <h2 class="ch-title reveal">Counter-Maps</h2>
+    <p class="ch-subtitle reveal">Or: the map as a tool you can pick up</p>
+
+    <div class="prose">
+      <p class="lead reveal">The founding story is William Bunge and Gwendolyn Warren in Detroit, 1967. Bunge was a geographer. Warren was a resident of the Ferguson neighbourhood. Together, they mapped rat bites by block, children&rsquo;s walking routes to school, abandoned buildings. The data came from the community. The maps went back to the community. The university was furious. Bunge was fired. The maps survived. They are now recognised as the founding moment of radical cartography.</p>
+
+      <p class="reveal">What made Detroit different was not the technique. It was the question: <em>who holds the data?</em> In conventional cartography, data flows upward &mdash; from the surveyed to the surveyor, from the mapped to the mapper. In counter-cartography, data flows back. The map becomes a mirror held up by the community to itself.</p>
+    </div>
+
+    <div class="voice-note voice-note--urbanist reveal" data-voice="The Urbanist">
+      <p>Jan Gehl spent his career trying to turn &ldquo;the view of his architect colleagues upside down, asking them to change their perspective, from the usual bird&rsquo;s-eye view to the view of the human being on the ground.&rdquo; His question cuts: &ldquo;All cities have traffic departments and statistics for traffic and parking. Do you know of any city with a department for pedestrians and public life?&rdquo; The planner&rsquo;s map sees roads. The lived map sees crossings. The counter-map sees the child trying not to get hit.</p>
+    </div>
+
+    <div class="prose">
+      <p class="reveal">In Australia, Songlines &mdash; oral maps encoding navigational information in song, story, dance, and art &mdash; represent the world&rsquo;s oldest living cartographic tradition, spanning 65,000+ years. Margo Neale calls them &ldquo;a master archive&rdquo; in which &ldquo;humans are documents.&rdquo; In Canada, Native Land Digital maps territories, treaties, and languages worldwide. Jordan Engel&rsquo;s Decolonial Atlas argues: &ldquo;Mapmaking is an art, not a science.&rdquo; Ushahidi, born in Kenya&rsquo;s 2007 election crisis, has been deployed in 160+ countries with over 50 million reports. The <em>New York Times</em> called it &ldquo;an innovation that comes from a world where entrepreneurship is born from hardship and survival.&rdquo;</p>
+
+      <p class="reveal">These are not alternative maps. They are <em>additional</em> maps. Peluso&rsquo;s definition still holds: counter-maps &ldquo;significantly increase the power of people living in a mapped area to control representations of themselves.&rdquo; Danny Dorling&rsquo;s cartograms &mdash; where area is proportional to human data rather than territory &mdash; offer &ldquo;a more socially just form of mapping by giving people more equitable representation in an image of the world.&rdquo; Bill Rankin at Yale names three values for cartography&rsquo;s future: <strong>uncertainty, multiplicity, and subjectivity</strong>. His radical cartography shows &ldquo;a geography that&rsquo;s messier, lumpier, with more overlaps and internal diversity.&rdquo;</p>
+
+      <p class="reveal">Messier. Lumpier. More overlaps. That&rsquo;s not a bug. That&rsquo;s the world.</p>
+    </div>
+
+    <div class="pull reveal">
+      <blockquote>&ldquo;Make a map, not a tracing. The map is open, connectable, reversible, susceptible to constant modification.&rdquo;</blockquote>
+      <cite>Deleuze &amp; Guattari, A Thousand Plateaus, 1980</cite>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     9. MANIFESTO
+     ========================================== -->
+<section class="section section--red" id="ch-manifesto">
+  <div class="section-inner">
+    <span class="ch-num reveal">Chapter 09</span>
+    <h2 class="ch-title reveal">Ten Things We Believe</h2>
+    <p class="ch-subtitle reveal" style="color:rgba(255,255,255,.55);">Not rules. Provocations.</p>
+
+    <div class="manifesto-num reveal">
+
+      <div class="mf-item">
+        <p><strong>North is not up.</strong> There is no up on a sphere. The convention is 500 years old, colonial in origin, and reinforced by every app on your phone. Rotate the map. See what loosens.</p>
+      </div>
+
+      <div class="mf-item">
+        <p><strong>Defaults are ideology.</strong> The default zoom level. The default centre point. The default basemap. Every default was chosen by someone with a worldview. Change the defaults and you change the world the map describes.</p>
+      </div>
+
+      <div class="mf-item">
+        <p><strong>If your map looks like Google Maps, it has failed.</strong> Style is not decoration &mdash; it is the argument. Rekacewicz draws maps by hand because the tremor of the line communicates uncertainty. A vector line communicates authority. Choose your line.</p>
+      </div>
+
+      <div class="mf-item">
+        <p><strong>Performance is a political act.</strong> A web map that takes 8 seconds to load on 3G in Lagos has excluded most of the planet. Ship less JavaScript. Use fewer tiles. If your radical map only works on a MacBook in Shoreditch, it isn&rsquo;t radical.</p>
+      </div>
+
+      <div class="mf-item">
+        <p><strong>Disorientation is a feature, not a bug.</strong> But it requires consent. Three to five seconds of productive confusion, followed by an insight. Time it like a punchline.</p>
+      </div>
+
+      <div class="mf-item">
+        <p><strong>Ask who is absent.</strong> Whose data was not collected? Whose neighbourhood was not surveyed? Whose language is not on the labels? Radical cartography begins with radical data governance.</p>
+      </div>
+
+      <div class="mf-item">
+        <p><strong>Every projection is a lie. Say which one.</strong> Every classification is a choice. Every colour ramp is a persuasion. If you can&rsquo;t explain the trade-offs you made &mdash; in plain language, to a non-specialist &mdash; you haven&rsquo;t finished the map.</p>
+      </div>
+
+      <div class="mf-item">
+        <p><strong>Open source is a start, not a solution.</strong> OpenStreetMap is 3% female. Open tools can reproduce closed biases. The architecture of participation matters as much as the licence. Who mapathons? Who decides the schema? Who sets the defaults? (See #2.)</p>
+      </div>
+
+      <div class="mf-item">
+        <p><strong>Not everything wants to be mapped.</strong> Glissant demanded &ldquo;the right to opacity for everyone.&rdquo; Some knowledge &mdash; Songlines, sacred sites, migration routes &mdash; belongs to communities, not databases. The radical cartographer knows when to stop drawing.</p>
+      </div>
+
+      <div class="mf-item">
+        <p><strong>The map is not a picture. It is an argument.</strong> Make yours.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     10. THE LIBRARY
+     ========================================== -->
+<section class="section" id="ch-library">
+  <div class="section-inner">
+    <span class="ch-num reveal">Chapter 10</span>
+    <h2 class="ch-title reveal">The Library</h2>
+    <p class="ch-subtitle reveal">A reading list for map-breakers. Organised by urgency.</p>
+
+    <div class="reveal">
+      <div class="book-item">
+        <div class="book-author">Denis Wood</div>
+        <div class="book-title">The Power of Maps (1992)</div>
+        <div class="book-why">The book that made cartographic criticism legible to non-geographers. Start here.</div>
+      </div>
+
+      <div class="book-item">
+        <div class="book-author">J.B. Harley</div>
+        <div class="book-title">&ldquo;Deconstructing the Map&rdquo; (1989)</div>
+        <div class="book-why">The most cited essay in cartographic theory. Fourteen pages that changed the field.</div>
+      </div>
+
+      <div class="book-item">
+        <div class="book-author">Mogel &amp; Bhagat</div>
+        <div class="book-title">An Atlas of Radical Cartography (2008)</div>
+        <div class="book-why">Ten artists, ten posters, ten arguments. Showed at MoMA PS1.</div>
+      </div>
+
+      <div class="book-item">
+        <div class="book-author">Orangotango+</div>
+        <div class="book-title">This Is Not an Atlas (2018)</div>
+        <div class="book-why">Counter-cartographies from around the world. Open access. Free.</div>
+      </div>
+
+      <div class="book-item">
+        <div class="book-author">Mark Monmonier</div>
+        <div class="book-title">How to Lie with Maps (1991)</div>
+        <div class="book-why">&ldquo;Not only is it easy to lie with maps, it&rsquo;s essential.&rdquo; The definitive primer on cartographic deception.</div>
+      </div>
+
+      <div class="book-item">
+        <div class="book-author">Simon Sadler</div>
+        <div class="book-title">The Situationist City (1998)</div>
+        <div class="book-why">Debord, Jorn, the d&eacute;rive, the psychogeographic maps. Essential context for what we&rsquo;re doing.</div>
+      </div>
+
+      <div class="book-item">
+        <div class="book-author">Henri Lefebvre</div>
+        <div class="book-title">The Production of Space (1974)</div>
+        <div class="book-why">Perceived, conceived, and lived space. The theoretical foundation for everything that followed.</div>
+      </div>
+
+      <div class="book-item">
+        <div class="book-author">Laura Kurgan</div>
+        <div class="book-title">Close Up at a Distance (2013)</div>
+        <div class="book-why">The intellectual framework for critiquing satellite cartography. Columbia University.</div>
+      </div>
+
+      <div class="book-item">
+        <div class="book-author">Bill Rankin</div>
+        <div class="book-title">Radical Cartography (2025)</div>
+        <div class="book-why">Uncertainty, multiplicity, subjectivity. The future of the field.</div>
+      </div>
+
+      <div class="book-item">
+        <div class="book-author">Cohen &amp; Duggan</div>
+        <div class="book-title">New Directions in Radical Cartography (2021)</div>
+        <div class="book-why">The most comprehensive contemporary survey. Community action to digital counter-mapping.</div>
+      </div>
+
+      <div class="book-item">
+        <div class="book-author">Zwer &amp; Rekacewicz</div>
+        <div class="book-title">Cartographie radicale: Explorations</div>
+        <div class="book-why">From Bunge &amp; Warren&rsquo;s Detroit to decolonial and ecofeminist cartographies. VisionsCarto.</div>
+      </div>
+
+      <div class="book-item">
+        <div class="book-author">Wis&lstrok;awa Szymborska</div>
+        <div class="book-title">&ldquo;Map&rdquo; (2012, posthumous)</div>
+        <div class="book-why">&ldquo;I like maps, because they lie.&rdquo; The last poem of a Nobel laureate. Read it.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     CLOSING
+     ========================================== -->
+<section class="section section--dark" style="min-height:auto; padding: 6rem 2rem;">
+  <div class="section-inner" style="text-align:center;">
+    <div class="prose reveal">
+      <p style="color:rgba(245,241,234,.6); font-size:1.1rem; line-height:1.8; max-width:36ch; margin:0 auto 2rem;">The first photograph of Earth had south on top. NASA flipped it. We&rsquo;re flipping it back.</p>
+    </div>
+    <div class="hero-cta reveal">
+      <a href="/map#10.78/51.4637/-0.0715/180">Open the Map &nearr;</a>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     COLOPHON
+     ========================================== -->
+<footer class="colophon">
+  <p>Upside Down &mdash; You&rsquo;ve Been Holding the Map Wrong</p>
+  <p>Research, editorial &amp; design by <a href="https://www.linkedin.com/in/gerardoezequielmc/">Gerardo MC</a> &middot; February 2026</p>
+  <p style="margin-top:.5rem;">South-up Mercator &middot; Protomaps &middot; OpenStreetMap &middot; MapLibre GL JS</p>
+  <p style="margin-top:1rem; color:rgba(245,241,234,.12);">bearing: 180</p>
+</footer>
+
+<!-- ==========================================
+     SCRIPTS
+     ========================================== -->
+<script>
+// Scroll reveal
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: .08, rootMargin: '0px 0px -30px 0px' });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// Chapter nav active state
+const sections = document.querySelectorAll('.section, .hero');
+const navLinks = document.querySelectorAll('.chapter-nav a');
+const navObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      navLinks.forEach(a => a.classList.remove('active'));
+      const active = document.querySelector(`.chapter-nav a[href="#${id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { threshold: .3 });
+sections.forEach(s => { if (s.id) navObs.observe(s); });
+
+// Progress bar
+const progressBar = document.getElementById('progressBar');
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  progressBar.style.width = progress + '%';
+}, { passive: true });
+
+// Hover rotate on "Wrong"
+const emEl = document.querySelector('.hero h1 em');
+if (emEl) {
+  let flipped = false;
+  emEl.addEventListener('click', () => {
+    flipped = !flipped;
+    emEl.style.transform = flipped ? 'rotate(180deg)' : 'rotate(0)';
+  });
+}
+</script>
+
+<script type="module">
+  import { inject } from '@vercel/analytics';
+  inject();
+</script>
+
+</body>
+</html>

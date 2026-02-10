@@ -4,9 +4,9 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --paper:  #F2EDE4;    /* warm uncoated stock */
-  --cream:  #EDE8E0;
-  --bg:     #EDE8E0;
+  --paper:  #FAFAF8;    /* light stock */
+  --cream:  #F0EFED;
+  --bg:     #F0EFED;
   --ink:    #000000;    /* black — primary accent (Drum 5) */
   --teal:   #00838A;    /* Drum 2 */
   --blue:   #0078BF;    /* Drum 3 */
@@ -16,7 +16,7 @@
   --mid:    #88898A;    /* light gray ink */
   --light:  #C4BAA8;    /* subtle elements */
   --rule:   #000000;    /* band borders — black */
-  --earth:  #EDE8E0;
+  --earth:  #F0EFED;
 }
 
 body {

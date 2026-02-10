@@ -12,7 +12,7 @@
       "id": "background",
       "type": "background",
       "paint": {
-        "background-color": "#cccccc"
+        "background-color": "#FAFAF8"
       }
     },
     {
@@ -22,7 +22,7 @@
       "source": "protomaps",
       "source-layer": "earth",
       "paint": {
-        "fill-color": "#e2dfda"
+        "fill-color": "#F0EFED"
       }
     },
     {

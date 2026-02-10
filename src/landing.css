@@ -7,9 +7,9 @@
 
 /* ── Root Variables ── */
 :root {
-  /* Paper — warm uncoated riso stock */
-  --paper:          #F2EDE4;
-  --paper-dark:     #E8E2D8;
+  /* Paper — light stock */
+  --paper:          #FAFAF8;
+  --paper-dark:     #F0EFED;
 
   /* 5 Riso Inks */
   --ink-black:      #000000;
@@ -1497,6 +1497,165 @@ section, .section-divider, .pull-quote, footer.colophon {
 }
 
 /* ══════════════════════════════════════
+   VOICES — Nine disciplinary perspectives
+   ══════════════════════════════════════ */
+
+.voices-section {
+  padding: 4rem 0;
+  position: relative;
+}
+
+.voices-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 45%;
+  height: 100%;
+  background-image:
+    radial-gradient(circle, var(--ink-teal) 0.6px, transparent 0.6px),
+    radial-gradient(circle, var(--ink-fluor-pink) 0.5px, transparent 0.5px);
+  background-size: 12px 12px, 9px 9px;
+  background-position: 0 0, 4px 4px;
+  opacity: 0.04;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse at top right, black 0%, transparent 60%);
+  -webkit-mask-image: radial-gradient(ellipse at top right, black 0%, transparent 60%);
+}
+
+.voices-section .section-header {
+  grid-column: 1 / 10;
+  margin-bottom: 1.5rem;
+}
+
+.voices-section .section-header .meta {
+  display: inline-block;
+  margin-bottom: 1rem;
+  padding: 4px 10px;
+  background: rgba(0, 131, 138, 0.08);
+  border-left: 3px solid var(--ink-teal);
+}
+
+.voices-intro {
+  grid-column: 1 / 7;
+  margin-bottom: 3rem;
+}
+
+/* ── Voice card grid — 3 columns ── */
+.voices-grid {
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--gray-20);
+}
+
+.voice-card {
+  position: relative;
+  padding: 2rem;
+  border-right: 1px solid var(--gray-20);
+  border-bottom: 1px solid var(--gray-20);
+  background: var(--paper);
+  transition: border-color 0.2s;
+}
+
+.voice-card:nth-child(3n) {
+  border-right: none;
+}
+
+.voice-card:hover {
+  border-color: var(--ink-teal);
+  box-shadow: inset 0 0 0 1px rgba(0, 131, 138, 0.1);
+}
+
+.voice-card[data-ink="blue"]:hover {
+  border-color: var(--ink-blue);
+  box-shadow: inset 0 0 0 1px rgba(0, 120, 191, 0.1);
+}
+
+.voice-card[data-ink="pink"]:hover {
+  border-color: var(--ink-fluor-pink);
+  box-shadow: inset 0 0 0 1px rgba(255, 72, 176, 0.1);
+}
+
+.voice-card[data-ink="black"]:hover {
+  border-color: var(--ink-black);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+/* Top accent stripe per card */
+.voice-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+
+.voice-card[data-ink="teal"]::before  { background: var(--ink-teal); }
+.voice-card[data-ink="blue"]::before  { background: var(--ink-blue); }
+.voice-card[data-ink="pink"]::before  { background: var(--ink-fluor-pink); }
+.voice-card[data-ink="black"]::before { background: var(--ink-black); }
+
+.voice-discipline {
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+.voice-card[data-ink="teal"]  .voice-discipline { color: var(--ink-teal); }
+.voice-card[data-ink="blue"]  .voice-discipline { color: var(--ink-blue); }
+.voice-card[data-ink="pink"]  .voice-discipline { color: var(--ink-fluor-pink); }
+.voice-card[data-ink="black"] .voice-discipline { color: var(--ink-black); }
+
+.voice-quote {
+  margin: 0 0 0.75rem;
+  padding: 0;
+  border: none;
+}
+
+.voice-quote p {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--ink-black);
+}
+
+.voice-cite {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-light-gray);
+  font-style: normal;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--gray-20);
+}
+
+.voice-context {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+/* ── Voices data block ── */
+.voices-data {
+  grid-column: 8 / 13;
+  margin-top: 2rem;
+}
+
+.voices-data-block {
+  grid-column: auto;
+}
+
+/* ── Pull quote citations ── */
+.pull-quote-cite {
+  display: block;
+  margin-top: 0.75rem;
+  font-style: normal;
+}
+
+/* ══════════════════════════════════════
    THE MOVEMENT — Counter-Cartographers
    ══════════════════════════════════════ */
 
@@ -1753,6 +1912,23 @@ section, .section-divider, .pull-quote, footer.colophon {
   color: var(--paper);
   transform: translateY(-2px);
   box-shadow: 3px 5px 0 0 var(--ink-fluor-pink);
+}
+
+.cta-story-link {
+  grid-column: 1 / 5;
+  display: block;
+  justify-self: start;
+  margin-top: 1.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.cta-story-link:hover {
+  color: var(--ink-fluor-pink);
 }
 
 /* ══════════════════════════════════════
@@ -2240,6 +2416,31 @@ section, .section-divider, .pull-quote, footer.colophon {
     grid-column: 5 / -1;
   }
 
+  /* Voices */
+  .voices-section .section-header {
+    grid-column: 1 / -1;
+  }
+
+  .voices-intro {
+    grid-column: 1 / -1;
+  }
+
+  .voices-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .voice-card:nth-child(3n) {
+    border-right: 1px solid var(--gray-20);
+  }
+
+  .voice-card:nth-child(2n) {
+    border-right: none;
+  }
+
+  .voices-data {
+    grid-column: 1 / -1;
+  }
+
   /* Movement */
   .movement-section .section-header {
     grid-column: 1 / -1;
@@ -2561,6 +2762,27 @@ section, .section-divider, .pull-quote, footer.colophon {
   .idiom-list {
     grid-column: 1 / -1;
     grid-row: auto;
+  }
+
+  /* Voices */
+  .voices-section .section-header {
+    grid-column: 1 / -1;
+  }
+
+  .voices-intro {
+    grid-column: 1 / -1;
+  }
+
+  .voices-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .voice-card {
+    border-right: none !important;
+  }
+
+  .voices-data {
+    grid-column: 1 / -1;
   }
 
   /* Movement */

@@ -8,6 +8,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, "index.html"),
         map: resolve(__dirname, "map.html"),
+        story: resolve(__dirname, "story.html"),
       },
     },
   },

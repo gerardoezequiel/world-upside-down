@@ -39,8 +39,8 @@ export const RISO_INKS: Record<string, InkDef> = {
   },
 };
 
-export const PAPER = '#F2EDE4';
-export const PAPER_RGB = { r: 242, g: 237, b: 228 };
+export const PAPER = '#FAFAF8';
+export const PAPER_RGB = { r: 250, g: 250, b: 248 };
 
 export const PRINT_ORDER = ['lightGray', 'teal', 'blue', 'fluorPink', 'black'] as const;
 
