@@ -372,7 +372,8 @@ body {
   color: #F7FF00;
   /* Two-drum riso: pink pass offset behind yellow pass */
   text-shadow:
-    6px 6px 0 #FF48B0;
+    8px 8px 0 #FF48B0,
+    16px 16px 0 rgba(200, 25, 80, 0.7);
 }
 
 /* ── MANIFESTO TYPEWRITER (map overlay) ── */
