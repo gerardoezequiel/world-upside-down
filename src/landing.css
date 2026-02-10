@@ -187,6 +187,20 @@ a.link-underline:hover::after {
   padding: 2px 6px;
 }
 
+/* Scroll progress bar — thin pink line below ink strip */
+.scroll-progress {
+  position: fixed;
+  top: 4px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--ink-fluor-pink);
+  z-index: 9999;
+  pointer-events: none;
+  transition: width 0.05s linear;
+  box-shadow: 0 1px 0 0 rgba(0, 131, 138, 0.3);
+}
+
 /* Visible grid overlay — teal registration lines */
 .grid-overlay {
   position: fixed;
@@ -665,6 +679,36 @@ a.link-underline:hover::after {
 .orient-reason {
   color: var(--text-secondary);
   font-size: clamp(0.75rem, 0.9vw, 0.875rem);
+}
+
+/* Historical map images */
+.orientation-maps {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.orient-map-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.orient-map-img {
+  width: 100%;
+  height: auto;
+  border: 2px solid var(--ink-black);
+  filter: grayscale(0.5) contrast(1.15) brightness(1.05);
+  box-shadow:
+    3px 3px 0 0 var(--ink-teal),
+    -2px -2px 0 0 rgba(255, 72, 176, 0.2);
+  transition: filter 0.3s;
+}
+
+.orient-map-img:hover {
+  filter: grayscale(0.2) contrast(1.1);
 }
 
 /* ══════════════════════════════════════
@@ -1902,6 +1946,10 @@ a.link-underline:hover::after {
     margin-top: 2rem;
   }
 
+  .orientation-maps {
+    grid-template-columns: 1fr;
+  }
+
   /* Pull quotes */
   .pull-quote-text {
     grid-column: 1 / -1;
@@ -2121,6 +2169,7 @@ a.link-underline:hover::after {
   .hero-halftone,
   .card-pattern,
   .scroll-indicator,
+  .scroll-progress,
   .map-frame,
   .map-shield,
   .pink-accent-line {

@@ -36,6 +36,9 @@
   <span class="ink-strip-label">5-DRUM RISO &middot; 150 DPI &middot; UNCOATED STOCK</span>
 </div>
 
+<!-- ── Scroll progress bar ── -->
+<div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+
 <!-- ── Visible grid overlay ── -->
 <div class="grid-overlay" aria-hidden="true"></div>
 
@@ -168,6 +171,17 @@ North.">
         <span class="orient-culture meta">Post-1500s Europe</span>
         <span class="orient-dir heading-sm">North &uarr;</span>
         <span class="orient-reason body">Compass + printing press + colonial expansion</span>
+      </div>
+    </div>
+
+    <div class="orientation-maps reveal reveal-d2">
+      <div class="orient-map-item">
+        <img src="/maps/tabula-rogeriana.jpg" alt="Al-Idrisi's Tabula Rogeriana, 1154 — south is at the top" class="orient-map-img" loading="lazy" />
+        <span class="meta">Al-Idrisi &middot; Tabula Rogeriana &middot; 1154 &middot; South-up</span>
+      </div>
+      <div class="orient-map-item">
+        <img src="/maps/to-map.jpg" alt="T-O Mappa Mundi, 12th century — east is at the top" class="orient-map-img" loading="lazy" />
+        <span class="meta">T-O Mappa Mundi &middot; 12th c. &middot; East-up</span>
       </div>
     </div>
   </div>
@@ -1052,6 +1066,28 @@ again.">Look<br>again.</h2>
   }
 
   /* ══════════════════════════════════════
+     SCROLL PROGRESS BAR
+     ══════════════════════════════════════ */
+
+  function initScrollProgress() {
+    var bar = document.getElementById('scroll-progress');
+    if (!bar) return;
+    var ticking = false;
+    window.addEventListener('scroll', function() {
+      if (!ticking) {
+        requestAnimationFrame(function() {
+          var scrollTop = window.scrollY;
+          var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+          var pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+          bar.style.width = pct + '%';
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+  }
+
+  /* ══════════════════════════════════════
      INIT
      ══════════════════════════════════════ */
 
@@ -1064,6 +1100,7 @@ again.">Look<br>again.</h2>
     initOrientationAnimation();
     initMapShield();
     initScrollEffects();
+    initScrollProgress();
   }
 
   // Run when DOM is ready
