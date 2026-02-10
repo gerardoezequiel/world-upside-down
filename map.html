@@ -19,7 +19,7 @@
   <meta name="twitter:description" content="The first photo of Earth had south on top. NASA flipped it. This map flips it back." />
   <meta name="twitter:image" content="/og-image.png" />
 
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:wght@400;500;700&family=Instrument+Serif:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/src/style.css" />
 </head>
 <body>
@@ -36,9 +36,6 @@
       </div>
       <span class="subtitle">an exercise in unlearning north</span>
     </div>
-    <div id="manifesto">
-      <p>"North is not a fact. It is a decision. Every map is a portrait of power disguised as geography."</p>
-    </div>
     <div id="coords">
       <span id="coords-lat">51.51° N</span>
       <span class="coord-sep">/</span>
@@ -53,6 +50,15 @@
     <div id="map"></div>
     <canvas id="dymaxion-canvas"></canvas>
     <div id="dymaxion-label">No north. No south. Just Earth.</div>
+
+    <!-- ── Screenprint title overlay ── -->
+    <div id="screenprint-overlay" aria-hidden="true">
+      <span class="screenprint-line" id="screenprint-l1">UPSIDE</span>
+      <span class="screenprint-line" id="screenprint-l2">DOWN</span>
+    </div>
+
+    <!-- ── Manifesto typewriter ── -->
+    <div id="manifesto"><span id="manifesto-text"></span></div>
 
     <!-- ── Flip toast ── -->
     <div id="flip-toast"></div>
@@ -69,14 +75,19 @@
       Protomaps &middot; OpenStreetMap
     </div>
 
-    <!-- ── Touch controls (mobile) — two flip buttons ── -->
+    <!-- ── Touch controls — two flip buttons ── -->
     <div class="touch-controls" id="touch-controls">
-      <button class="flip-btn" data-orient="normal" aria-label="Normal orientation">
-        <span class="flip-btn-arrow">&#8593;</span>
-      </button>
-      <button class="flip-btn" data-orient="mirrored" aria-label="Mirror">
-        <span class="flip-btn-arrow">&#8594;</span>
-      </button>
+      <span class="touch-prompt" id="touch-prompt">Try flipping</span>
+      <div class="touch-buttons">
+        <button class="flip-btn" data-orient="normal" aria-label="Normal orientation">
+          <span class="flip-btn-arrow">&#8593;</span>
+          <span class="flip-btn-label">N</span>
+        </button>
+        <button class="flip-btn" data-orient="mirrored" aria-label="Mirror">
+          <span class="flip-btn-arrow">&#8594;</span>
+          <span class="flip-btn-label">E</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -141,21 +152,18 @@
     <!-- Flip hint (desktop) — in bottom band -->
     <div id="flip-hint">
       <kbd>&uarr;</kbd>
-      <span>normal</span>
-      <span class="coord-sep">&middot;</span>
-      <kbd>&darr;</kbd>
-      <span>upside down</span>
+      <span>flip north</span>
       <span class="coord-sep">&middot;</span>
       <kbd>&rarr;</kbd>
-      <span>mirror</span>
+      <span>mirror east</span>
     </div>
 
     <!-- Links -->
     <div class="bot-links">
-      <a href="/" class="bot-link">Read the story</a>
-      <a href="https://www.linkedin.com/in/gerardoezequielmc/" target="_blank" rel="noopener" class="bot-link">
+      <a href="/" class="bot-button">Read the story &rarr;</a>
+      <a href="https://www.linkedin.com/in/gerardoezequielmc/" target="_blank" rel="noopener" class="bot-link bot-link-author">
+        <span class="bot-author-name">Gerardo Ezequiel</span>
         <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-        LinkedIn
       </a>
     </div>
   </div>

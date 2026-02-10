@@ -485,6 +485,10 @@ const toastMessages: Record<Orientation, string[]> = {
     "Your brain just sighed with relief",
     "Plot twist: this is the weird one",
     "Congratulations, you're normal again",
+    "Back to the colonial default",
+    "Your atlas publisher approves",
+    "Safety blanket: activated",
+    "This is what centuries of propaganda look like",
   ],
   'upside-down': [
     "Ah, much better",
@@ -499,6 +503,10 @@ const toastMessages: Record<Orientation, string[]> = {
     "Suddenly everything is unfamiliar",
     "Try finding your house now",
     "There is no up in space",
+    "Now you see it as Apollo 17 did",
+    "The Southern Hemisphere approves",
+    "Your worldview just rotated. Literally.",
+    "Antarctica is on top now. Deal with it.",
   ],
   'mirrored': [
     "Through the looking glass",
@@ -511,8 +519,22 @@ const toastMessages: Record<Orientation, string[]> = {
     "Left is right, right is wrong",
     "Good luck navigating home",
     "Your brain: does not compute",
+    "Even Google Maps can't help you now",
+    "This is how da Vinci wrote his notes",
+    "Your inner compass just short-circuited",
   ],
 };
+
+/* ── Toggle map text labels (hide when mirrored to avoid backwards text) ── */
+function toggleMapLabels(map: maplibregl.Map, show: boolean): void {
+  const style = map.getStyle();
+  if (!style) return;
+  for (const layer of style.layers) {
+    if (layer.type === 'symbol') {
+      map.setLayoutProperty(layer.id, 'visibility', show ? 'visible' : 'none');
+    }
+  }
+}
 
 function showFlipToast(text: string): void {
   const toast = document.getElementById('flip-toast');
@@ -527,8 +549,6 @@ function applyOrientation(map: maplibregl.Map, target: Orientation): void {
   const prev = orientation;
   orientation = target;
 
-  const title = document.getElementById('city-title');
-  const sub = document.querySelector('.subtitle') as HTMLElement | null;
   const arrow = document.getElementById('north-arrow');
   const mapEl = document.getElementById('map');
 
@@ -551,6 +571,8 @@ function applyOrientation(map: maplibregl.Map, target: Orientation): void {
   // If coming from mirror or going to mirror, handle the CSS mirror
   if (prev === 'mirrored' && target !== 'mirrored') {
     mapEl?.classList.remove('mirrored');
+    // Restore label layers
+    toggleMapLabels(map, true);
   }
   if (target === 'mirrored' && prev !== 'mirrored') {
     // If we were upside-down, first reset bearing to 0
@@ -564,30 +586,27 @@ function applyOrientation(map: maplibregl.Map, target: Orientation): void {
       setTimeout(() => {
         bearingLocked = true;
         mapEl?.classList.add('mirrored');
+        // Hide label layers so text isn't backwards
+        toggleMapLabels(map, false);
       }, 1200);
     } else {
       mapEl?.classList.add('mirrored');
+      toggleMapLabels(map, false);
     }
-  }
-
-  // Title classes
-  if (title) {
-    title.classList.remove('normal', 'mirrored');
-    if (target === 'normal') title.classList.add('normal');
-    else if (target === 'mirrored') title.classList.add('mirrored');
-    // default (upside-down) has no extra class → CSS rotates 180
-  }
-
-  // Subtitle
-  if (sub) {
-    if (target === 'upside-down') sub.style.transform = 'rotate(180deg)';
-    else if (target === 'mirrored') sub.style.transform = 'scaleX(-1)';
-    else sub.style.transform = 'rotate(0deg)';
   }
 
   // North arrow
   if (arrow) {
     arrow.classList.toggle('flipped', target === 'normal' || target === 'mirrored');
+  }
+
+  // Screenprint title — update text based on orientation
+  const spL1 = document.getElementById('screenprint-l1');
+  const spL2 = document.getElementById('screenprint-l2');
+  if (spL1 && spL2) {
+    if (target === 'upside-down') { spL1.textContent = 'UPSIDE'; spL2.textContent = 'DOWN'; }
+    else if (target === 'normal') { spL1.textContent = 'NORTH'; spL2.textContent = 'UP'; }
+    else if (target === 'mirrored') { spL1.textContent = 'EAST'; spL2.textContent = 'WEST'; }
   }
 
   // Toast
@@ -634,12 +653,13 @@ function setupFlip(map: maplibregl.Map): void {
     flipHint?.classList.remove('visible');
   });
 
-  // ── Mobile flip buttons ──
+  // ── Flip buttons ──
+  const touchPrompt = document.getElementById('touch-prompt');
+
   function updateFlipButtons() {
     document.querySelectorAll('.flip-btn').forEach(btn => {
       const orient = (btn as HTMLElement).dataset.orient as Orientation;
-      // Flip the arrow icon when its orientation is active
-      btn.classList.toggle('flipped', orient === orientation);
+      btn.classList.toggle('active', orient === orientation);
     });
   }
 
@@ -651,6 +671,8 @@ function setupFlip(map: maplibregl.Map): void {
         const target = orientation === orient ? 'upside-down' : orient;
         applyOrientation(map, target);
         updateFlipButtons();
+        // Hide prompt after first use
+        touchPrompt?.classList.add('hidden');
       }
     });
   });
@@ -790,7 +812,7 @@ function setupGeocoder(map: maplibregl.Map): void {
 
 /* ── Dynamic Graticule with Major/Sub lines + inline labels ── */
 function addGraticule(map: maplibregl.Map): void {
-  const GRAT_COLOR = '#fdf28c';
+  const GRAT_COLOR = '#D4A017'; // Riso Yellow — warm gold, visible on paper
 
   function getIntervals(zoom: number): { major: number; sub: number; labelSpacing: number } {
     if (zoom >= 10) return { major: 1, sub: 0.25, labelSpacing: 5 };
@@ -873,8 +895,8 @@ function addGraticule(map: maplibregl.Map): void {
     filter: ['==', ['get', 'rank'], 'sub'],
     paint: {
       'line-color': GRAT_COLOR,
-      'line-opacity': 0.12,
-      'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.3, 5, 0.4, 10, 0.5, 14, 0.6],
+      'line-opacity': 0.22,
+      'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.4, 5, 0.5, 10, 0.6, 14, 0.8],
     },
   });
 
@@ -886,8 +908,8 @@ function addGraticule(map: maplibregl.Map): void {
     filter: ['==', ['get', 'rank'], 'major'],
     paint: {
       'line-color': GRAT_COLOR,
-      'line-opacity': 0.25,
-      'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.4, 5, 0.6, 10, 0.8, 14, 1.0],
+      'line-opacity': 0.40,
+      'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.5, 5, 0.7, 10, 1.0, 14, 1.2],
     },
   });
 
@@ -910,8 +932,9 @@ function addGraticule(map: maplibregl.Map): void {
     },
     paint: {
       'text-color': GRAT_COLOR,
-      'text-opacity': 0.50,
-      'text-halo-width': 0,
+      'text-opacity': 0.65,
+      'text-halo-color': 'rgba(242, 237, 228, 0.6)',
+      'text-halo-width': 1,
     },
   });
 
@@ -1064,20 +1087,63 @@ async function init() {
     // ── Riso misregistration (Approach B — style-level duplicate layers) ──
     applyRisoMisregistration(map);
 
-    // Show manifesto in top band with a gentle fade-in
+    // ── Manifesto typewriter (cycling quotes) ──
     const manifestoEl = document.getElementById('manifesto');
-    setTimeout(() => {
-      manifestoEl?.classList.add('visible');
-    }, 1200);
+    const manifestoText = document.getElementById('manifesto-text');
 
-    // Fade out manifesto when user starts interacting
-    const hideManifesto = () => {
+    const manifestoQuotes = [
+      'North is not a fact. It is a decision.',
+      'Every map is a portrait of power disguised as geography.',
+      'There is no up in space.',
+      'The first photo of Earth had south on top.',
+      "You've been holding the map wrong.",
+      "Orientation comes from orient — it means east, not north.",
+    ];
+
+    let manifestoCancelled = false;
+
+    // Cancel manifesto on user interaction
+    const cancelManifesto = () => {
+      manifestoCancelled = true;
       manifestoEl?.classList.remove('visible');
-      map.off('movestart', hideManifesto);
     };
-    map.on('movestart', hideManifesto);
+    map.on('movestart', cancelManifesto);
 
-    // ── Typewriter search hint (after 20s) ──
+    async function typeManifesto(el: HTMLElement, text: string, speed = 45): Promise<void> {
+      el.textContent = '';
+      for (let i = 0; i < text.length; i++) {
+        if (manifestoCancelled) return;
+        el.textContent += text[i];
+        await new Promise(r => setTimeout(r, speed));
+      }
+    }
+
+    async function deleteManifesto(el: HTMLElement, speed = 25): Promise<void> {
+      const text = el.textContent || '';
+      for (let i = text.length; i > 0; i--) {
+        if (manifestoCancelled) return;
+        el.textContent = text.substring(0, i - 1);
+        await new Promise(r => setTimeout(r, speed));
+      }
+    }
+
+    (async () => {
+      await new Promise(r => setTimeout(r, 2000));
+      if (manifestoCancelled || !manifestoEl || !manifestoText) return;
+
+      let quoteIdx = 0;
+      while (!manifestoCancelled) {
+        manifestoEl.classList.add('visible');
+        await typeManifesto(manifestoText, manifestoQuotes[quoteIdx]);
+        await new Promise(r => setTimeout(r, 3500));
+        if (manifestoCancelled) return;
+        await deleteManifesto(manifestoText);
+        await new Promise(r => setTimeout(r, 600));
+        quoteIdx = (quoteIdx + 1) % manifestoQuotes.length;
+      }
+    })();
+
+    // ── Typewriter search hint (after 12s) ──
     const twEl = document.getElementById('search-typewriter');
     const twText = document.getElementById('typewriter-text');
     let searchHintCancelled = false;
@@ -1147,6 +1213,41 @@ async function init() {
         setTimeout(() => titleEl.classList.remove('hint-pulse'), 2000);
       }
     }, 12000);
+
+    // ── Periodic ambient toasts ──
+    const ambientMessages = [
+      "Your compass has trust issues now",
+      "Geography is just organised disagreement",
+      "The Equator doesn't care which way you hold the map",
+      "Fun fact: medieval maps put east on top",
+      "Australia has entered the chat",
+      "Buckminster Fuller would approve",
+      "This is what the Blue Marble actually showed",
+      "Perspective is everything",
+      "The Southern Hemisphere thanks you",
+      "Maps lie. All of them. Even this one.",
+      "Your mental map just filed a complaint",
+      "No GPS was harmed in the making of this map",
+      "Plot twist: there is no correct orientation",
+      "South is just north with confidence",
+      "Ancient Egyptians oriented south. Just saying.",
+      "Your school atlas owes you an apology",
+      "The Earth is a sphere. It has no top.",
+      "Try scrolling to the edge of the world",
+      "North was a marketing decision",
+      "Copernicus would have loved this",
+    ];
+    let ambientIdx = Math.floor(Math.random() * ambientMessages.length);
+
+    function showAmbientToast() {
+      showFlipToast(ambientMessages[ambientIdx]);
+      ambientIdx = (ambientIdx + 1) % ambientMessages.length;
+      // Next toast in 25-40s
+      setTimeout(showAmbientToast, 25000 + Math.random() * 15000);
+    }
+
+    // First ambient toast after 12s
+    setTimeout(showAmbientToast, 12000);
   });
 
   // ── Dymaxion projection crossfade on zoom out ──
@@ -1168,10 +1269,15 @@ async function init() {
     window.addEventListener('resize', () => dymaxion.resize());
   });
 
-  // Live updates on zoom/move
+  // ── Screenprint fade on zoom ──
+  const spOverlay = document.getElementById('screenprint-overlay');
   map.on('zoom', () => {
     updateScaleBar(map);
     updateCoords(map);
+    // Fade screenprint at high zoom (detailed work)
+    if (spOverlay) {
+      spOverlay.classList.toggle('faded', map.getZoom() > 14);
+    }
   });
 
   map.on('moveend', () => {

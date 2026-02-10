@@ -7,9 +7,9 @@
 
 /* ── Root Variables ── */
 :root {
-  /* Paper — cool white uncoated riso stock */
-  --paper:          #F8F6F1;
-  --paper-dark:     #EDEAE4;
+  /* Paper — warm uncoated riso stock */
+  --paper:          #F2EDE4;
+  --paper-dark:     #E8E2D8;
 
   /* 5 Riso Inks */
   --ink-black:      #000000;
