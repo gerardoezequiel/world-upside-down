@@ -4,65 +4,46 @@ import { initDymaxion } from "./dymaxion";
 import { RISO_INKS, PAPER, generateMisregistration, getSessionSeed } from "./riso";
 
 /* ── 5-Colour Risograph — Official Riso Kagaku Inks ─────────── */
-// Drum 1: Light Gray (#88898A) — land, terrain, secondary roads
-// Drum 2: Teal (#00838A) — water, ocean, rivers, coastline
-// Drum 3: Blue (#0078BF) — buildings, urban fabric
-// Drum 4: Fluorescent Pink (#FF48B0) — parks, green space
-// Drum 5: Black (#000000) — text, road casings, boundaries
-// Paper: white (#FFFFFF)
 const PALETTE = {
-  // Paper stock
-  bg:        PAPER,        // white paper
-  earth:     "#F5F5F5",   // white paper — land base
-  // Drum 2: TEAL — water
-  water:     RISO_INKS.teal.hex,       // #00838A
-  waterLine: "#006A70",   // darker teal for rivers
-  // Drum 3: BLUE — buildings
-  buildings: RISO_INKS.blue.hex,       // #0078BF
-  urban:     "#7BBCE0",   // diluted blue wash (suburban)
-  // Drum 4: FLUORESCENT PINK — parks
-  park:      RISO_INKS.fluorPink.hex,  // #FF48B0
-  parkAlt:   "#FF80C8",   // lighter pink wash
-  // Drum 1: LIGHT GRAY — land, secondary roads
-  road:      "#000000",   // black for primary roads
-  roadMajor: "#000000",   // black
-  roadMinor: RISO_INKS.lightGray.hex,  // #88898A
-  roadCas:   "#D8D4CC",   // warm grey casing
-  rail:      "#000000",   // black
-  // Drum 5: BLACK — boundaries, text, structure
-  boundary:  "#000000",   // black
-  label:     "#000000",   // black
-  labelHalo: PAPER,       // paper halo
-  // Landcover — light gray wash tones
-  grass:     "#DDD8CC",   // warm sand
-  farmland:  "#E0DCC8",   // warm beige
-  scrub:     "#D4D0C0",   // sage-sand
-  barren:    "#E0DAC8",   // sandy
-  glacier:   "#EEEEEE",   // near white
-  // Special — tints from ink overlap
-  hospital:  "#FFB8D8",   // pink tint
-  school:    "#A0D4F0",   // blue tint
-  industrial:"#D0D4D8",   // gray
-  beach:     "#F0E8D0",   // sandy
-  zoo:       "#FFB0D0",   // pink tint
-  aerodrome: "#D0D0D0",   // neutral grey
-  pier:      "#D8D4CC",   // warm grey
-  pedestrian:"#E0DCD4",   // warm off-white
-  runway:    "#B8B4AC",   // medium grey
+  bg:        PAPER,
+  earth:     "#F5F5F5",
+  water:     RISO_INKS.teal.hex,
+  waterLine: "#006A70",
+  buildings: RISO_INKS.blue.hex,
+  urban:     "#7BBCE0",
+  park:      RISO_INKS.fluorPink.hex,
+  parkAlt:   "#FF80C8",
+  road:      "#000000",
+  roadMajor: "#000000",
+  roadMinor: RISO_INKS.lightGray.hex,
+  roadCas:   "#D8D4CC",
+  rail:      "#000000",
+  boundary:  "#000000",
+  label:     "#000000",
+  labelHalo: PAPER,
+  grass:     "#DDD8CC",
+  farmland:  "#E0DCC8",
+  scrub:     "#D4D0C0",
+  barren:    "#E0DAC8",
+  glacier:   "#EEEEEE",
+  hospital:  "#FFB8D8",
+  school:    "#A0D4F0",
+  industrial:"#D0D4D8",
+  beach:     "#F0E8D0",
+  zoo:       "#FFB0D0",
+  aerodrome: "#D0D0D0",
+  pier:      "#D8D4CC",
+  pedestrian:"#E0DCD4",
+  runway:    "#B8B4AC",
 };
 
 /* ── Color replacement map ────────────────────────────────── */
-// Maps original style.json colors → risograph palette
 const COLOR_MAP: Record<string, string> = {
-  // Background & earth
   "#cccccc": PALETTE.bg,
   "#e2dfda": PALETTE.earth,
-  // Buildings
-  "#cccccc_buildings": PALETTE.buildings, // handled specially
-  // Water
+  "#cccccc_buildings": PALETTE.buildings,
   "#80deea": PALETTE.water,
   "#b4d4e1": PALETTE.waterLine,
-  // Parks (greens → corals)
   "rgba(210, 239, 207, 1)": PALETTE.grass,
   "rgba(255, 243, 215, 1)": PALETTE.barren,
   "rgba(230, 230, 230, 1)": PALETTE.urban,
@@ -79,44 +60,36 @@ function recolorStyle(style: maplibregl.StyleSpecification): maplibregl.StyleSpe
   for (const layer of s.layers) {
     const id = (layer as any).id as string;
 
-    // Background
     if (id === "background" && "paint" in layer) {
       (layer as any).paint["background-color"] = PALETTE.bg;
       continue;
     }
 
-    // Earth
     if (id === "earth" && "paint" in layer) {
       (layer as any).paint["fill-color"] = PALETTE.earth;
       continue;
     }
 
-    // Buildings → signature riso-blue with zoom-dependent opacity + outline
     if (id === "buildings" && "paint" in layer) {
       (layer as any).paint["fill-color"] = PALETTE.buildings;
       (layer as any).paint["fill-opacity"] = [
         "interpolate", ["linear"], ["zoom"],
-        12, 0.5,
-        14, 0.70,
-        16, 0.85,
+        12, 0.5, 14, 0.70, 16, 0.85,
       ];
       (layer as any).paint["fill-outline-color"] = "rgba(0, 120, 191, 0.25)";
       continue;
     }
 
-    // Water fill
     if (id === "water" && "paint" in layer) {
       (layer as any).paint["fill-color"] = PALETTE.water;
       continue;
     }
 
-    // Water streams & rivers
     if ((id === "water_stream" || id === "water_river") && "paint" in layer) {
       (layer as any).paint["line-color"] = PALETTE.waterLine;
       continue;
     }
 
-    // Parks / green spaces → coral/salmon
     if (id.startsWith("landuse_park") && "paint" in layer) {
       (layer as any).paint["fill-color"] = PALETTE.park;
       (layer as any).paint["fill-opacity"] = 0.7;
@@ -127,125 +100,66 @@ function recolorStyle(style: maplibregl.StyleSpecification): maplibregl.StyleSpe
       continue;
     }
 
-    // Hospital, school, industrial, etc.
-    if (id === "landuse_hospital" && "paint" in layer) {
-      (layer as any).paint["fill-color"] = PALETTE.hospital;
-      continue;
-    }
-    if (id === "landuse_school" && "paint" in layer) {
-      (layer as any).paint["fill-color"] = PALETTE.school;
-      continue;
-    }
-    if (id === "landuse_industrial" && "paint" in layer) {
-      (layer as any).paint["fill-color"] = PALETTE.industrial;
-      continue;
-    }
-    if (id === "landuse_beach" && "paint" in layer) {
-      (layer as any).paint["fill-color"] = PALETTE.beach;
-      continue;
-    }
-    if (id === "landuse_zoo" && "paint" in layer) {
-      (layer as any).paint["fill-color"] = PALETTE.zoo;
-      continue;
-    }
-    if (id === "landuse_aerodrome" && "paint" in layer) {
-      (layer as any).paint["fill-color"] = PALETTE.aerodrome;
-      continue;
-    }
-    if (id === "landuse_pedestrian" && "paint" in layer) {
-      (layer as any).paint["fill-color"] = PALETTE.pedestrian;
-      continue;
-    }
-    if (id === "landuse_pier" && "paint" in layer) {
-      (layer as any).paint["fill-color"] = PALETTE.pier;
-      continue;
-    }
-    if (id === "landuse_runway" && "paint" in layer) {
-      (layer as any).paint["fill-color"] = PALETTE.runway;
-      continue;
-    }
+    if (id === "landuse_hospital" && "paint" in layer) { (layer as any).paint["fill-color"] = PALETTE.hospital; continue; }
+    if (id === "landuse_school" && "paint" in layer) { (layer as any).paint["fill-color"] = PALETTE.school; continue; }
+    if (id === "landuse_industrial" && "paint" in layer) { (layer as any).paint["fill-color"] = PALETTE.industrial; continue; }
+    if (id === "landuse_beach" && "paint" in layer) { (layer as any).paint["fill-color"] = PALETTE.beach; continue; }
+    if (id === "landuse_zoo" && "paint" in layer) { (layer as any).paint["fill-color"] = PALETTE.zoo; continue; }
+    if (id === "landuse_aerodrome" && "paint" in layer) { (layer as any).paint["fill-color"] = PALETTE.aerodrome; continue; }
+    if (id === "landuse_pedestrian" && "paint" in layer) { (layer as any).paint["fill-color"] = PALETTE.pedestrian; continue; }
+    if (id === "landuse_pier" && "paint" in layer) { (layer as any).paint["fill-color"] = PALETTE.pier; continue; }
+    if (id === "landuse_runway" && "paint" in layer) { (layer as any).paint["fill-color"] = PALETTE.runway; continue; }
 
-    // Landcover (low zoom)
     if (id === "landcover" && "paint" in layer) {
       (layer as any).paint["fill-color"] = [
         "match", ["get", "kind"],
-        "grassland",   PALETTE.grass,
-        "barren",      PALETTE.barren,
-        "urban_area",  PALETTE.urban,
-        "farmland",    PALETTE.farmland,
-        "glacier",     PALETTE.glacier,
-        "scrub",       PALETTE.scrub,
+        "grassland", PALETTE.grass, "barren", PALETTE.barren,
+        "urban_area", PALETTE.urban, "farmland", PALETTE.farmland,
+        "glacier", PALETTE.glacier, "scrub", PALETTE.scrub,
         PALETTE.grass,
       ];
       continue;
     }
 
-    // Roads — casing layers
     if (id.includes("_casing") && "paint" in layer) {
       const p = (layer as any).paint;
-      if (p["line-color"]) {
-        if (id.includes("highway")) {
-          p["line-color"] = PALETTE.roadCas;
-        } else if (id.includes("major")) {
-          p["line-color"] = PALETTE.roadCas;
-        } else {
-          p["line-color"] = PALETTE.roadCas;
-        }
-      }
+      if (p["line-color"]) p["line-color"] = PALETTE.roadCas;
       continue;
     }
 
-    // Roads — fill layers
     if (id.startsWith("roads_") && !id.includes("label") && !id.includes("shield") && !id.includes("oneway") && "paint" in layer) {
       const p = (layer as any).paint;
       if (p["line-color"]) {
-        if (id.includes("highway")) {
-          p["line-color"] = PALETTE.roadMajor;
-        } else if (id.includes("major")) {
-          p["line-color"] = PALETTE.roadMajor;
-        } else if (id.includes("minor") || id.includes("other") || id.includes("link")) {
-          p["line-color"] = PALETTE.roadMinor;
-        } else if (id.includes("rail")) {
-          p["line-color"] = PALETTE.rail;
-        } else if (id.includes("pier")) {
-          p["line-color"] = PALETTE.pier;
-        } else if (id.includes("runway") || id.includes("taxiway")) {
-          p["line-color"] = PALETTE.runway;
-        }
+        if (id.includes("highway") || id.includes("major")) p["line-color"] = PALETTE.roadMajor;
+        else if (id.includes("minor") || id.includes("other") || id.includes("link")) p["line-color"] = PALETTE.roadMinor;
+        else if (id.includes("rail")) p["line-color"] = PALETTE.rail;
+        else if (id.includes("pier")) p["line-color"] = PALETTE.pier;
+        else if (id.includes("runway") || id.includes("taxiway")) p["line-color"] = PALETTE.runway;
       }
       continue;
     }
 
-    // Boundaries
     if (id.startsWith("boundaries") && "paint" in layer) {
       (layer as any).paint["line-color"] = PALETTE.boundary;
       continue;
     }
 
-    // POIs — strip icons, text-only with risograph palette colors
     if (id === "pois") {
       const l = layer as any;
-      // Remove sprite icons entirely — text only
       delete l.layout["icon-image"];
       l.layout["text-offset"] = [0, 0];
       l.layout["text-variable-anchor"] = ["center", "left", "right", "top", "bottom"];
       l.layout["text-size"] = ["interpolate", ["linear"], ["zoom"], 14, 9, 18, 13];
-
-      // Palette-matched POI text colors
       l.paint["text-color"] = [
         "match", ["get", "kind"],
-        // Nature → coral (matching parks)
         "park", PALETTE.park, "forest", PALETTE.park, "garden", PALETTE.park,
         "beach", PALETTE.park, "zoo", PALETTE.zoo, "marina", PALETTE.waterLine,
-        // Transit → dark navy
         "station", PALETTE.road, "bus_stop", PALETTE.roadMinor,
         "ferry_terminal", PALETTE.waterLine, "aerodrome", PALETTE.roadMinor,
-        // Civic → muted rose (matching boundaries)
         "university", PALETTE.boundary, "library", PALETTE.boundary,
         "school", PALETTE.boundary, "townhall", PALETTE.boundary,
         "post_office", PALETTE.boundary, "museum", PALETTE.boundary,
         "theatre", PALETTE.boundary, "artwork", PALETTE.boundary,
-        // Default
         PALETTE.roadMinor,
       ];
       l.paint["text-halo-color"] = PALETTE.labelHalo;
@@ -253,58 +167,47 @@ function recolorStyle(style: maplibregl.StyleSpecification): maplibregl.StyleSpe
       continue;
     }
 
-    // Places locality — strip townspot/capital dot icons
     if (id === "places_locality") {
-      const l = layer as any;
-      delete l.layout["icon-image"];
+      delete (layer as any).layout["icon-image"];
       continue;
     }
 
-    // Road shields — hide (too noisy for this aesthetic)
     if (id === "roads_shields") {
       (layer as any).layout = { visibility: "none" };
       continue;
     }
 
-    // Labels — text color + halo
     if ("paint" in layer) {
       const p = (layer as any).paint;
-      if (p["text-color"]) {
-        p["text-color"] = PALETTE.label;
-      }
-      if (p["text-halo-color"]) {
-        p["text-halo-color"] = PALETTE.labelHalo;
-      }
+      if (p["text-color"]) p["text-color"] = PALETTE.label;
+      if (p["text-halo-color"]) p["text-halo-color"] = PALETTE.labelHalo;
     }
   }
 
   return s;
 }
 
-/* ── Scale bar configuration ──────────────────────────────── */
-interface ScaleConfig {
-  total: number;
-  detail: number;
-  dStep: number;
-  mStep: number;
-}
+/* ══════════════════════════════════════════════════════════════
+   SCALE BAR
+   ══════════════════════════════════════════════════════════════ */
+interface ScaleConfig { total: number; detail: number; dStep: number; mStep: number; }
 
 const scaleConfigs: ScaleConfig[] = [
-  { total: 100,      detail: 10,     dStep: 2,     mStep: 20 },
-  { total: 200,      detail: 20,     dStep: 5,     mStep: 50 },
-  { total: 500,      detail: 50,     dStep: 10,    mStep: 100 },
-  { total: 1000,     detail: 100,    dStep: 20,    mStep: 200 },
-  { total: 2000,     detail: 200,    dStep: 50,    mStep: 500 },
-  { total: 5000,     detail: 500,    dStep: 100,   mStep: 1000 },
-  { total: 10000,    detail: 1000,   dStep: 200,   mStep: 2000 },
-  { total: 20000,    detail: 2000,   dStep: 500,   mStep: 5000 },
-  { total: 50000,    detail: 5000,   dStep: 1000,  mStep: 10000 },
-  { total: 100000,   detail: 10000,  dStep: 2000,  mStep: 20000 },
-  { total: 200000,   detail: 20000,  dStep: 5000,  mStep: 50000 },
-  { total: 500000,   detail: 50000,  dStep: 10000, mStep: 100000 },
-  { total: 1000000,  detail: 100000, dStep: 20000, mStep: 200000 },
-  { total: 2000000,  detail: 200000, dStep: 50000, mStep: 500000 },
-  { total: 5000000,  detail: 500000, dStep: 100000,mStep: 1000000 },
+  { total: 100, detail: 10, dStep: 2, mStep: 20 },
+  { total: 200, detail: 20, dStep: 5, mStep: 50 },
+  { total: 500, detail: 50, dStep: 10, mStep: 100 },
+  { total: 1000, detail: 100, dStep: 20, mStep: 200 },
+  { total: 2000, detail: 200, dStep: 50, mStep: 500 },
+  { total: 5000, detail: 500, dStep: 100, mStep: 1000 },
+  { total: 10000, detail: 1000, dStep: 200, mStep: 2000 },
+  { total: 20000, detail: 2000, dStep: 500, mStep: 5000 },
+  { total: 50000, detail: 5000, dStep: 1000, mStep: 10000 },
+  { total: 100000, detail: 10000, dStep: 2000, mStep: 20000 },
+  { total: 200000, detail: 20000, dStep: 5000, mStep: 50000 },
+  { total: 500000, detail: 50000, dStep: 10000, mStep: 100000 },
+  { total: 1000000, detail: 100000, dStep: 20000, mStep: 200000 },
+  { total: 2000000, detail: 200000, dStep: 50000, mStep: 500000 },
+  { total: 5000000, detail: 500000, dStep: 100000, mStep: 1000000 },
 ];
 
 const niceRatios = [
@@ -313,7 +216,6 @@ const niceRatios = [
   250000, 500000, 1000000,
 ];
 
-/* ── Dynamic scale bar renderer ──────────────────────────── */
 function updateScaleBar(map: maplibregl.Map): void {
   const ctr = map.getCenter();
   const y = (ctr.lat * Math.PI) / 180;
@@ -327,15 +229,11 @@ function updateScaleBar(map: maplibregl.Map): void {
   }
 
   let totalPx = cfg.total / mpp;
-
-  // Ensure minimum readable width at low zoom levels
   if (totalPx < 80) {
-    // Pick a larger config that yields at least 80px
     for (const c of scaleConfigs) {
       const px = c.total / mpp;
       if (px >= 80 && px <= 300) { cfg = c; totalPx = px; break; }
     }
-    // Fallback: just use the largest config
     if (totalPx < 80) {
       cfg = scaleConfigs[scaleConfigs.length - 1];
       totalPx = cfg.total / mpp;
@@ -350,14 +248,11 @@ function updateScaleBar(map: maplibregl.Map): void {
   const pad = 2;
 
   let svg = `<svg width="${Math.ceil(totalPx + pad + 4)}" height="${svgH}" viewBox="0 0 ${Math.ceil(totalPx + pad + 4)} ${svgH}" xmlns="http://www.w3.org/2000/svg">`;
-
-  // Baseline
   svg += `<line x1="${pad}" y1="${baseline}" x2="${pad + totalPx}" y2="${baseline}" stroke="${ink}" stroke-width="1"/>`;
 
   interface Tick { px: number; label: string; isMajor: boolean; }
   const ticks: Tick[] = [];
 
-  // Detail section
   const useKm = cfg.total >= 2000;
   for (let m = 0; m <= cfg.detail; m += cfg.dStep) {
     const px = pad + (m / cfg.total) * totalPx;
@@ -368,14 +263,12 @@ function updateScaleBar(map: maplibregl.Map): void {
     ticks.push({ px, label, isMajor });
   }
 
-  // Major section
   for (let m = cfg.detail + cfg.mStep; m <= cfg.total; m += cfg.mStep) {
     const px = pad + (m / cfg.total) * totalPx;
     const label = useKm ? String(m / 1000) : String(m);
     ticks.push({ px, label, isMajor: true });
   }
 
-  // End tick
   const endPx = pad + totalPx;
   const endInList = ticks.some((t) => Math.abs(t.px - endPx) < 1);
   if (!endInList) {
@@ -386,7 +279,6 @@ function updateScaleBar(map: maplibregl.Map): void {
     });
   }
 
-  // Draw ticks
   for (const t of ticks) {
     const h = t.isMajor ? tickMajor : tickMinor;
     svg += `<line x1="${t.px}" y1="${baseline}" x2="${t.px}" y2="${baseline - h}" stroke="${ink}" stroke-width="${t.isMajor ? 1 : 0.6}"/>`;
@@ -402,7 +294,6 @@ function updateScaleBar(map: maplibregl.Map): void {
   const el = document.getElementById('scale-svg');
   if (el) el.outerHTML = svg.replace('<svg ', '<svg id="scale-svg" ');
 
-  // Numerical ratio (1:X)
   const metersPerCm = mpp * 37.8;
   let ratio = Math.round(metersPerCm * 100);
   let best = niceRatios[0];
@@ -432,9 +323,120 @@ function updateCoords(map: maplibregl.Map): void {
   if (zoomEl) zoomEl.textContent = `z${z.toFixed(1)}`;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   THREE-MODE STATE MACHINE
+   ══════════════════════════════════════════════════════════════ */
+type Mode = 'poster' | 'explore' | 'maker';
+let currentMode: Mode = 'poster';
+let hasCustomTitle = false;
+
+const IDLE_TIMEOUT = 45000; // 45s
+let idleTimer: ReturnType<typeof setTimeout> | null = null;
+
+const root = document.documentElement;
+
+function setOverlayOpacity(val: number, transition?: string) {
+  root.style.setProperty('--overlay-opacity', String(val));
+  if (transition) root.style.setProperty('--overlay-transition', transition);
+}
+
+function setMode(mode: Mode, map?: maplibregl.Map) {
+  if (mode === currentMode) return;
+  const prev = currentMode;
+  currentMode = mode;
+
+  const overlay = document.getElementById('screenprint-overlay');
+  const regMark = document.getElementById('reg-mark');
+  const touchControls = document.getElementById('touch-controls');
+  const flipHint = document.getElementById('flip-hint');
+
+  if (mode === 'poster') {
+    root.style.setProperty('--overlay-transition', '1.2s cubic-bezier(0.4, 0, 0.2, 1)');
+    setOverlayOpacity(0.90);
+    overlay?.classList.add('poster-mode');
+    regMark?.classList.remove('visible');
+    touchControls?.classList.remove('visible');
+    flipHint?.classList.remove('visible');
+    clearIdleTimer();
+  }
+
+  if (mode === 'explore') {
+    root.style.setProperty('--overlay-transition', prev === 'poster' ? '1.2s cubic-bezier(0.4, 0, 0.2, 1)' : '0.6s ease');
+    // Zoom-based opacity
+    const zoom = map?.getZoom() ?? 11;
+    setOverlayOpacity(zoom > 16 ? 0 : zoom > 14 ? 0.04 : 0.08);
+    overlay?.classList.remove('poster-mode');
+
+    // Staggered entrance
+    setTimeout(() => regMark?.classList.add('visible'), 0);
+    setTimeout(() => touchControls?.classList.add('visible'), 150);
+    setTimeout(() => {
+      // Show flip hint on desktop, first visit only
+      if (flipHint && !localStorage.getItem('wud-explored')) {
+        flipHint.classList.add('visible');
+      }
+    }, 300);
+
+    // Discovery cue for ⊕
+    if (!localStorage.getItem('wud-explored')) {
+      localStorage.setItem('wud-explored', '1');
+      regMark?.classList.add('discovery-pulse');
+      regMark?.addEventListener('animationend', () => {
+        regMark.classList.remove('discovery-pulse');
+      }, { once: true });
+    }
+
+    startIdleTimer(map);
+  }
+
+  if (mode === 'maker') {
+    root.style.setProperty('--overlay-transition', '0.4s ease');
+    setOverlayOpacity(0.50);
+    overlay?.classList.remove('poster-mode');
+    clearIdleTimer();
+  }
+}
+
+function startIdleTimer(map?: maplibregl.Map) {
+  clearIdleTimer();
+  idleTimer = setTimeout(() => {
+    if (currentMode === 'explore') {
+      // Gentle drift back to poster
+      root.style.setProperty('--overlay-transition', '3s ease-in-out');
+      setOverlayOpacity(0.90);
+      // After transition, formally enter poster mode
+      setTimeout(() => {
+        if (currentMode === 'explore') {
+          currentMode = 'poster';
+          document.getElementById('screenprint-overlay')?.classList.add('poster-mode');
+          document.getElementById('reg-mark')?.classList.remove('visible');
+          document.getElementById('touch-controls')?.classList.remove('visible');
+        }
+      }, 3000);
+    }
+  }, IDLE_TIMEOUT);
+}
+
+function clearIdleTimer() {
+  if (idleTimer) { clearTimeout(idleTimer); idleTimer = null; }
+}
+
+function resetIdleTimer(map?: maplibregl.Map) {
+  if (currentMode === 'explore') {
+    // If we're drifting back, snap to explore
+    const currentOpacity = parseFloat(root.style.getPropertyValue('--overlay-opacity') || '0.08');
+    if (currentOpacity > 0.08) {
+      root.style.setProperty('--overlay-transition', '0.3s ease');
+      const zoom = map?.getZoom() ?? 11;
+      setOverlayOpacity(zoom > 16 ? 0 : zoom > 14 ? 0.04 : 0.08);
+    }
+    startIdleTimer(map);
+  }
+}
+
 /* ── Reverse geocode for city name ───────────────────────── */
 let geocodeTimeout: ReturnType<typeof setTimeout> | null = null;
-let currentCityName = ''; // stored for location-aware toasts
+let currentCityName = '';
 
 function updateCityTitle(map: maplibregl.Map): void {
   if (geocodeTimeout) clearTimeout(geocodeTimeout);
@@ -444,7 +446,6 @@ function updateCityTitle(map: maplibregl.Map): void {
     const titleEl = document.getElementById('city-title');
     if (!titleEl) return;
 
-    // Only show place names at zoom >= 5
     if (z < 5) {
       titleEl.textContent = 'Upside Down';
       currentCityName = '';
@@ -464,100 +465,63 @@ function updateCityTitle(map: maplibregl.Map): void {
         currentCityName = name;
       }
     } catch {
-      // Silently fail — keep last known name
+      // Silently fail
     }
   }, 800);
 }
 
-/* ── Orientation state ────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════
+   ORIENTATION SYSTEM
+   ══════════════════════════════════════════════════════════════ */
 type Orientation = 'upside-down' | 'normal' | 'mirrored';
 let orientation: Orientation = 'upside-down';
-let bearingLocked = true; // disable during programmatic orientation changes
+let bearingLocked = true;
 
 const toastMessages: Record<Orientation, string[]> = {
   'normal': [
-    "Wait... this feels wrong",
-    "Oh no, not this again",
-    "The boring way up",
-    "How conventional of you",
-    "You've been conditioned",
-    "This is just a convention, you know",
-    "North is a social construct",
-    "Comfortable? That's the problem",
-    "Welcome back to the Matrix",
-    "Your brain just sighed with relief",
-    "Plot twist: this is the weird one",
-    "Congratulations, you're normal again",
-    "Back to the colonial default",
-    "Your atlas publisher approves",
-    "Safety blanket: activated",
-    "This is what centuries of propaganda look like",
+    "Wait... this feels wrong", "Oh no, not this again", "The boring way up",
+    "How conventional of you", "You've been conditioned",
+    "North is a social construct", "Comfortable? That's the problem",
+    "Welcome back to the Matrix", "Plot twist: this is the weird one",
+    "Back to the colonial default", "Safety blanket: activated",
   ],
   'upside-down': [
-    "Ah, much better",
-    "Welcome back",
-    "Now we're talking",
-    "Home sweet upside down",
-    "This is the real world",
-    "Your GPS is confused",
-    "South is the new up",
-    "Wait, where's my country?",
-    "Earth has no opinion on the matter",
-    "Suddenly everything is unfamiliar",
-    "Try finding your house now",
-    "There is no up in space",
-    "Now you see it as Apollo 17 did",
-    "The Southern Hemisphere approves",
-    "Your worldview just rotated. Literally.",
+    "Ah, much better", "Welcome back", "Now we're talking",
+    "Home sweet upside down", "This is the real world",
+    "South is the new up", "Earth has no opinion on the matter",
+    "Suddenly everything is unfamiliar", "There is no up in space",
+    "Now you see it as Apollo 17 did", "The Southern Hemisphere approves",
     "Antarctica is on top now. Deal with it.",
   ],
   'mirrored': [
-    "Through the looking glass",
-    "Everything is backwards now",
-    "Mirror, mirror on the wall...",
-    "East is west, west is east",
-    "The sun rises in the west now",
-    "Your mental map just broke",
-    "Try giving someone directions now",
-    "Left is right, right is wrong",
-    "Good luck navigating home",
-    "Your brain: does not compute",
+    "Through the looking glass", "Everything is backwards now",
+    "Mirror, mirror on the wall...", "East is west, west is east",
+    "Your mental map just broke", "Try giving someone directions now",
     "Even Google Maps can't help you now",
     "This is how da Vinci wrote his notes",
-    "Your inner compass just short-circuited",
   ],
 };
 
-/* Location-aware toast templates — {city} replaced at runtime */
 const locationToasts: Record<Orientation, string[]> = {
   'normal': [
     "{city} looks boringly correct now",
     "The people of {city} feel safe again",
     "{city}: back to the atlas version",
-    "Bet you feel at home in {city} now",
-    "{city} just went back to normal. How sad.",
   ],
   'upside-down': [
     "Did you get lost in {city}?",
     "{city} looks different from down here",
-    "Even locals in {city} wouldn't recognise this",
     "Welcome to {city}... upside down",
-    "Trying to find your way around {city}?",
     "Is that really {city}?",
-    "{city} has never looked so confused",
     "Good luck giving directions in {city} now",
-    "Your Airbnb in {city} is... somewhere",
   ],
   'mirrored': [
     "{city} through the looking glass",
     "Try finding your hotel in {city} now",
     "{city} but make it backwards",
-    "The street signs in {city} are lying to you",
-    "Good luck navigating {city} like this",
   ],
 };
 
-/* ── Toggle map text labels (hide when mirrored to avoid backwards text) ── */
 function toggleMapLabels(map: maplibregl.Map, show: boolean): void {
   const style = map.getStyle();
   if (!style) return;
@@ -569,7 +533,7 @@ function toggleMapLabels(map: maplibregl.Map, show: boolean): void {
 }
 
 let lastToastTime = 0;
-const TOAST_COOLDOWN = 3000; // min ms between toasts
+const TOAST_COOLDOWN = 3000;
 
 function showFlipToast(text: string): void {
   const now = Date.now();
@@ -584,7 +548,6 @@ function showFlipToast(text: string): void {
 }
 
 function getOrientationToast(target: Orientation): string {
-  // ~40% chance of location-aware toast if city name is known
   if (currentCityName && Math.random() < 0.4) {
     const locMsgs = locationToasts[target];
     const template = locMsgs[Math.floor(Math.random() * locMsgs.length)];
@@ -602,14 +565,13 @@ function applyOrientation(map: maplibregl.Map, target: Orientation): void {
   const arrow = document.getElementById('north-arrow');
   const mapEl = document.getElementById('map');
 
-  // Handle bearing changes (upside-down vs normal/mirrored)
   const needsBearingChange =
     (prev === 'upside-down' && target !== 'upside-down') ||
     (prev !== 'upside-down' && target === 'upside-down');
 
   if (needsBearingChange) {
     const targetBearing = target === 'upside-down' ? 180 : 0;
-    bearingLocked = false; // allow animation
+    bearingLocked = false;
     map.easeTo({
       bearing: targetBearing,
       duration: 1200,
@@ -618,25 +580,20 @@ function applyOrientation(map: maplibregl.Map, target: Orientation): void {
     setTimeout(() => { bearingLocked = true; }, 1300);
   }
 
-  // If coming from mirror or going to mirror, handle the CSS mirror
   if (prev === 'mirrored' && target !== 'mirrored') {
     mapEl?.classList.remove('mirrored');
-    // Restore label layers
     toggleMapLabels(map, true);
   }
   if (target === 'mirrored' && prev !== 'mirrored') {
-    // If we were upside-down, first reset bearing to 0
     if (prev === 'upside-down') {
       bearingLocked = false;
       map.easeTo({
-        bearing: 0,
-        duration: 1200,
+        bearing: 0, duration: 1200,
         easing: (t: number) => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2,
       });
       setTimeout(() => {
         bearingLocked = true;
         mapEl?.classList.add('mirrored');
-        // Hide label layers so text isn't backwards
         toggleMapLabels(map, false);
       }, 1200);
     } else {
@@ -645,64 +602,79 @@ function applyOrientation(map: maplibregl.Map, target: Orientation): void {
     }
   }
 
-  // North arrow
   if (arrow) {
     arrow.classList.toggle('flipped', target === 'normal' || target === 'mirrored');
   }
 
-  // Screenprint title — update text based on orientation
-  const spL1 = document.getElementById('screenprint-l1');
-  const spL2 = document.getElementById('screenprint-l2');
-  if (spL1 && spL2) {
-    if (target === 'upside-down') { spL1.textContent = 'UPSIDE'; spL2.textContent = 'DOWN'; }
-    else if (target === 'normal') { spL1.textContent = 'NORTH'; spL2.textContent = 'UP'; }
-    else if (target === 'mirrored') { spL1.textContent = 'EAST'; spL2.textContent = 'WEST'; }
+  // Update screenprint text — only if user hasn't customized
+  if (!hasCustomTitle) {
+    const spL1 = document.getElementById('screenprint-l1');
+    const spL2 = document.getElementById('screenprint-l2');
+    if (spL1 && spL2) {
+      if (target === 'upside-down') { spL1.textContent = 'UPSIDE'; spL2.textContent = 'DOWN'; }
+      else if (target === 'normal') { spL1.textContent = 'NORTH'; spL2.textContent = 'UP'; }
+      else if (target === 'mirrored') { spL1.textContent = 'EAST'; spL2.textContent = 'WEST'; }
+    }
+    // Brief overlay pulse
+    if (currentMode === 'explore') {
+      root.style.setProperty('--overlay-transition', '0.4s ease');
+      setOverlayOpacity(0.60);
+      setTimeout(() => {
+        if (currentMode === 'explore') {
+          root.style.setProperty('--overlay-transition', '0.8s ease');
+          const zoom = map.getZoom();
+          setOverlayOpacity(zoom > 16 ? 0 : zoom > 14 ? 0.04 : 0.08);
+        }
+      }, 1500);
+    }
+  } else {
+    // Custom title — subtle pulse
+    if (currentMode === 'explore') {
+      root.style.setProperty('--overlay-transition', '0.3s ease');
+      setOverlayOpacity(0.15);
+      setTimeout(() => {
+        if (currentMode === 'explore') {
+          root.style.setProperty('--overlay-transition', '0.5s ease');
+          const zoom = map.getZoom();
+          setOverlayOpacity(zoom > 16 ? 0 : zoom > 14 ? 0.04 : 0.08);
+        }
+      }, 800);
+    }
   }
 
-  // Toast
   showFlipToast(getOrientationToast(target));
 
-  // Hide hint
-  document.getElementById('flip-hint')?.classList.remove('visible');
+  // Enter explore mode on flip
+  if (currentMode === 'poster') {
+    setMode('explore', map);
+  }
 }
 
 function setupFlip(map: maplibregl.Map): void {
-  // Show hints after a short delay (persistent on desktop until first key press)
   const flipHint = document.getElementById('flip-hint');
-  setTimeout(() => {
-    flipHint?.classList.add('visible');
-  }, 2000);
-
-  // Show mobile flip buttons after a short delay
-  setTimeout(() => {
-    document.getElementById('touch-controls')?.classList.add('visible');
-  }, 2000);
 
   document.addEventListener('keydown', (e) => {
-    if ((e.target as HTMLElement).tagName === 'INPUT') return;
+    if ((e.target as HTMLElement).tagName === 'INPUT' ||
+        (e.target as HTMLElement).hasAttribute('contenteditable')) return;
 
     switch (e.key) {
-      case 'ArrowUp':
-        applyOrientation(map, 'normal');
-        break;
-      case 'ArrowDown':
-        applyOrientation(map, 'upside-down');
-        break;
-      case 'ArrowRight':
-        applyOrientation(map, 'mirrored');
-        break;
-      case 'ArrowLeft':
-        applyOrientation(map, 'normal');
-        break;
-      default:
+      case 'ArrowUp': applyOrientation(map, 'normal'); break;
+      case 'ArrowDown': applyOrientation(map, 'upside-down'); break;
+      case 'ArrowRight': applyOrientation(map, 'mirrored'); break;
+      case 'ArrowLeft': applyOrientation(map, 'normal'); break;
+      case 'Escape':
+        closeAllMenus();
+        if (currentMode === 'explore' || currentMode === 'maker') {
+          setMode('poster', map);
+        }
         return;
+      default: return;
     }
     e.preventDefault();
-    // Hide hint after first arrow key use
     flipHint?.classList.remove('visible');
   });
 
-  // ── Flip buttons ──
+  // Flip buttons (mobile)
   const touchPrompt = document.getElementById('touch-prompt');
 
   function updateFlipButtons() {
@@ -716,21 +688,20 @@ function setupFlip(map: maplibregl.Map): void {
     btn.addEventListener('click', () => {
       const orient = (btn as HTMLElement).dataset.orient as Orientation;
       if (orient) {
-        // Toggle: if already in this orientation, go back to upside-down
         const target = orientation === orient ? 'upside-down' : orient;
         applyOrientation(map, target);
         updateFlipButtons();
-        // Hide prompt after first use
         touchPrompt?.classList.add('hidden');
       }
     });
   });
 
-  // Set initial state
   updateFlipButtons();
 }
 
-/* ── Geocoder search ─────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════
+   GEOCODER
+   ══════════════════════════════════════════════════════════════ */
 let searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
 function setupGeocoder(map: maplibregl.Map): void {
@@ -756,15 +727,12 @@ function setupGeocoder(map: maplibregl.Map): void {
     if (searchTimeout) clearTimeout(searchTimeout);
   }
 
-  // Click title → open search
   titleEl.addEventListener('click', openGeocoder);
 
-  // Escape → close
   inputEl.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeGeocoder();
   });
 
-  // Close when clicking outside
   document.addEventListener('click', (e) => {
     if (geocoderEl.classList.contains('open') &&
         !geocoderEl.contains(e.target as Node) &&
@@ -773,7 +741,6 @@ function setupGeocoder(map: maplibregl.Map): void {
     }
   });
 
-  // Search on typing (debounced)
   inputEl.addEventListener('input', () => {
     const q = inputEl.value.trim();
     if (searchTimeout) clearTimeout(searchTimeout);
@@ -818,26 +785,21 @@ function setupGeocoder(map: maplibregl.Map): void {
             const lon = parseFloat(r.lon);
             const bbox = r.boundingbox;
 
-            // Fly to location
             if (bbox) {
               const sw: [number, number] = [parseFloat(bbox[2]), parseFloat(bbox[0])];
               const ne: [number, number] = [parseFloat(bbox[3]), parseFloat(bbox[1])];
               map.fitBounds([sw, ne], {
                 bearing: orientation === 'upside-down' ? 180 : 0,
-                padding: 60,
-                duration: 1800,
-                maxZoom: 14,
+                padding: 60, duration: 1800, maxZoom: 14,
               });
             } else {
               map.flyTo({
-                center: [lon, lat],
-                zoom: 12,
+                center: [lon, lat], zoom: 12,
                 bearing: orientation === 'upside-down' ? 180 : 0,
                 duration: 1800,
               });
             }
 
-            // Update title to place name
             titleEl.textContent = name;
             closeGeocoder();
           });
@@ -850,7 +812,6 @@ function setupGeocoder(map: maplibregl.Map): void {
     }, 350);
   });
 
-  // Enter key → select first result
   inputEl.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       const first = resultsEl.querySelector('.geocoder-result') as HTMLElement | null;
@@ -859,11 +820,13 @@ function setupGeocoder(map: maplibregl.Map): void {
   });
 }
 
-/* ── Dynamic Graticule with Major/Sub lines + inline labels ── */
+/* ══════════════════════════════════════════════════════════════
+   GRATICULE
+   ══════════════════════════════════════════════════════════════ */
 function addGraticule(map: maplibregl.Map): void {
-  const GRAT_COLOR = '#D4A017'; // Riso Yellow — warm gold, visible on paper
+  const GRAT_COLOR = '#D4A017';
 
-  function getIntervals(zoom: number): { major: number; sub: number; labelSpacing: number } {
+  function getIntervals(zoom: number) {
     if (zoom >= 10) return { major: 1, sub: 0.25, labelSpacing: 5 };
     if (zoom >= 7)  return { major: 2, sub: 0.5, labelSpacing: 10 };
     if (zoom >= 5)  return { major: 5, sub: 1, labelSpacing: 20 };
@@ -875,13 +838,11 @@ function addGraticule(map: maplibregl.Map): void {
   function buildGraticuleGeoJSON(major: number, sub: number, labelSpacing: number): GeoJSON.FeatureCollection {
     const features: GeoJSON.Feature[] = [];
 
-    // Major longitude lines (vertical)
     for (let lon = -180; lon <= 180; lon += major) {
       const coords: [number, number][] = [];
       for (let lat = -85; lat <= 85; lat += 2) coords.push([lon, lat]);
       features.push({ type: 'Feature', properties: { rank: 'major' }, geometry: { type: 'LineString', coordinates: coords } });
 
-      // Labels along this longitude line, spaced every labelSpacing degrees of latitude
       const lonLabel = lon === 0 ? '0°' : `${Math.abs(lon)}°${lon > 0 ? 'E' : 'W'}`;
       for (let lat = -80; lat <= 80; lat += labelSpacing) {
         features.push({
@@ -892,13 +853,11 @@ function addGraticule(map: maplibregl.Map): void {
       }
     }
 
-    // Major latitude lines (horizontal)
     for (let lat = -80; lat <= 80; lat += major) {
       const coords: [number, number][] = [];
       for (let lon = -180; lon <= 180; lon += 2) coords.push([lon, lat]);
       features.push({ type: 'Feature', properties: { rank: 'major' }, geometry: { type: 'LineString', coordinates: coords } });
 
-      // Labels along this latitude line
       const latLabel = lat === 0 ? '0°' : `${Math.abs(lat)}°${lat > 0 ? 'N' : 'S'}`;
       for (let lon = -180; lon <= 180; lon += labelSpacing) {
         features.push({
@@ -909,7 +868,6 @@ function addGraticule(map: maplibregl.Map): void {
       }
     }
 
-    // Sub longitude lines
     for (let lon = -180; lon <= 180; lon += sub) {
       if (Number.isInteger(lon / major) && lon % major === 0) continue;
       const coords: [number, number][] = [];
@@ -917,7 +875,6 @@ function addGraticule(map: maplibregl.Map): void {
       features.push({ type: 'Feature', properties: { rank: 'sub' }, geometry: { type: 'LineString', coordinates: coords } });
     }
 
-    // Sub latitude lines
     for (let lat = -80; lat <= 80; lat += sub) {
       if (Number.isInteger(lat / major) && lat % major === 0) continue;
       const coords: [number, number][] = [];
@@ -936,37 +893,26 @@ function addGraticule(map: maplibregl.Map): void {
     data: buildGraticuleGeoJSON(major, sub, labelSpacing),
   });
 
-  // Sub lines — very faint
   map.addLayer({
-    id: 'graticule-sub',
-    type: 'line',
-    source: 'graticule',
+    id: 'graticule-sub', type: 'line', source: 'graticule',
     filter: ['==', ['get', 'rank'], 'sub'],
     paint: {
-      'line-color': GRAT_COLOR,
-      'line-opacity': 0.22,
+      'line-color': GRAT_COLOR, 'line-opacity': 0.22,
       'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.4, 5, 0.5, 10, 0.6, 14, 0.8],
     },
   });
 
-  // Major lines — subtle
   map.addLayer({
-    id: 'graticule-major',
-    type: 'line',
-    source: 'graticule',
+    id: 'graticule-major', type: 'line', source: 'graticule',
     filter: ['==', ['get', 'rank'], 'major'],
     paint: {
-      'line-color': GRAT_COLOR,
-      'line-opacity': 0.40,
+      'line-color': GRAT_COLOR, 'line-opacity': 0.40,
       'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.5, 5, 0.7, 10, 1.0, 14, 1.2],
     },
   });
 
-  // Inline labels — sit on the lines, move with the map
   map.addLayer({
-    id: 'graticule-labels',
-    type: 'symbol',
-    source: 'graticule',
+    id: 'graticule-labels', type: 'symbol', source: 'graticule',
     filter: ['==', ['get', 'rank'], 'label'],
     layout: {
       'text-field': ['get', 'text'],
@@ -980,14 +926,11 @@ function addGraticule(map: maplibregl.Map): void {
       'symbol-placement': 'point',
     },
     paint: {
-      'text-color': GRAT_COLOR,
-      'text-opacity': 0.65,
-      'text-halo-color': 'rgba(242, 237, 228, 0.6)',
-      'text-halo-width': 1,
+      'text-color': GRAT_COLOR, 'text-opacity': 0.65,
+      'text-halo-color': 'rgba(242, 237, 228, 0.6)', 'text-halo-width': 1,
     },
   });
 
-  // Update density on zoom
   map.on('zoomend', () => {
     const intervals = getIntervals(map.getZoom());
     if (intervals.major !== currentMajor) {
@@ -997,72 +940,60 @@ function addGraticule(map: maplibregl.Map): void {
     }
   });
 
-  // Clear the old HTML label container (no longer used)
   const labelContainer = document.getElementById('grat-edge-labels');
   if (labelContainer) labelContainer.innerHTML = '';
 }
 
-/* ── Riso Misregistration (Approach B — style-level) ──────── */
+/* ── Riso Misregistration ──────────────────────────────────── */
 function applyRisoMisregistration(map: maplibregl.Map): void {
   const seed = getSessionSeed();
   const misreg = generateMisregistration(seed);
   const style = map.getStyle();
   if (!style) return;
 
-  // Scale factor — exaggerate sub-pixel offsets for visibility
   const SCALE = 2.5;
 
-  // ── Water misregistration (teal) ──
   const waterLayer = style.layers.find(l => l.id === 'water');
   if (waterLayer && 'source-layer' in waterLayer) {
     map.addLayer({
-      id: 'water-riso-offset',
-      type: 'fill',
+      id: 'water-riso-offset', type: 'fill',
       source: (waterLayer as any).source,
       'source-layer': (waterLayer as any)['source-layer'],
       paint: {
-        'fill-color': RISO_INKS.teal.hex,
-        'fill-opacity': 0.12,
+        'fill-color': RISO_INKS.teal.hex, 'fill-opacity': 0.12,
         'fill-translate': [misreg.teal.dx * SCALE, misreg.teal.dy * SCALE],
       },
     }, 'water');
   }
 
-  // ── Building misregistration (blue) ──
   const buildingLayer = style.layers.find(l => l.id === 'buildings');
   if (buildingLayer && 'source-layer' in buildingLayer) {
     map.addLayer({
-      id: 'buildings-riso-offset',
-      type: 'fill',
+      id: 'buildings-riso-offset', type: 'fill',
       source: (buildingLayer as any).source,
       'source-layer': (buildingLayer as any)['source-layer'],
       paint: {
-        'fill-color': RISO_INKS.blue.hex,
-        'fill-opacity': 0.10,
+        'fill-color': RISO_INKS.blue.hex, 'fill-opacity': 0.10,
         'fill-translate': [misreg.blue.dx * SCALE, misreg.blue.dy * SCALE],
       },
     }, 'buildings');
   }
 
-  // ── Park misregistration (fluorescent pink) ──
   for (const layer of style.layers) {
     if (layer.id.startsWith('landuse_park') && layer.type === 'fill' && 'source-layer' in layer) {
       map.addLayer({
-        id: `${layer.id}-riso-offset`,
-        type: 'fill',
+        id: `${layer.id}-riso-offset`, type: 'fill',
         source: (layer as any).source,
         'source-layer': (layer as any)['source-layer'],
         filter: (layer as any).filter,
         paint: {
-          'fill-color': RISO_INKS.fluorPink.hex,
-          'fill-opacity': 0.12,
+          'fill-color': RISO_INKS.fluorPink.hex, 'fill-opacity': 0.12,
           'fill-translate': [misreg.fluorPink.dx * SCALE, misreg.fluorPink.dy * SCALE],
         },
       }, layer.id);
     }
   }
 
-  // ── Road/boundary misregistration (black) ──
   for (const layer of style.layers) {
     if ((layer.id.startsWith('roads_') || layer.id.startsWith('boundaries')) &&
         layer.type === 'line' && 'source-layer' in layer &&
@@ -1070,26 +1001,807 @@ function applyRisoMisregistration(map: maplibregl.Map): void {
       const lineWidth = (layer as any).paint?.['line-width'] || 1;
       try {
         map.addLayer({
-          id: `${layer.id}-riso-offset`,
-          type: 'line',
+          id: `${layer.id}-riso-offset`, type: 'line',
           source: (layer as any).source,
           'source-layer': (layer as any)['source-layer'],
           filter: (layer as any).filter,
           paint: {
-            'line-color': '#333333',
-            'line-width': lineWidth,
+            'line-color': '#333333', 'line-width': lineWidth,
             'line-opacity': 0.08,
             'line-translate': [misreg.black.dx * SCALE, misreg.black.dy * SCALE],
           },
         }, layer.id);
       } catch {
-        // Skip if layer can't be duplicated
+        // Skip
       }
     }
   }
 }
 
-/* ── Init ──────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════
+   ⊕ REGISTRATION MARK & TOOL MENU
+   ══════════════════════════════════════════════════════════════ */
+let menuOpen = false;
+let formatsOpen = false;
+
+function closeAllMenus() {
+  const toolMenu = document.getElementById('tool-menu');
+  const downloadFormats = document.getElementById('download-formats');
+  const colorStrip = document.getElementById('color-strip');
+  const exportPreview = document.getElementById('export-preview');
+
+  toolMenu?.classList.remove('open');
+  downloadFormats?.classList.remove('open');
+  colorStrip?.classList.remove('visible');
+  exportPreview?.classList.remove('visible');
+  menuOpen = false;
+  formatsOpen = false;
+}
+
+function setupRegMark(map: maplibregl.Map): void {
+  const regMark = document.getElementById('reg-mark')!;
+  const toolMenu = document.getElementById('tool-menu')!;
+
+  // ⊕ click → toggle menu
+  regMark.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (formatsOpen) {
+      // Close format picker, return to menu
+      document.getElementById('download-formats')?.classList.remove('open');
+      formatsOpen = false;
+      toolMenu.classList.add('open');
+      menuOpen = true;
+      return;
+    }
+    if (menuOpen) {
+      closeAllMenus();
+    } else {
+      toolMenu.classList.add('open');
+      menuOpen = true;
+
+      // First-visit "Make it yours" whisper
+      if (!localStorage.getItem('wud-menu-opened')) {
+        localStorage.setItem('wud-menu-opened', '1');
+        const titleLabel = document.querySelector('[data-tool="title"] .tool-label');
+        if (titleLabel) {
+          titleLabel.textContent = 'Make it yours';
+          titleLabel.classList.add('whisper');
+        }
+      }
+    }
+  });
+
+  // Close on click outside
+  document.addEventListener('click', (e) => {
+    if (menuOpen && !toolMenu.contains(e.target as Node) && e.target !== regMark) {
+      closeAllMenus();
+    }
+  });
+
+  // Wire up tool items
+  setupToolLocate(map);
+  setupToolTitle(map);
+  setupToolDownload(map);
+  setupToolShare(map);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TOOL: ⌖ FIND ME (Geolocation)
+   ══════════════════════════════════════════════════════════════ */
+function setupToolLocate(map: maplibregl.Map): void {
+  const btn = document.getElementById('tool-locate');
+  if (!btn) return;
+
+  btn.addEventListener('click', () => {
+    closeAllMenus();
+
+    if (!navigator.geolocation) {
+      showFlipToast("Couldn't find you — try searching instead");
+      return;
+    }
+
+    showFlipToast("Finding you...");
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude: lat, longitude: lon } = pos.coords;
+
+        map.flyTo({
+          center: [lon, lat], zoom: 13,
+          bearing: orientation === 'upside-down' ? 180 : 0,
+          duration: 2000,
+        });
+
+        // Reverse geocode
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&zoom=14&format=json&accept-language=en`,
+            { headers: { 'User-Agent': 'world-upside-down/1.0' } }
+          );
+          const data = await res.json();
+          const addr = data.address;
+          const name = addr?.city || addr?.town || addr?.village || addr?.state || addr?.country || 'Here';
+
+          // Update title
+          const titleEl = document.getElementById('city-title');
+          if (titleEl) titleEl.textContent = name;
+          currentCityName = name;
+
+          // Update screenprint text
+          updateScreenprintText(name);
+          hasCustomTitle = true;
+
+          // Snap to poster with new text
+          setTimeout(() => setMode('poster', map), 500);
+          setTimeout(() => showFlipToast(`${name}, upside down`), 2600);
+        } catch {
+          setMode('poster', map);
+        }
+      },
+      () => {
+        showFlipToast("Couldn't find you — try searching instead");
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  });
+}
+
+function updateScreenprintText(name: string): void {
+  const spL1 = document.getElementById('screenprint-l1');
+  const spL2 = document.getElementById('screenprint-l2');
+  if (!spL1 || !spL2) return;
+
+  const words = name.toUpperCase().split(/\s+/);
+  if (words.length === 1) {
+    spL1.textContent = words[0];
+    spL2.textContent = '';
+  } else if (words.length === 2) {
+    spL1.textContent = words[0];
+    spL2.textContent = words[1];
+  } else {
+    spL1.textContent = words[0];
+    spL2.textContent = words.slice(1).join(' ');
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TOOL: T TITLE EDITOR
+   ══════════════════════════════════════════════════════════════ */
+function setupToolTitle(map: maplibregl.Map): void {
+  const btn = document.getElementById('tool-title');
+  const colorStrip = document.getElementById('color-strip');
+  const spL1 = document.getElementById('screenprint-l1');
+  const spL2 = document.getElementById('screenprint-l2');
+  if (!btn || !colorStrip || !spL1 || !spL2) return;
+
+  btn.addEventListener('click', () => {
+    closeAllMenus();
+    setMode('maker', map);
+
+    // Make text editable
+    spL1.setAttribute('contenteditable', 'true');
+    spL2.setAttribute('contenteditable', 'true');
+
+    // Select line 1 text
+    const range = document.createRange();
+    range.selectNodeContents(spL1);
+    const sel = window.getSelection();
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+
+    // Show color strip
+    colorStrip.classList.add('visible');
+
+    // Enter on line 1 → focus line 2
+    function handleL1Keydown(e: KeyboardEvent) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        spL2.focus();
+        const r = document.createRange();
+        r.selectNodeContents(spL2);
+        const s = window.getSelection();
+        s?.removeAllRanges();
+        s?.addRange(r);
+      }
+    }
+
+    // Enter on line 2 or Escape → confirm
+    function handleL2Keydown(e: KeyboardEvent) {
+      if (e.key === 'Enter' || e.key === 'Escape') {
+        e.preventDefault();
+        confirmEdit();
+      }
+    }
+
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        confirmEdit();
+      }
+    }
+
+    // Click outside to confirm
+    function handleClickOutside(e: MouseEvent) {
+      if (!spL1.contains(e.target as Node) &&
+          !spL2.contains(e.target as Node) &&
+          !colorStrip.contains(e.target as Node)) {
+        confirmEdit();
+      }
+    }
+
+    function confirmEdit() {
+      spL1.removeAttribute('contenteditable');
+      spL2.removeAttribute('contenteditable');
+      colorStrip.classList.remove('visible');
+
+      spL1.removeEventListener('keydown', handleL1Keydown);
+      spL2.removeEventListener('keydown', handleL2Keydown);
+      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('click', handleClickOutside);
+
+      hasCustomTitle = true;
+
+      // Store in session
+      sessionStorage.setItem('wud-custom-title', JSON.stringify({
+        l1: spL1.textContent || '',
+        l2: spL2.textContent || '',
+      }));
+
+      // Update shareable URL
+      updateShareableHash();
+
+      // Snap to poster
+      setMode('poster', map);
+
+      const toasts = ["Your poster", "Claimed", "Now it's yours"];
+      setTimeout(() => showFlipToast(toasts[Math.floor(Math.random() * toasts.length)]), 700);
+    }
+
+    spL1.addEventListener('keydown', handleL1Keydown);
+    spL2.addEventListener('keydown', handleL2Keydown);
+    document.addEventListener('keydown', handleEscape);
+    // Delay click-outside to avoid immediate trigger
+    setTimeout(() => document.addEventListener('click', handleClickOutside), 100);
+  });
+
+  // Color dot clicks
+  colorStrip.querySelectorAll('.color-dot').forEach(dot => {
+    dot.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const el = dot as HTMLElement;
+      const color = el.dataset.color!;
+      const shadow = el.dataset.shadow!;
+
+      // Update active state
+      colorStrip.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+      el.classList.add('active');
+
+      // Update CSS custom properties
+      root.style.setProperty('--sp-color', color);
+      root.style.setProperty('--sp-shadow', shadow);
+
+      updateShareableHash();
+    });
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TOOL: ↓ DOWNLOAD
+   ══════════════════════════════════════════════════════════════ */
+function setupToolDownload(map: maplibregl.Map): void {
+  const btn = document.getElementById('tool-download');
+  const downloadFormats = document.getElementById('download-formats');
+  const toolMenu = document.getElementById('tool-menu');
+  if (!btn || !downloadFormats || !toolMenu) return;
+
+  btn.addEventListener('click', () => {
+    // Hide tool menu, show format picker
+    toolMenu.classList.remove('open');
+    menuOpen = false;
+    downloadFormats.classList.add('open');
+    formatsOpen = true;
+  });
+
+  // Format card clicks
+  downloadFormats.querySelectorAll('.dl-format').forEach(card => {
+    card.addEventListener('click', () => {
+      const format = (card as HTMLElement).dataset.format!;
+      closeAllMenus();
+      openExportPreview(map, format);
+    });
+  });
+}
+
+function openExportPreview(map: maplibregl.Map, format: string): void {
+  const preview = document.getElementById('export-preview');
+  const exportCanvas = document.getElementById('export-canvas');
+  const exportSubtitle = document.getElementById('export-subtitle') as HTMLInputElement;
+  const exportToggles = document.getElementById('export-toggles');
+  const exportColorStrip = document.getElementById('export-color-strip');
+  if (!preview || !exportCanvas) return;
+
+  // Set aspect ratio on preview canvas
+  const ratios: Record<string, { w: number; h: number }> = {
+    feed: { w: 1, h: 1 },
+    reel: { w: 9, h: 16 },
+    poster: { w: 3, h: 4 },
+  };
+
+  const ratio = ratios[format] || ratios.feed;
+  const maxH = window.innerHeight * 0.55;
+  const maxW = window.innerWidth * 0.7;
+  let h = maxH;
+  let w = h * (ratio.w / ratio.h);
+  if (w > maxW) { w = maxW; h = w * (ratio.h / ratio.w); }
+
+  exportCanvas.style.width = `${w}px`;
+  exportCanvas.style.height = `${h}px`;
+
+  // Render map snapshot into preview
+  const mapCanvas = map.getCanvas();
+  const previewCanvas = document.createElement('canvas');
+  previewCanvas.width = Math.round(w * 2);
+  previewCanvas.height = Math.round(h * 2);
+  const ctx = previewCanvas.getContext('2d')!;
+
+  // Crop map to aspect ratio
+  const srcW = mapCanvas.width;
+  const srcH = mapCanvas.height;
+  const targetRatio = ratio.w / ratio.h;
+  const srcRatio = srcW / srcH;
+
+  let cropX = 0, cropY = 0, cropW = srcW, cropH = srcH;
+  if (srcRatio > targetRatio) {
+    cropW = srcH * targetRatio;
+    cropX = (srcW - cropW) / 2;
+  } else {
+    cropH = srcW / targetRatio;
+    cropY = (srcH - cropH) / 2;
+  }
+
+  ctx.drawImage(mapCanvas, cropX, cropY, cropW, cropH, 0, 0, previewCanvas.width, previewCanvas.height);
+
+  // Draw screenprint text on preview
+  const spColor = getComputedStyle(root).getPropertyValue('--sp-color').trim();
+  const spShadow = getComputedStyle(root).getPropertyValue('--sp-shadow').trim();
+  const l1 = document.getElementById('screenprint-l1')?.textContent || '';
+  const l2 = document.getElementById('screenprint-l2')?.textContent || '';
+
+  const fontSize = previewCanvas.width * 0.14;
+  ctx.font = `400 ${fontSize}px Anton`;
+  ctx.textAlign = 'center';
+  ctx.globalCompositeOperation = 'multiply';
+
+  const cx = previewCanvas.width / 2;
+  const cy = previewCanvas.height / 2;
+
+  // Shadow pass
+  ctx.fillStyle = spShadow;
+  ctx.globalAlpha = 0.9;
+  ctx.fillText(l1, cx + 5, cy - fontSize * 0.1 + 4);
+  ctx.fillText(l2, cx + 5, cy + fontSize * 0.88 + 4);
+
+  // Main pass
+  ctx.fillStyle = spColor;
+  ctx.globalAlpha = 0.9;
+  ctx.fillText(l1, cx, cy - fontSize * 0.1);
+  ctx.fillText(l2, cx, cy + fontSize * 0.88);
+
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.globalAlpha = 1;
+
+  previewCanvas.style.width = '100%';
+  previewCanvas.style.height = '100%';
+  exportCanvas.innerHTML = '';
+  exportCanvas.appendChild(previewCanvas);
+
+  // Pre-fill subtitle
+  if (exportSubtitle) {
+    const subtitleText = document.getElementById('subtitle-text');
+    exportSubtitle.value = subtitleText?.textContent || '';
+  }
+
+  // Show/hide toggles based on format
+  if (exportToggles) {
+    exportToggles.style.display = format === 'poster' ? 'none' : 'flex';
+  }
+
+  // Clone color dots for export color strip
+  if (exportColorStrip) {
+    const mainStrip = document.getElementById('color-strip');
+    if (mainStrip) {
+      exportColorStrip.innerHTML = mainStrip.innerHTML;
+      exportColorStrip.style.position = 'static';
+      exportColorStrip.style.transform = 'none';
+      exportColorStrip.style.opacity = '1';
+      exportColorStrip.style.pointerEvents = 'auto';
+
+      exportColorStrip.querySelectorAll('.color-dot').forEach(dot => {
+        dot.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const el = dot as HTMLElement;
+          exportColorStrip.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+          el.classList.add('active');
+          root.style.setProperty('--sp-color', el.dataset.color!);
+          root.style.setProperty('--sp-shadow', el.dataset.shadow!);
+        });
+      });
+    }
+  }
+
+  preview.classList.add('visible');
+  preview.dataset.format = format;
+
+  // Wire up export buttons
+  setupExportButtons(map, format);
+}
+
+function setupExportButtons(map: maplibregl.Map, format: string): void {
+  const downloadBtn = document.getElementById('export-download');
+  const copyBtn = document.getElementById('export-copy');
+  const closeBtn = document.getElementById('export-close');
+  const preview = document.getElementById('export-preview');
+
+  function closeExport() {
+    preview?.classList.remove('visible');
+    setMode('explore', map);
+  }
+
+  const handleDownload = () => { captureAndExport(map, format, 'download'); };
+  const handleCopy = () => { captureAndExport(map, format, 'copy'); };
+
+  // Remove old listeners by cloning
+  if (downloadBtn) {
+    const newBtn = downloadBtn.cloneNode(true) as HTMLElement;
+    downloadBtn.parentNode?.replaceChild(newBtn, downloadBtn);
+    newBtn.addEventListener('click', handleDownload);
+  }
+  if (copyBtn) {
+    const newBtn = copyBtn.cloneNode(true) as HTMLElement;
+    copyBtn.parentNode?.replaceChild(newBtn, copyBtn);
+    newBtn.addEventListener('click', handleCopy);
+  }
+  if (closeBtn) {
+    const newBtn = closeBtn.cloneNode(true) as HTMLElement;
+    closeBtn.parentNode?.replaceChild(newBtn, closeBtn);
+    newBtn.addEventListener('click', closeExport);
+  }
+}
+
+async function captureAndExport(map: maplibregl.Map, format: string, action: 'download' | 'copy'): Promise<void> {
+  const resolutions: Record<string, { w: number; h: number }> = {
+    feed: { w: 1080, h: 1080 },
+    reel: { w: 1080, h: 1920 },
+    poster: { w: 3600, h: 4800 },
+  };
+
+  const res = resolutions[format] || resolutions.feed;
+  const exportSubtitle = (document.getElementById('export-subtitle') as HTMLInputElement)?.value || '';
+
+  // Close preview
+  document.getElementById('export-preview')?.classList.remove('visible');
+
+  showFlipToast('Generating...');
+
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+  if (format === 'poster') {
+    // For poster, use html2canvas on #page
+    try {
+      const html2canvas = (await import('html2canvas')).default;
+      const page = document.getElementById('page')!;
+
+      // Hide UI elements
+      const hideEls = [
+        document.getElementById('reg-mark'),
+        document.getElementById('tool-menu'),
+        document.getElementById('touch-controls'),
+        document.getElementById('flip-toast'),
+        document.getElementById('download-formats'),
+      ];
+      hideEls.forEach(el => { if (el) el.style.display = 'none'; });
+
+      // Set overlay to poster opacity
+      setOverlayOpacity(0.90);
+      await new Promise(r => setTimeout(r, 400));
+
+      const canvas = await html2canvas(page, {
+        scale: 3,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#FFFFFF',
+      });
+
+      // Restore UI
+      hideEls.forEach(el => { if (el) el.style.display = ''; });
+
+      await exportCanvas(canvas, format, action, exportSubtitle);
+    } catch (err) {
+      showFlipToast('Export failed — try Feed or Reel');
+      console.error('Poster export failed:', err);
+    }
+  } else {
+    // Feed/Reel: offscreen canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = res.w;
+    canvas.height = res.h;
+    const ctx = canvas.getContext('2d')!;
+
+    // Draw map
+    const mapCanvas = map.getCanvas();
+    const targetRatio = res.w / res.h;
+    const srcW = mapCanvas.width;
+    const srcH = mapCanvas.height;
+    const srcRatio = srcW / srcH;
+
+    let cropX = 0, cropY = 0, cropW = srcW, cropH = srcH;
+    if (srcRatio > targetRatio) {
+      cropW = srcH * targetRatio;
+      cropX = (srcW - cropW) / 2;
+    } else {
+      cropH = srcW / targetRatio;
+      cropY = (srcH - cropH) / 2;
+    }
+
+    ctx.drawImage(mapCanvas, cropX, cropY, cropW, cropH, 0, 0, res.w, res.h);
+
+    // Draw screenprint text
+    const spColor = getComputedStyle(root).getPropertyValue('--sp-color').trim();
+    const spShadow = getComputedStyle(root).getPropertyValue('--sp-shadow').trim();
+    const l1 = document.getElementById('screenprint-l1')?.textContent || '';
+    const l2 = document.getElementById('screenprint-l2')?.textContent || '';
+
+    const fontSize = res.w * 0.14;
+    ctx.font = `400 ${fontSize}px Anton`;
+    ctx.textAlign = 'center';
+    ctx.globalCompositeOperation = 'multiply';
+
+    const cx = res.w / 2;
+    const cy = format === 'reel' ? res.h * 0.33 : res.h / 2;
+
+    // Shadow
+    ctx.fillStyle = spShadow;
+    ctx.globalAlpha = 0.9;
+    ctx.fillText(l1, cx + 5, cy - fontSize * 0.1 + 4);
+    ctx.fillText(l2, cx + 5, cy + fontSize * 0.88 + 4);
+
+    // Main text
+    ctx.fillStyle = spColor;
+    ctx.globalAlpha = 0.9;
+    ctx.fillText(l1, cx, cy - fontSize * 0.1);
+    ctx.fillText(l2, cx, cy + fontSize * 0.88);
+
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalAlpha = 1;
+
+    // Subtitle
+    if (exportSubtitle) {
+      ctx.font = `italic ${fontSize * 0.16}px 'Instrument Serif', serif`;
+      ctx.fillStyle = spColor;
+      ctx.globalAlpha = 0.6;
+      ctx.fillText(exportSubtitle, cx, cy + fontSize * 1.6);
+      ctx.globalAlpha = 1;
+    }
+
+    // Credit line
+    ctx.font = `400 ${res.w * 0.009}px 'Space Mono', monospace`;
+    ctx.fillStyle = '#88898A';
+    ctx.globalAlpha = 0.5;
+    ctx.textAlign = 'right';
+    ctx.fillText('Gerardo Ezequiel · upside-down.vercel.app', res.w - 20, res.h - 20);
+    ctx.globalAlpha = 1;
+
+    // Check toggles
+    const toggles = document.getElementById('export-toggles');
+    if (toggles) {
+      const compassOn = (toggles.querySelector('[data-toggle="compass"]') as HTMLInputElement)?.checked;
+      const coordsOn = (toggles.querySelector('[data-toggle="coords"]') as HTMLInputElement)?.checked;
+      const urlOn = (toggles.querySelector('[data-toggle="url"]') as HTMLInputElement)?.checked;
+
+      if (coordsOn) {
+        const ctr = map.getCenter();
+        const coordText = `${Math.abs(ctr.lat).toFixed(2)}°${ctr.lat >= 0 ? 'N' : 'S'} / ${Math.abs(ctr.lng).toFixed(2)}°${ctr.lng >= 0 ? 'E' : 'W'}`;
+        ctx.font = `400 ${res.w * 0.007}px 'Space Mono', monospace`;
+        ctx.fillStyle = '#88898A';
+        ctx.globalAlpha = 0.5;
+        ctx.textAlign = 'left';
+        ctx.fillText(coordText, 20, res.h - 20);
+        ctx.globalAlpha = 1;
+      }
+
+      if (urlOn) {
+        ctx.font = `400 ${res.w * 0.007}px 'Space Mono', monospace`;
+        ctx.fillStyle = '#88898A';
+        ctx.globalAlpha = 0.5;
+        ctx.textAlign = 'center';
+        ctx.fillText('upside-down.vercel.app', res.w / 2, res.h - 20);
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    await exportCanvas(canvas, format, action, exportSubtitle);
+  }
+
+  setMode('explore', map);
+}
+
+async function exportCanvas(canvas: HTMLCanvasElement, format: string, action: 'download' | 'copy', _subtitle: string): Promise<void> {
+  const citySlug = (currentCityName || 'world').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+  const filename = `upside-down-${format}-${citySlug}.png`;
+
+  if (action === 'download') {
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+
+    const toasts: Record<string, string> = {
+      feed: 'Ready for the grid',
+      reel: 'Swipe up on that',
+      poster: 'Print it. Frame it. Flip someone\'s world.',
+    };
+    setTimeout(() => showFlipToast(toasts[format] || 'Downloaded'), 500);
+  }
+
+  if (action === 'copy') {
+    try {
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob(b => resolve(b!), 'image/png');
+      });
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': blob }),
+      ]);
+      setTimeout(() => showFlipToast('Copied — paste it anywhere'), 500);
+    } catch {
+      // Fallback to download
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      setTimeout(() => showFlipToast('Downloaded (copy unavailable)'), 500);
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TOOL: ⤴ SHARE
+   ══════════════════════════════════════════════════════════════ */
+function setupToolShare(map: maplibregl.Map): void {
+  const btn = document.getElementById('tool-share');
+  if (!btn) return;
+
+  btn.addEventListener('click', async () => {
+    closeAllMenus();
+
+    const url = window.location.href;
+    const text = "I flipped the world upside down.";
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Upside Down', text, url });
+      } catch {
+        // User cancelled
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        showFlipToast('Link copied — spread the disorientation');
+      } catch {
+        showFlipToast('Copy the URL from your browser');
+      }
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SHAREABLE URLs
+   ══════════════════════════════════════════════════════════════ */
+const COLOR_NAMES: Record<string, { color: string; shadow: string }> = {
+  yellow: { color: '#FFE627', shadow: '#FF48B0' },
+  pink:   { color: '#FF48B0', shadow: '#C4305C' },
+  teal:   { color: '#00838A', shadow: '#004D52' },
+  blue:   { color: '#0078BF', shadow: '#004A75' },
+  black:  { color: '#000000', shadow: '#333333' },
+};
+
+function getColorNameFromHex(hex: string): string | null {
+  for (const [name, val] of Object.entries(COLOR_NAMES)) {
+    if (val.color.toLowerCase() === hex.toLowerCase()) return name;
+  }
+  return null;
+}
+
+function updateShareableHash(): void {
+  const hash = window.location.hash;
+  // MapLibre hash format: #zoom/lat/lng
+  // We append: /bearing/t:TITLE/c:COLOR
+  const parts = hash.replace('#', '').split('/');
+
+  // Keep first 3 parts (zoom/lat/lng)
+  const base = parts.slice(0, 3).join('/');
+
+  const bearing = orientation === 'upside-down' ? 180 : 0;
+  let newHash = `#${base}/${bearing}`;
+
+  if (hasCustomTitle) {
+    const l1 = document.getElementById('screenprint-l1')?.textContent || '';
+    const l2 = document.getElementById('screenprint-l2')?.textContent || '';
+    const title = l2 ? `${l1} ${l2}`.trim() : l1.trim();
+    if (title && title !== 'UPSIDE DOWN') {
+      newHash += `/t:${encodeURIComponent(title).replace(/%20/g, '+')}`;
+    }
+  }
+
+  const currentColor = getComputedStyle(root).getPropertyValue('--sp-color').trim();
+  const colorName = getColorNameFromHex(currentColor);
+  if (colorName && colorName !== 'yellow') {
+    newHash += `/c:${colorName}`;
+  }
+
+  history.replaceState(null, '', newHash);
+}
+
+function parseShareableHash(): { title?: string; colorName?: string } {
+  const hash = window.location.hash.replace('#', '');
+  const parts = hash.split('/');
+
+  let title: string | undefined;
+  let colorName: string | undefined;
+
+  for (const part of parts) {
+    if (part.startsWith('t:')) {
+      title = decodeURIComponent(part.slice(2).replace(/\+/g, ' '));
+    }
+    if (part.startsWith('c:')) {
+      colorName = part.slice(2);
+    }
+  }
+
+  return { title, colorName };
+}
+
+function applyShareableParams(): void {
+  const { title, colorName } = parseShareableHash();
+
+  if (title) {
+    updateScreenprintText(title);
+    hasCustomTitle = true;
+  }
+
+  if (colorName && COLOR_NAMES[colorName]) {
+    const { color, shadow } = COLOR_NAMES[colorName];
+    root.style.setProperty('--sp-color', color);
+    root.style.setProperty('--sp-shadow', shadow);
+
+    // Update color strip active state
+    document.querySelectorAll('#color-strip .color-dot').forEach(dot => {
+      const el = dot as HTMLElement;
+      dot.classList.toggle('active', el.dataset.color === color);
+    });
+  }
+
+  // Restore session title if no URL title
+  if (!title) {
+    const stored = sessionStorage.getItem('wud-custom-title');
+    if (stored) {
+      try {
+        const { l1, l2 } = JSON.parse(stored);
+        const spL1 = document.getElementById('screenprint-l1');
+        const spL2 = document.getElementById('screenprint-l2');
+        if (spL1 && spL2 && l1) {
+          spL1.textContent = l1;
+          spL2.textContent = l2;
+          hasCustomTitle = true;
+        }
+      } catch {
+        // Ignore
+      }
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   INIT
+   ══════════════════════════════════════════════════════════════ */
 async function init() {
   const res = await fetch("/style.json");
   const baseStyle = (await res.json()) as maplibregl.StyleSpecification;
@@ -1098,21 +1810,20 @@ async function init() {
   const map = new maplibregl.Map({
     container: "map",
     style,
-    center: [-0.128, 51.507], // London
+    center: [-0.128, 51.507],
     zoom: 11,
-    bearing: 180,              // THE FLIP — south is up
+    bearing: 180,
     pitch: 0,
     minZoom: 1,
     maxZoom: 18,
     maxTileCacheSize: 200,
     attributionControl: {},
-    hash: true,                // Persist position in URL
+    hash: true,
+    preserveDrawingBuffer: true, // needed for canvas export
   });
 
-  // Lock bearing so user can't accidentally rotate back
   map.dragRotate.disable();
 
-  // Snap bearing back AFTER gestures complete (not during — so pinch zoom works)
   map.on('moveend', () => {
     if (!bearingLocked) return;
     const expected = orientation === 'upside-down' ? 180 : 0;
@@ -1121,22 +1832,60 @@ async function init() {
     }
   });
 
-  // ── Wire up cartographic UI ──
+  // ── Map interaction → enter explore mode ──
+  map.on('movestart', () => {
+    if (currentMode === 'poster') setMode('explore', map);
+    resetIdleTimer(map);
+  });
+
+  map.on('zoomstart', () => {
+    if (currentMode === 'poster') setMode('explore', map);
+    resetIdleTimer(map);
+  });
+
+  // Zoom-based overlay opacity updates while in explore
+  map.on('zoom', () => {
+    if (currentMode === 'explore') {
+      const zoom = map.getZoom();
+      root.style.setProperty('--overlay-transition', '0.3s ease');
+      setOverlayOpacity(zoom > 16 ? 0 : zoom > 14 ? 0.04 : 0.08);
+    }
+  });
+
+  // Any interaction resets idle
+  ['mousemove', 'touchstart', 'wheel', 'keydown'].forEach(evt => {
+    document.addEventListener(evt, () => resetIdleTimer(map), { passive: true });
+  });
+
+  // ── Screenprint overlay click → toggle poster/explore ──
+  const spOverlay = document.getElementById('screenprint-overlay');
+  spOverlay?.addEventListener('click', () => {
+    if (currentMode === 'poster') {
+      setMode('explore', map);
+    }
+  });
+
   map.on('load', () => {
-    // Initial render
     updateScaleBar(map);
     updateCoords(map);
     updateCityTitle(map);
     setupGeocoder(map);
     setupFlip(map);
-
-    // Graticule
     addGraticule(map);
-
-    // ── Riso misregistration (Approach B — style-level duplicate layers) ──
     applyRisoMisregistration(map);
+    setupRegMark(map);
 
-    // ── Animated subtitle (top band — cycling phrases) ──
+    // Apply shareable URL params
+    applyShareableParams();
+
+    // Start in poster mode
+    setMode('poster', map);
+    // Need to re-set since setMode checks prev === current
+    currentMode = 'poster';
+    root.style.setProperty('--overlay-opacity', '0.90');
+    spOverlay?.classList.add('poster-mode');
+
+    // ── Animated subtitle ──
     const subtitleEl = document.getElementById('subtitle');
     const subtitleText = document.getElementById('subtitle-text');
 
@@ -1177,11 +1926,9 @@ async function init() {
 
     (async () => {
       if (!subtitleEl || !subtitleText) return;
-
-      // Show initial text for a while before starting the cycle
       await new Promise(r => setTimeout(r, 8000));
 
-      let phraseIdx = 1; // skip first phrase (already showing)
+      let phraseIdx = 1;
       while (!subtitleCancelled) {
         subtitleEl.classList.add('typing');
         await deleteSubtitle(subtitleText);
@@ -1194,35 +1941,9 @@ async function init() {
         phraseIdx = (phraseIdx + 1) % subtitlePhrases.length;
       }
     })();
-
-    // ── Screenprint overlay — hide on interaction, show "LOST IN [city]" after 10s idle ──
-    const spOverlayEl = document.getElementById('screenprint-overlay');
-    const spL1 = document.getElementById('screenprint-l1');
-    const spL2 = document.getElementById('screenprint-l2');
-    let idleTimer: ReturnType<typeof setTimeout> | null = null;
-
-    function hideScreenprint() {
-      if (!spOverlayEl) return;
-      spOverlayEl.classList.add('hidden');
-      // Reset idle timer
-      if (idleTimer) clearTimeout(idleTimer);
-      idleTimer = setTimeout(showIdleScreenprint, 10000);
-    }
-
-    function showIdleScreenprint() {
-      if (!spOverlayEl || !spL1 || !spL2) return;
-      // Update text to "LOST IN / [city]"
-      spL1.textContent = 'LOST IN';
-      spL2.textContent = currentCityName ? currentCityName.toUpperCase() : 'NOWHERE';
-      spOverlayEl.classList.remove('hidden');
-    }
-
-    map.on('movestart', hideScreenprint);
-    map.on('zoomstart', hideScreenprint);
-
   });
 
-  // ── Dymaxion projection crossfade on zoom out ──
+  // ── Dymaxion crossfade ──
   const mapFrame = document.getElementById('map-frame')!;
   const mapEl = document.getElementById('map')!;
   const dymaxionLabel = document.getElementById('dymaxion-label');
