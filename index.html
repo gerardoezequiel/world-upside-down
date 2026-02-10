@@ -3,542 +3,761 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Upside Down | You've Been Holding the Map Wrong</title>
+<title>Upside Down | An Exercise in Unlearning North</title>
 <meta name="description" content="The first photo of Earth had south on top. NASA flipped it. This map flips it back." />
 
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Upside Down | You've Been Holding the Map Wrong" />
+<meta property="og:title" content="Upside Down | An Exercise in Unlearning North" />
 <meta property="og:description" content="The first photo of Earth had south on top. NASA flipped it. This map flips it back." />
 <meta property="og:image" content="/og-image.png" />
 <meta property="og:url" content="https://world-upside-down.vercel.app" />
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Upside Down | You've Been Holding the Map Wrong" />
+<meta name="twitter:title" content="Upside Down | An Exercise in Unlearning North" />
 <meta name="twitter:description" content="The first photo of Earth had south on top. NASA flipped it. This map flips it back." />
 <meta name="twitter:image" content="/og-image.png" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Libre+Franklin:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@300;400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/src/landing.css" />
 </head>
 <body>
 
+<!-- ── Ink registration strip — 5 drums ── -->
+<div class="ink-strip" aria-hidden="true">
+  <div class="ink-strip-swatch" style="background: #000000"></div>
+  <div class="ink-strip-swatch" style="background: #88898A"></div>
+  <div class="ink-strip-swatch" style="background: #00838A"></div>
+  <div class="ink-strip-swatch" style="background: #0078BF"></div>
+  <div class="ink-strip-swatch" style="background: #FF48B0"></div>
+  <span class="ink-strip-label">5-DRUM RISO &middot; 150 DPI &middot; UNCOATED STOCK</span>
+</div>
+
+<!-- ── Visible grid overlay ── -->
+<div class="grid-overlay" aria-hidden="true"></div>
+
+<!-- ── Grain overlay ── -->
+<div class="page-grain" aria-hidden="true"></div>
+
 <!-- ==========================================
-     HERO — THE MAP
+     HERO — Typography + Stochastic halftone
      ========================================== -->
 <section class="hero" id="hero">
-  <div class="hero-map-wrapper">
-    <iframe id="map-iframe" src="/map#11/51.507/-0.128/180" frameborder="0" allow="fullscreen" loading="lazy"></iframe>
-    <div class="hero-map-shield"></div>
-  </div>
+  <canvas class="hero-halftone" id="hero-halftone" aria-hidden="true"></canvas>
 
-  <div class="hero-overlay">
-    <div class="hero-content">
-      <div class="hero-overline">A Cartographic Provocation</div>
-      <h1 class="hero-title">
-        UPSIDE<br><span class="flip">DOWN</span>
-      </h1>
-      <p class="hero-subtitle">The world looks different from here. That's the point.</p>
-      <div class="hero-actions">
-        <a href="/map" class="hero-launch">Launch the Map</a>
-        <a href="#scandal" class="hero-scroll-link">or scroll to learn why</a>
-      </div>
+  <div class="page-grid hero-grid">
+    <div class="hero-meta meta">
+      <span>51.5464&deg; N, 0.0554&deg; W</span>
+      <span>2026.02</span>
+      <span>Edition 001</span>
     </div>
-  </div>
 
-  <a href="#scandal" class="scroll-indicator">
-    <div class="scroll-line"></div>
-  </a>
+    <h1 class="hero-title display-xl" data-text="An Exercise in Unlearning North.">
+      An Exercise<br>in Unlearning<br>North.
+    </h1>
+
+    <p class="hero-subtitle">A cartographic provocation</p>
+
+    <div class="hero-actions">
+      <a href="/map" class="hero-launch">Launch the Map</a>
+      <a href="#map-section" class="hero-scroll-link">or scroll to preview</a>
+    </div>
+
+    <a href="#map-section" class="scroll-indicator">
+      <div class="scroll-line"></div>
+    </a>
+  </div>
 </section>
 
+<!-- ── Divider ── -->
+<div class="section-divider"></div>
+
 <!-- ==========================================
-     THE SCANDAL
+     MAP PREVIEW — Framed within the grid
      ========================================== -->
-<section class="scandal" id="scandal">
-  <div class="container">
-    <div class="scandal-layout">
-      <div class="scandal-content">
-        <div class="section-label reveal">The Blue Marble Scandal</div>
-        <h2 class="big-statement reveal reveal-delay-1">
-          The first photograph of Earth had <em>south on top.</em><br>
-          NASA flipped it.
-        </h2>
-        <p class="body-text reveal reveal-delay-2">
-          In 1972, the Apollo 17 crew captured the most iconic image of our planet: the Blue Marble.
-          In the original photograph, the southern tip of Africa pointed upward. But before releasing it,
-          NASA <strong>rotated the image 180&deg;</strong> to match the convention that north belongs on top.
-          They literally turned the planet upside down to make it look "right."
-        </p>
-      </div>
-      <div class="blue-marble-pair reveal reveal-delay-2">
-        <div class="marble-item">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/3/39/The_Earth_seen_from_Apollo_17_%28Original_Orientation%29.jpg" alt="Blue Marble original orientation, south on top" class="marble-img" loading="lazy" />
-          <span class="marble-label">Original photograph</span>
-        </div>
-        <div class="marble-rotate-arrow" aria-hidden="true">&#x27F3;</div>
-        <div class="marble-item">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/c/cb/The_Blue_Marble_%28remastered%29.jpg" alt="Blue Marble NASA version, north on top" class="marble-img marble-flipped" loading="lazy" />
-          <span class="marble-label">"Corrected" by NASA</span>
-        </div>
+<section class="map-section" id="map-section">
+  <div class="page-grid">
+    <a href="/map" class="map-enter meta link-underline">Enter the Map &rarr;</a>
+
+    <div class="map-frame">
+      <iframe id="map-iframe" src="/map#11/51.507/-0.128/180" frameborder="0" allow="fullscreen" loading="lazy"></iframe>
+      <div class="map-shield"></div>
+    </div>
+
+    <div class="map-meta-bar">
+      <div class="pink-accent-line"></div>
+      <div class="map-meta meta">
+        <span>Mercator</span>
+        <span>Bearing 180&deg;</span>
+        <span>South-Up</span>
+        <span>z11</span>
       </div>
     </div>
   </div>
 </section>
 
+<!-- ── Divider ── -->
+<div class="section-divider"></div>
+
 <!-- ==========================================
-     TORRES GARCIA QUOTE
+     PROVOCATION — Quote + Body + Data Block
      ========================================== -->
-<section class="quote-section section-dark torres-section">
-  <div class="torres-layout">
-    <div class="torres-img-wrapper reveal">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/0/0d/Joaqu%C3%ADn_Torres_Garc%C3%ADa_-_Am%C3%A9rica_Invertida.jpg" alt="Am&eacute;rica Invertida by Torres Garc&iacute;a, 1943" class="torres-img" loading="lazy" />
-    </div>
-    <blockquote class="reveal reveal-delay-1">
-      <p>"Nuestro norte es el Sur. No debe haber norte, para nosotros, sino por oposici&oacute;n a nuestro Sur.
-      Por eso ahora ponemos el mapa al rev&eacute;s."</p>
-      <p class="quote-translation">"Our north is the South. There should be no north for us, except in opposition to our South.
-      That is why we now turn the map upside down."</p>
-      <cite>Joaqu&iacute;n Torres Garc&iacute;a, Universalismo Constructivo, 1935</cite>
+<section class="provocation-section" id="provocation">
+  <div class="page-grid">
+    <blockquote class="provocation-quote heading-lg reveal">
+      <div class="quote-accent-bar"></div>
+      &ldquo;Every world map is a political statement. This one just admits it.&rdquo;
     </blockquote>
-  </div>
-</section>
 
-<!-- ==========================================
-     FACTS — Horizontal scroll (8 cards)
-     ========================================== -->
-<section class="facts-section">
-  <div class="facts-nav">
-    <div class="facts-scroll">
-      <div class="fact-card fact-dark">
-        <span class="fact-number">01</span>
-        <p class="fact-text">The word "orientation" comes from <em>oriens</em>, Latin for "east." Medieval European maps had east on top, toward Paradise and the rising sun.</p>
-        <span class="fact-source">Etymology</span>
-      </div>
-      <div class="fact-card fact-accent">
-        <span class="fact-number">02</span>
-        <p class="fact-text">China invented the compass and called it the "south-pointing stone." Calling it "north-pointing" was a European choice.</p>
-        <span class="fact-source">History of Science</span>
-      </div>
-      <div class="fact-card fact-dark">
-        <span class="fact-number">03</span>
-        <p class="fact-text">Ancient Egyptian maps placed south on top because the Nile flows northward, downhill. South was the source. South was supreme.</p>
-        <span class="fact-source">Ancient Egypt</span>
-      </div>
-      <div class="fact-card fact-accent">
-        <span class="fact-number">04</span>
-        <p class="fact-text">Google Maps chose north-up as the default for <em>4.3 billion users</em> without public debate. One company's design decision now shapes how most humans see the planet.</p>
-        <span class="fact-source">Digital Cartography</span>
-      </div>
-      <div class="fact-card fact-dark">
-        <span class="fact-number">05</span>
-        <p class="fact-text">When participants were shown south-up maps, the measured psychological bias that equates "north = good, south = bad" completely disappeared.</p>
-        <span class="fact-source">Psychological Research</span>
-      </div>
-      <div class="fact-card fact-accent">
-        <span class="fact-number">06</span>
-        <p class="fact-text">Every GPS app you use defaults to north-up. When you rotate your phone, it snaps back. The algorithm won't let you <em>unlearn</em> the convention.</p>
-        <span class="fact-source">Technology &amp; Bias</span>
-      </div>
-      <div class="fact-card fact-dark">
-        <span class="fact-number">07</span>
-        <p class="fact-text">The Mercator projection makes Europe appear larger than South America. In reality, South America is nearly twice the size of Europe.</p>
-        <span class="fact-source">Projection Bias</span>
-      </div>
-      <div class="fact-card fact-accent">
-        <span class="fact-number">08</span>
-        <p class="fact-text">There is no physical reason for north to be up. In space, Earth has no top or bottom. Orientation is a psychological construct, not a geographic one.</p>
-        <span class="fact-source">Cognitive Science</span>
-      </div>
+    <div class="provocation-body body reveal reveal-d1">
+      <p>
+        In 1972, the Apollo 17 crew captured the most iconic photograph of Earth: the Blue Marble.
+        In the original, the southern tip of Africa pointed upward. Before releasing it,
+        NASA rotated the image 180&deg; to match the convention that north belongs on top.
+      </p>
+      <p>
+        They literally turned the planet upside down to make it look &ldquo;right.&rdquo;
+      </p>
+      <p>
+        This project flips it back. The map loads at bearing 180&deg;. South is up.
+        Your city looks unfamiliar. Your country is in the wrong place.
+        That discomfort is the point.
+      </p>
     </div>
-    <button class="facts-arrow facts-arrow-left" aria-label="Scroll left">&#8592;</button>
-    <button class="facts-arrow facts-arrow-right" aria-label="Scroll right">&#8594;</button>
-    <div class="facts-fade facts-fade-left"></div>
-    <div class="facts-fade facts-fade-right"></div>
-    <div class="facts-swipe-hint">
-      <span class="swipe-hand">&#9758;</span>
-      <span class="swipe-text">Swipe</span>
-    </div>
-  </div>
-</section>
 
-<!-- ==========================================
-     TIMELINE (8 cards)
-     ========================================== -->
-<section class="timeline-section">
-  <div class="timeline-header">
-    <div class="section-label reveal">5,000 Years of Orientation</div>
-    <h2 class="big-statement reveal reveal-delay-1">Which way is <em>up?</em></h2>
-  </div>
-  <div class="timeline-grid">
-    <div class="timeline-card reveal">
-      <div class="timeline-arrow">&uarr;</div>
-      <div class="timeline-era">S</div>
-      <div class="timeline-period">Ancient Egypt &middot; ~3000 BCE</div>
-      <div class="timeline-direction">South is up</div>
-      <p class="timeline-reason">The Nile flows north, therefore south, the source, is the natural "top" of the world.</p>
-    </div>
-    <div class="timeline-card reveal reveal-delay-1">
-      <div class="timeline-arrow">&rarr;</div>
-      <div class="timeline-era">E</div>
-      <div class="timeline-period">Medieval Europe &middot; 500&ndash;1500 CE</div>
-      <div class="timeline-direction">East is up</div>
-      <p class="timeline-reason">The direction of Paradise and the rising sun. Our word "orientation" literally means "facing east."</p>
-    </div>
-    <div class="timeline-card reveal reveal-delay-2">
-      <div class="timeline-arrow">&uarr;</div>
-      <div class="timeline-era">S</div>
-      <div class="timeline-period">Islamic Golden Age &middot; 1154</div>
-      <div class="timeline-direction">South is up</div>
-      <p class="timeline-reason">Al-Idrisi's Tabula Rogeriana, one of the most advanced maps in history, placed south on top.</p>
-    </div>
-    <div class="timeline-card reveal reveal-delay-3">
-      <div class="timeline-arrow">&uarr;</div>
-      <div class="timeline-era">S</div>
-      <div class="timeline-period">Chinese Cartography</div>
-      <div class="timeline-direction">South is up</div>
-      <p class="timeline-reason">The compass was the "south-pointing stone." South was the primary direction.</p>
-    </div>
-    <div class="timeline-card reveal">
-      <div class="timeline-arrow">&darr;</div>
-      <div class="timeline-era">N</div>
-      <div class="timeline-period">Renaissance &middot; 1569</div>
-      <div class="timeline-direction">North wins</div>
-      <p class="timeline-reason">Mercator's projection + European maritime expansion + compass convention = north on top becomes the "standard."</p>
-    </div>
-    <div class="timeline-card reveal reveal-delay-1">
-      <div class="timeline-arrow">&darr;</div>
-      <div class="timeline-era">N</div>
-      <div class="timeline-period">Colonial Era &middot; 1600s&ndash;1900s</div>
-      <div class="timeline-direction">North consolidates</div>
-      <p class="timeline-reason">European empires spread north-up maps across the globe. Colonial education systems cemented the convention as "objective truth."</p>
-    </div>
-    <div class="timeline-card reveal reveal-delay-2">
-      <div class="timeline-arrow">&#x21C5;</div>
-      <div class="timeline-era">!</div>
-      <div class="timeline-period">Counter-Cartography &middot; 1943&ndash;now</div>
-      <div class="timeline-direction">Artists rebel</div>
-      <p class="timeline-reason">Torres Garc&iacute;a, Fuller, Hatoum, Kentridge and others flip the map. South-up maps become tools of cultural resistance.</p>
-    </div>
-    <div class="timeline-card reveal reveal-delay-3">
-      <div class="timeline-arrow">&#x27F3;</div>
-      <div class="timeline-era">?</div>
-      <div class="timeline-period">Now &middot; You decide</div>
-      <div class="timeline-direction">No direction is "correct"</div>
-      <p class="timeline-reason">Earth is a sphere floating in space. There is no up. There is no down. There is only convention.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ==========================================
-     HISTORICAL MAP IMAGE BREAK
-     ========================================== -->
-<section class="map-image-break">
-  <div class="map-break-inner">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/d/db/Al-Idrisi%27s_world_map.JPG" alt="Al-Idrisi circular world map, 1154, south on top" class="historical-map-img spin-on-scroll" loading="lazy" />
-    <div class="map-break-caption reveal">
-      <span class="map-break-title">Al-Idrisi's World Map</span>
-      <span class="map-break-date">1154 CE</span>
-      <span class="map-break-note">South is on top. This was one of the most advanced maps in human history.</span>
-    </div>
-  </div>
-</section>
-
-<!-- ==========================================
-     ARTISTS
-     ========================================== -->
-<section class="artists-section section-dark">
-  <div class="container" style="padding-bottom: 2rem;">
-    <div class="section-label reveal" style="color: #c9a84c;">Counter-Cartographies</div>
-    <h2 class="big-statement reveal reveal-delay-1">Artists &amp; architects<br>who <em>flipped the script</em></h2>
-  </div>
-  <div class="artists-grid">
-    <!-- Row 1: manifesto → instability → architecture -->
-    <div class="artist-card reveal" data-year="1943">
-      <img class="artist-img" src="https://upload.wikimedia.org/wikipedia/commons/0/0d/Joaqu%C3%ADn_Torres_Garc%C3%ADa_-_Am%C3%A9rica_Invertida.jpg" alt="Am&eacute;rica Invertida by Torres Garc&iacute;a, 1943" loading="lazy" />
-      <h3 class="artist-name">Joaqu&iacute;n Torres Garc&iacute;a</h3>
-      <div class="artist-origin">Uruguay &middot; Painter &amp; Theorist</div>
-      <div class="artist-work">Am&eacute;rica Invertida (1943)</div>
-      <p class="artist-desc">Drew South America upside down as a decolonial manifesto. "Our north is the south" became a rallying cry for Latin American cultural autonomy.</p>
-      <div class="artist-credit">Public Domain, Wikimedia Commons</div>
-    </div>
-    <div class="artist-card reveal reveal-delay-1" data-year="1996">
-      <img class="artist-img" src="https://upload.wikimedia.org/wikipedia/commons/b/b8/Impenetrable%2C_1999_%28Mona_Hatoum%29.jpg" alt="Impenetrable, installation by Mona Hatoum, 1999" loading="lazy" />
-      <h3 class="artist-name">Mona Hatoum</h3>
-      <div class="artist-origin">Palestine / UK &middot; Installation Artist</div>
-      <div class="artist-work">Present Tense (1996) &amp; Hot Spot (2006)</div>
-      <p class="artist-desc">Maps made from soap with glass beads tracing the Oslo Accords, and a glowing neon globe where every continent is a hot spot. Territory as fragile material. Geography as violence.</p>
-      <div class="artist-credit">Image: Impenetrable (1999) at IVAM, Miguel Lorenzo, CC BY-SA 4.0</div>
-    </div>
-    <div class="artist-card reveal reveal-delay-2" data-year="1943">
-      <img class="artist-img" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Dymaxion_projection.png" alt="Dymaxion map projection" loading="lazy" />
-      <h3 class="artist-name">Buckminster Fuller</h3>
-      <div class="artist-origin">USA &middot; Architect &amp; Systems Thinker</div>
-      <div class="artist-work">Dymaxion Map (1943)</div>
-      <p class="artist-desc">Unfolded the globe into a flat surface with no right way up. No country is at the top. No country is at the bottom. The whole thing can be rearranged.</p>
-      <div class="artist-credit">Image: NASA / Wikimedia Commons, Public Domain</div>
-    </div>
-    <!-- Row 2: colonial maps → rearrangeable world → the punchline -->
-    <div class="artist-card reveal" data-year="1990">
-      <img class="artist-img" src="https://upload.wikimedia.org/wikipedia/commons/5/50/Performance_of_Triumphs_%26_Laments.jpg" alt="Triumphs and Laments by William Kentridge, Rome" loading="lazy" />
-      <h3 class="artist-name">William Kentridge</h3>
-      <div class="artist-origin">South Africa &middot; Artist &amp; Filmmaker</div>
-      <div class="artist-work">Drawings for Projection (1989&ndash;2011)</div>
-      <p class="artist-desc">Animated charcoal drawings where maps of Johannesburg dissolve and redraw themselves. Colonial borders erased and redrawn in real time. The landscape remembers what the map tries to forget.</p>
-      <div class="artist-credit">Image: Triumphs &amp; Laments, Rome, Philip Miller, CC BY-SA 4.0</div>
-    </div>
-    <div class="artist-card reveal reveal-delay-1" data-year="1972">
-      <img class="artist-img" src="https://upload.wikimedia.org/wikipedia/commons/9/97/Fahlstro.JPG" alt="&Ouml;yvind Fahlstr&ouml;m, 1961" loading="lazy" />
-      <h3 class="artist-name">&Ouml;yvind Fahlstr&ouml;m</h3>
-      <div class="artist-origin">Sweden / Brazil &middot; Painter &amp; Poet</div>
-      <div class="artist-work">World Map (1972)</div>
-      <p class="artist-desc">Painted world maps with moveable magnetic pieces. Viewers could rearrange countries, rewrite borders, redistribute power. The map was never finished because it was never meant to be.</p>
-      <div class="artist-credit">Image: Portrait, 1961, Public Domain</div>
-    </div>
-    <div class="artist-card reveal reveal-delay-2" data-year="1964">
-      <img class="artist-img" src="https://upload.wikimedia.org/wikipedia/commons/c/cd/Mafalda_Bs_As.jpg" alt="Mafalda statue in Buenos Aires, San Telmo" loading="lazy" />
-      <h3 class="artist-name">Quino (Mafalda)</h3>
-      <div class="artist-origin">Argentina &middot; Cartoonist</div>
-      <div class="artist-work">Libertad Flips the Globe</div>
-      <p class="artist-desc">"The idea that the North is 'above' is a psychological trick invented by those who believe they are on top." A six-year-old cartoon character understood what five centuries of cartography got wrong.</p>
-      <div class="artist-credit">Image: Mafalda statue, San Telmo, Buenos Aires, CC BY 2.0</div>
-    </div>
-  </div>
-</section>
-
-<!-- ==========================================
-     PSYCHOLOGY
-     ========================================== -->
-<section class="psych-section">
-  <div class="container">
-    <div class="psych-grid">
-      <div>
-        <div class="section-label reveal">The Psychology</div>
-        <h2 class="big-statement reveal reveal-delay-1">When we say things <em>"went south,"</em> we mean they went wrong.</h2>
-        <p class="body-text reveal reveal-delay-2">
-          Research shows that people associate <strong>north positions on maps with wealth, prestige, and higher altitude</strong>,
-          while south positions are linked to poverty and lower status. The critical finding:
-          <strong>when participants were shown south-up maps, this bias completely disappeared.</strong>
-        </p>
+    <div class="data-block reveal reveal-d2">
+      <div class="data-block-title meta">Mercator Distortion</div>
+      <div class="data-row">
+        <span class="data-label">Africa</span>
+        <span class="data-value">30.4M km&sup2;</span>
       </div>
-      <div class="reveal reveal-delay-2">
-        <ul class="idiom-list">
-          <li>"Heading <strong>up</strong> north" <span class="meaning">&rarr; going somewhere better</span></li>
-          <li>"Going <strong>down</strong> south" <span class="meaning">&rarr; going somewhere lesser</span></li>
-          <li>"<strong>Down Under</strong>" <span class="meaning">&rarr; under what, exactly? Under whose map?</span></li>
-          <li>"<strong>Top</strong> of the world" <span class="meaning">&rarr; success, power, achievement</span></li>
-          <li>"Things went <strong>south</strong>" <span class="meaning">&rarr; things went wrong</span></li>
-          <li>"<strong>Developing</strong> world" <span class="meaning">&rarr; almost always south of the equator</span></li>
-        </ul>
+      <div class="data-row">
+        <span class="data-label">Greenland</span>
+        <span class="data-value">2.2M km&sup2;</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Mercator Ratio</span>
+        <span class="data-value">1:1.8</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">True Ratio</span>
+        <span class="data-value">1:14</span>
       </div>
     </div>
   </div>
 </section>
 
+<!-- ── Divider ── -->
+<div class="section-divider"></div>
+
 <!-- ==========================================
-     FINAL QUOTE
+     BLUE MARBLE SCANDAL
      ========================================== -->
-<section class="quote-section section-accent">
-  <blockquote class="reveal">
-    <p>"When you flip a map, nothing about the geography changes. Everything about the psychology does."</p>
-  </blockquote>
+<section class="marble-section" id="scandal">
+  <div class="page-grid">
+    <div class="section-header">
+      <span class="meta reveal">The Blue Marble Scandal</span>
+      <h2 class="heading-lg reveal reveal-d1">The first photograph of Earth had south on top. NASA flipped it.</h2>
+    </div>
+
+    <div class="marble-pair reveal reveal-d2">
+      <div class="marble-item">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/3/39/The_Earth_seen_from_Apollo_17_%28Original_Orientation%29.jpg" alt="Blue Marble original orientation, south on top" class="marble-img" loading="lazy" />
+        <span class="meta">Original photograph</span>
+      </div>
+      <div class="marble-arrow" aria-hidden="true">&#x27F3;</div>
+      <div class="marble-item">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/cb/The_Blue_Marble_%28remastered%29.jpg" alt="Blue Marble NASA version, north on top" class="marble-img marble-flipped" loading="lazy" />
+        <span class="meta">&ldquo;Corrected&rdquo; by NASA</span>
+      </div>
+    </div>
+  </div>
 </section>
+
+<!-- ── Divider ── -->
+<div class="section-divider"></div>
+
+<!-- ==========================================
+     TORRES GARC&Iacute;A QUOTE
+     ========================================== -->
+<section class="torres-section">
+  <div class="page-grid">
+    <div class="torres-layout">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/0/0d/Joaqu%C3%ADn_Torres_Garc%C3%ADa_-_Am%C3%A9rica_Invertida.jpg" alt="Am&eacute;rica Invertida by Torres Garc&iacute;a, 1943" class="torres-img reveal" loading="lazy" />
+      <blockquote class="torres-quote reveal reveal-d1">
+        <p class="heading-lg">&ldquo;Nuestro norte es el Sur.&rdquo;</p>
+        <p class="body quote-translation">&ldquo;Our north is the South. There should be no north for us, except in opposition to our South.
+        That is why we now turn the map upside down.&rdquo;</p>
+        <cite class="meta">Joaqu&iacute;n Torres Garc&iacute;a &middot; Universalismo Constructivo &middot; 1935</cite>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<!-- ── Divider ── -->
+<div class="section-divider"></div>
+
+<!-- ==========================================
+     COUNTER-CARTOGRAPHY ARTISTS
+     ========================================== -->
+<section class="artists-section" id="artists">
+  <div class="page-grid">
+    <div class="section-header">
+      <span class="meta reveal">Counter-Cartographies</span>
+      <h2 class="heading-lg reveal reveal-d1">Artists &amp; architects who flipped the script</h2>
+    </div>
+  </div>
+
+  <div class="artists-grid page-grid">
+    <div class="artist-card reveal" data-pattern="grid" data-ink="teal">
+      <canvas class="card-pattern" aria-hidden="true"></canvas>
+      <h3 class="heading-sm">Joaqu&iacute;n Torres Garc&iacute;a</h3>
+      <div class="artist-meta meta">Uruguay &middot; 1943</div>
+      <p class="body">Drew South America upside down as a decolonial manifesto. &ldquo;Our north is the south&rdquo; became a rallying cry for Latin American cultural autonomy.</p>
+      <div class="artist-work meta">Am&eacute;rica Invertida</div>
+    </div>
+
+    <div class="artist-card reveal reveal-d1" data-pattern="stochastic" data-ink="blue">
+      <canvas class="card-pattern" aria-hidden="true"></canvas>
+      <h3 class="heading-sm">Mona Hatoum</h3>
+      <div class="artist-meta meta">Palestine / UK &middot; 2006</div>
+      <p class="body">Maps made from soap with glass beads. A glowing neon globe where every continent is a hot spot. Territory as fragile material. Geography as violence.</p>
+      <div class="artist-work meta">Present Tense &amp; Hot Spot</div>
+    </div>
+
+    <div class="artist-card reveal reveal-d2" data-pattern="diamond" data-ink="teal">
+      <canvas class="card-pattern" aria-hidden="true"></canvas>
+      <h3 class="heading-sm">Buckminster Fuller</h3>
+      <div class="artist-meta meta">USA &middot; 1943</div>
+      <p class="body">Unfolded the globe into a flat surface with no right way up. No country is at the top. No country is at the bottom. The whole thing can be rearranged.</p>
+      <div class="artist-work meta">Dymaxion Map</div>
+    </div>
+
+    <div class="artist-card reveal" data-pattern="horizontal" data-ink="black">
+      <canvas class="card-pattern" aria-hidden="true"></canvas>
+      <h3 class="heading-sm">William Kentridge</h3>
+      <div class="artist-meta meta">South Africa &middot; 1989</div>
+      <p class="body">Animated charcoal drawings where maps of Johannesburg dissolve and redraw themselves. Colonial borders erased and redrawn in real time.</p>
+      <div class="artist-work meta">Drawings for Projection</div>
+    </div>
+
+    <div class="artist-card reveal reveal-d1" data-pattern="reaction" data-ink="blue">
+      <canvas class="card-pattern" aria-hidden="true"></canvas>
+      <h3 class="heading-sm">&Ouml;yvind Fahlstr&ouml;m</h3>
+      <div class="artist-meta meta">Sweden / Brazil &middot; 1972</div>
+      <p class="body">Painted world maps with moveable magnetic pieces. Viewers could rearrange countries, rewrite borders, redistribute power. The map was never finished.</p>
+      <div class="artist-work meta">World Map</div>
+    </div>
+
+    <div class="artist-card reveal reveal-d2" data-pattern="concentric" data-ink="teal">
+      <canvas class="card-pattern" aria-hidden="true"></canvas>
+      <h3 class="heading-sm">Quino (Mafalda)</h3>
+      <div class="artist-meta meta">Argentina &middot; 1964</div>
+      <p class="body">&ldquo;The idea that the North is &lsquo;above&rsquo; is a psychological trick invented by those who believe they are on top.&rdquo; A six-year-old cartoon character understood what five centuries of cartography got wrong.</p>
+      <div class="artist-work meta">Libertad Flips the Globe</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Divider ── -->
+<div class="section-divider"></div>
+
+<!-- ==========================================
+     PSYCHOLOGY / IDIOMS
+     ========================================== -->
+<section class="psych-section" id="psychology">
+  <div class="page-grid">
+    <div class="psych-header">
+      <span class="meta reveal">The Psychology</span>
+      <h2 class="heading-lg reveal reveal-d1">When we say things &ldquo;went south,&rdquo; we mean they went wrong.</h2>
+    </div>
+
+    <div class="psych-body body reveal reveal-d2">
+      <p>
+        Research shows that people associate north positions on maps with wealth, prestige, and higher altitude,
+        while south positions are linked to poverty and lower status. The critical finding:
+        when participants were shown south-up maps, this bias completely disappeared.
+      </p>
+    </div>
+
+    <ul class="idiom-list reveal reveal-d2">
+      <li>&ldquo;Heading <strong>up</strong> north&rdquo; <span class="idiom-meaning meta">&rarr; going somewhere better</span></li>
+      <li>&ldquo;Going <strong>down</strong> south&rdquo; <span class="idiom-meaning meta">&rarr; going somewhere lesser</span></li>
+      <li>&ldquo;<strong>Down Under</strong>&rdquo; <span class="idiom-meaning meta">&rarr; under what, exactly? Under whose map?</span></li>
+      <li>&ldquo;<strong>Top</strong> of the world&rdquo; <span class="idiom-meaning meta">&rarr; success, power, achievement</span></li>
+      <li>&ldquo;Things went <strong>south</strong>&rdquo; <span class="idiom-meaning meta">&rarr; things went wrong</span></li>
+      <li>&ldquo;<strong>Developing</strong> world&rdquo; <span class="idiom-meaning meta">&rarr; almost always south of the equator</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ── Divider ── -->
+<div class="section-divider"></div>
 
 <!-- ==========================================
      CTA
      ========================================== -->
-<section class="cta-section">
-  <div class="cta-content">
-    <h2 class="cta-title reveal">Flip your<br>world.</h2>
-    <p class="cta-body reveal reveal-delay-1">
+<section class="cta-section" id="cta">
+  <div class="page-grid">
+    <h2 class="cta-title display-xl reveal" data-text="Flip your world.">Flip your<br>world.</h2>
+
+    <p class="cta-body body reveal reveal-d1">
       This map loads at bearing 180&deg;. South is up. Your city looks unfamiliar.
-      Your country is in the wrong place. Press the arrow keys and the world snaps back to "normal."
-      But now you know: normal is just a convention. And conventions can be changed.
+      Your country is in the wrong place. Press the arrow keys and the world snaps
+      back to &ldquo;normal.&rdquo; But now you know: normal is just a convention.
+      And conventions can be changed.
     </p>
-    <a href="/map" class="cta-button reveal reveal-delay-2">Launch the Map &#x27F3;</a>
+
+    <a href="/map" class="cta-button reveal reveal-d2">Launch the Map &#x27F3;</a>
   </div>
 </section>
 
+<!-- ── Divider ── -->
+<div class="section-divider"></div>
+
 <!-- ==========================================
-     FOOTER
+     COLOPHON
      ========================================== -->
-<footer>
-  <p>Upside Down, a project by Gerardo Mart&iacute;n Carre&ntilde;o &middot; 2026</p>
-  <p style="margin-top: 0.5rem;">
-    Built with love from Clapton, East London,
-    a place that looks different at bearing 180&deg;
-  </p>
-  <a href="https://www.linkedin.com/in/gerardoezequielmc/" target="_blank" rel="noopener" class="linkedin-link">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-    <span>Connect on LinkedIn</span>
-  </a>
+<footer class="colophon">
+  <div class="page-grid">
+    <div class="colophon-header meta">Colophon</div>
+
+    <div class="colophon-block">
+      <div class="colophon-col">
+        <span class="data-label">Built With</span>
+        <span class="data-value">MapLibre GL JS</span>
+        <span class="data-value">D3.js</span>
+        <span class="data-value">PMTiles</span>
+        <span class="data-value">Natural Earth</span>
+      </div>
+      <div class="colophon-col">
+        <span class="data-label">Author</span>
+        <span class="data-value">Gerardo Mart&iacute;n Carre&ntilde;o</span>
+        <span class="meta">Spatial Data Scientist</span>
+      </div>
+    </div>
+
+    <div class="colophon-block">
+      <div class="colophon-col">
+        <span class="data-label">Projection</span>
+        <span class="data-value">Mercator (bearing 180&deg;)</span>
+        <span class="data-value">Airocean (Dymaxion)</span>
+      </div>
+      <div class="colophon-col">
+        <span class="data-label">Ink System</span>
+        <div class="ink-row"><div class="ink-swatch" style="--swatch: #000000"></div><span class="meta">Black &middot; Pantone Black U</span></div>
+        <div class="ink-row"><div class="ink-swatch" style="--swatch: #00838A"></div><span class="meta">Teal &middot; Pantone 321 U</span></div>
+        <div class="ink-row"><div class="ink-swatch" style="--swatch: #0078BF"></div><span class="meta">Blue &middot; Pantone 3005 U</span></div>
+        <div class="ink-row"><div class="ink-swatch" style="--swatch: #FF48B0"></div><span class="meta">Fluor Pink &middot; 806 U</span></div>
+        <div class="ink-row"><div class="ink-swatch" style="--swatch: #88898A"></div><span class="meta">Light Gray &middot; 424 U</span></div>
+      </div>
+    </div>
+
+    <div class="colophon-block">
+      <div class="colophon-col">
+        <span class="data-label">Typefaces</span>
+        <span class="data-value">Space Grotesk</span>
+        <span class="data-value">Inter</span>
+        <span class="data-value">JetBrains Mono</span>
+      </div>
+      <div class="colophon-col">
+        <span class="data-label">Paper</span>
+        <div class="ink-row"><div class="ink-swatch" style="--swatch: #F2EDE4"></div><span class="data-value">#F2EDE4</span></div>
+        <span class="meta">Warm uncoated stock</span>
+      </div>
+    </div>
+
+    <div class="colophon-footer">
+      <p class="meta">Upside Down &middot; A project by Gerardo Mart&iacute;n Carre&ntilde;o &middot; 2026</p>
+      <p class="meta">Built with love from Clapton, East London, a place that looks different at bearing 180&deg;</p>
+      <a href="https://www.linkedin.com/in/gerardoezequielmc/" target="_blank" rel="noopener" class="linkedin-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        <span>Connect on LinkedIn</span>
+      </a>
+    </div>
+  </div>
 </footer>
 
 <script type="module" src="/src/analytics.ts"></script>
 <script>
-  // Scroll reveal
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) entry.target.classList.add('visible');
-    });
-  }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+(function() {
+  'use strict';
 
-  // Map iframe scroll fix
-  const shield = document.querySelector('.hero-map-shield');
-  if (shield) {
-    shield.addEventListener('click', () => { shield.style.display = 'none'; });
-    document.getElementById('hero')?.addEventListener('mouseleave', () => { shield.style.display = ''; });
+  /* ══════════════════════════════════════
+     REACTION-DIFFUSION HALFTONE — Hero background
+     Blue metaball pattern on hex grid, dense at bottom
+     ══════════════════════════════════════ */
+
+  function generateHeroHalftone() {
+    var canvas = document.getElementById('hero-halftone');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+
+    // Size canvas to hero
+    var hero = canvas.parentElement;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var w = hero.offsetWidth;
+    var h = hero.offsetHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.scale(dpr, dpr);
+
+    // ── 2D value noise (hash-based) ──
+    function hash2d(ix, iy) {
+      var n = Math.sin(ix * 127.1 + iy * 311.7) * 43758.5453;
+      return n - Math.floor(n);
+    }
+
+    function smoothNoise(x, y) {
+      var ix = Math.floor(x), iy = Math.floor(y);
+      var fx = x - ix, fy = y - iy;
+      // Smoothstep interpolation
+      fx = fx * fx * (3 - 2 * fx);
+      fy = fy * fy * (3 - 2 * fy);
+      var a = hash2d(ix, iy), b = hash2d(ix + 1, iy);
+      var c = hash2d(ix, iy + 1), d = hash2d(ix + 1, iy + 1);
+      return a + (b - a) * fx + (c - a) * fy + (a - b - c + d) * fx * fy;
+    }
+
+    // Fractal Brownian Motion — 4 octaves
+    function fbm(x, y) {
+      var val = 0, amp = 0.5;
+      for (var o = 0; o < 4; o++) {
+        val += amp * smoothNoise(x, y);
+        x *= 2.0; y *= 2.0; amp *= 0.5;
+      }
+      return val;
+    }
+
+    // ── Build hex-grid dots with noise-modulated sizes ──
+    var INK = '#0078BF'; // Riso blue
+    var spacing = 14;
+    var rowH = spacing * 0.866; // sin(60°)
+    var freq = 0.022; // noise frequency — controls blob size
+    var dots = [];
+
+    for (var row = -1; row * rowH < h + spacing; row++) {
+      var yPos = row * rowH;
+      var xOff = (row % 2) ? spacing * 0.5 : 0;
+
+      for (var col = -1; col * spacing < w + spacing; col++) {
+        var xPos = col * spacing + xOff;
+
+        // Fractal noise for organic blobs
+        var n = fbm(xPos * freq, yPos * freq);
+
+        // Y gradient: pattern starts at ~35% from top, dense at bottom
+        var yNorm = yPos / h;
+        var gradStart = 0.30;
+        var yDensity = Math.max(0, (yNorm - gradStart) / (1 - gradStart));
+        yDensity = yDensity * yDensity; // ease-in curve
+
+        // Combine noise + gradient
+        var combined = n * 0.55 + yDensity * 0.50;
+
+        // Threshold — below this, no dot
+        var threshold = 0.30;
+        if (combined > threshold) {
+          var t = (combined - threshold) / (1 - threshold);
+          // Radius grows with intensity — large enough to merge with neighbors
+          var radius = 1.5 + t * (spacing * 0.52);
+          dots.push({ x: xPos, y: yPos, r: radius });
+        }
+      }
+    }
+
+    // ── Animate: sweep reveal from bottom to top over 1.5s ──
+    // Sort dots by y descending (bottom first)
+    dots.sort(function(a, b) { return b.y - a.y; });
+
+    var totalFrames = 90; // ~1.5s at 60fps
+    var dotsPerFrame = Math.ceil(dots.length / totalFrames);
+    var drawn = 0;
+
+    ctx.fillStyle = INK;
+    ctx.globalAlpha = 1;
+
+    function drawBatch() {
+      var end = Math.min(drawn + dotsPerFrame, dots.length);
+
+      for (var k = drawn; k < end; k++) {
+        var dot = dots[k];
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, dot.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      drawn = end;
+      if (drawn < dots.length) {
+        requestAnimationFrame(drawBatch);
+      }
+    }
+
+    requestAnimationFrame(drawBatch);
   }
 
-  // Fun: Blue Marble spin on scroll — the "flip" animation
-  const marbleFlipped = document.querySelector('.marble-flipped');
-  if (marbleFlipped) {
-    const marbleObs = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
+  /* ══════════════════════════════════════
+     CARD HALFTONE PATTERNS
+     ══════════════════════════════════════ */
+
+  var INK_COLORS = {
+    teal:  '#00838A',
+    blue:  '#0078BF',
+    black: '#000000'
+  };
+
+  function drawCardPattern(canvas, patternType, inkColor) {
+    if (!canvas || !canvas.getContext) return;
+    var ctx = canvas.getContext('2d');
+    var w = canvas.parentElement.offsetWidth;
+    var h = canvas.parentElement.offsetHeight;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = w + 'px';
+    canvas.style.height = h + 'px';
+    ctx.scale(dpr, dpr);
+
+    ctx.fillStyle = inkColor;
+    ctx.strokeStyle = inkColor;
+
+    switch (patternType) {
+      case 'grid':
+        for (var x = 4; x < w; x += 8) {
+          for (var y = 4; y < h; y += 8) {
+            ctx.beginPath();
+            ctx.arc(x, y, 1.2, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+        break;
+
+      case 'stochastic':
+        var count = Math.floor(w * h * 0.002);
+        for (var i = 0; i < count; i++) {
+          ctx.beginPath();
+          ctx.arc(
+            Math.random() * w,
+            Math.random() * h,
+            0.8 + Math.random() * 1.2,
+            0, Math.PI * 2
+          );
+          ctx.fill();
+        }
+        break;
+
+      case 'diamond':
+        ctx.save();
+        ctx.translate(w / 2, h / 2);
+        ctx.rotate(Math.PI / 4);
+        ctx.translate(-w, -h);
+        for (var dx = 0; dx < w * 2; dx += 7) {
+          for (var dy = 0; dy < h * 2; dy += 7) {
+            ctx.fillRect(dx, dy, 2, 2);
+          }
+        }
+        ctx.restore();
+        break;
+
+      case 'horizontal':
+        ctx.lineWidth = 0.5;
+        for (var hy = 0; hy < h; hy += 4) {
+          ctx.beginPath();
+          ctx.moveTo(0, hy);
+          ctx.lineTo(w, hy);
+          ctx.stroke();
+        }
+        break;
+
+      case 'reaction':
+        var centers = [];
+        for (var c = 0; c < 15; c++) {
+          centers.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            r: 10 + Math.random() * 20
+          });
+        }
+        for (var ci = 0; ci < centers.length; ci++) {
+          var ctr = centers[ci];
+          for (var rj = 0; rj < 20; rj++) {
+            var angle = Math.random() * Math.PI * 2;
+            var dist = Math.random() * ctr.r;
+            ctx.beginPath();
+            ctx.arc(
+              ctr.x + Math.cos(angle) * dist,
+              ctr.y + Math.sin(angle) * dist,
+              1.5 + Math.random(),
+              0, Math.PI * 2
+            );
+            ctx.fill();
+          }
+        }
+        break;
+
+      case 'concentric':
+        var cx = w / 2;
+        var cy = h / 2;
+        ctx.lineWidth = 0.5;
+        for (var cr = 5; cr < Math.max(w, h); cr += 8) {
+          ctx.beginPath();
+          ctx.arc(cx, cy, cr, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+        break;
+    }
+  }
+
+  function initCardPatterns() {
+    var cards = document.querySelectorAll('.artist-card');
+    cards.forEach(function(card) {
+      var canvas = card.querySelector('.card-pattern');
+      var pattern = card.getAttribute('data-pattern');
+      var inkKey = card.getAttribute('data-ink') || 'teal';
+      var color = INK_COLORS[inkKey] || INK_COLORS.teal;
+      drawCardPattern(canvas, pattern, color);
+    });
+  }
+
+  /* ══════════════════════════════════════
+     SCROLL REVEAL
+     ══════════════════════════════════════ */
+
+  function initScrollReveal() {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
         if (entry.isIntersecting) {
-          marbleFlipped.classList.add('do-flip');
-          marbleObs.unobserve(entry.target);
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal').forEach(function(el) {
+      observer.observe(el);
+    });
+  }
+
+  /* ══════════════════════════════════════
+     BLUE MARBLE FLIP ANIMATION
+     ══════════════════════════════════════ */
+
+  function initMarbleFlip() {
+    var marble = document.querySelector('.marble-flipped');
+    if (!marble) return;
+
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          marble.classList.add('do-flip');
+          observer.unobserve(entry.target);
         }
       });
     }, { threshold: 0.3 });
-    marbleObs.observe(marbleFlipped);
+
+    observer.observe(marble);
   }
 
-  // Fun: Al-Idrisi map slow rotation on scroll
-  const spinImg = document.querySelector('.spin-on-scroll');
-  if (spinImg) {
-    const spinObs = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) spinImg.classList.add('spinning');
-        else spinImg.classList.remove('spinning');
-      });
-    }, { threshold: 0.2 });
-    spinObs.observe(spinImg);
-  }
+  /* ══════════════════════════════════════
+     IDIOM STAGGER ANIMATION
+     ══════════════════════════════════════ */
 
-  // Fun: Parallax floating elements on scroll
-  let ticking = false;
-  window.addEventListener('scroll', () => {
-    if (!ticking) {
-      requestAnimationFrame(() => {
-        const scrollY = window.scrollY;
-        // Rotate the marble-rotate-arrow based on scroll
-        const arrow = document.querySelector('.marble-rotate-arrow');
-        if (arrow) arrow.style.transform = `rotate(${scrollY * 0.3}deg)`;
+  function initIdiomAnimation() {
+    var list = document.querySelector('.idiom-list');
+    if (!list) return;
 
-        // Subtle parallax on section images
-        document.querySelectorAll('.torres-img').forEach(img => {
-          const rect = img.getBoundingClientRect();
-          if (rect.top < window.innerHeight && rect.bottom > 0) {
-            const offset = (rect.top - window.innerHeight / 2) * 0.05;
-            img.style.transform = `rotate(${-2 + offset * 0.3}deg)`;
-          }
-        });
-        ticking = false;
-      });
-      ticking = true;
-    }
-  });
-
-  // ─── Facts scroll navigation ───
-  const factsScroll = document.querySelector('.facts-scroll');
-  const arrowLeft = document.querySelector('.facts-arrow-left');
-  const arrowRight = document.querySelector('.facts-arrow-right');
-  const fadeLeft = document.querySelector('.facts-fade-left');
-  const fadeRight = document.querySelector('.facts-fade-right');
-  const swipeHint = document.querySelector('.facts-swipe-hint');
-
-  if (factsScroll) {
-    const updateFactsNav = () => {
-      const { scrollLeft, scrollWidth, clientWidth } = factsScroll;
-      const atStart = scrollLeft <= 10;
-      const atEnd = scrollLeft + clientWidth >= scrollWidth - 10;
-
-      if (arrowLeft) arrowLeft.classList.toggle('visible', !atStart);
-      if (arrowRight) arrowRight.classList.toggle('visible', !atEnd);
-      if (fadeLeft) fadeLeft.classList.toggle('visible', !atStart);
-      if (fadeRight) fadeRight.classList.toggle('visible', !atEnd);
-    };
-
-    // Scroll by one card width on arrow click
-    const scrollByCard = (direction) => {
-      const card = factsScroll.querySelector('.fact-card');
-      if (!card) return;
-      const distance = card.offsetWidth * direction;
-      factsScroll.scrollBy({ left: distance, behavior: 'smooth' });
-    };
-
-    if (arrowLeft) arrowLeft.addEventListener('click', () => scrollByCard(-1));
-    if (arrowRight) arrowRight.addEventListener('click', () => scrollByCard(1));
-
-    factsScroll.addEventListener('scroll', updateFactsNav, { passive: true });
-
-    // Show swipe hint on mobile when section enters viewport, dismiss on scroll
-    if (swipeHint) {
-      const hintObs = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            swipeHint.classList.add('visible');
-            hintObs.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.5 });
-      hintObs.observe(factsScroll);
-
-      factsScroll.addEventListener('scroll', () => {
-        if (factsScroll.scrollLeft > 20) {
-          swipeHint.classList.remove('visible');
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          var items = entry.target.querySelectorAll('li');
+          items.forEach(function(li, i) {
+            setTimeout(function() {
+              li.classList.add('idiom-visible');
+            }, i * 150);
+          });
+          observer.unobserve(entry.target);
         }
-      }, { passive: true });
-    }
+      });
+    }, { threshold: 0.3 });
 
-    // Initial state
-    updateFactsNav();
-    // Recheck after layout settles
-    requestAnimationFrame(updateFactsNav);
+    observer.observe(list);
   }
 
-  // Fun: Fact cards tilt on mouse move
-  document.querySelectorAll('.fact-card').forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-      card.style.transform = `perspective(600px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg)`;
+  /* ══════════════════════════════════════
+     MAP SHIELD — Click to interact, mouse-leave to re-shield
+     ══════════════════════════════════════ */
+
+  function initMapShield() {
+    var shield = document.querySelector('.map-shield');
+    var frame = document.querySelector('.map-frame');
+    if (!shield || !frame) return;
+
+    shield.addEventListener('click', function() {
+      shield.style.display = 'none';
     });
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = '';
+
+    frame.addEventListener('mouseleave', function() {
+      shield.style.display = '';
     });
+  }
+
+  /* ══════════════════════════════════════
+     MARBLE ARROW SCROLL ROTATION
+     ══════════════════════════════════════ */
+
+  function initScrollEffects() {
+    var arrow = document.querySelector('.marble-arrow');
+    var ticking = false;
+
+    window.addEventListener('scroll', function() {
+      if (!ticking) {
+        requestAnimationFrame(function() {
+          if (arrow) {
+            arrow.style.transform = 'rotate(' + (window.scrollY * 0.3) + 'deg)';
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+  }
+
+  /* ══════════════════════════════════════
+     INIT
+     ══════════════════════════════════════ */
+
+  function init() {
+    generateHeroHalftone();
+    initCardPatterns();
+    initScrollReveal();
+    initMarbleFlip();
+    initIdiomAnimation();
+    initMapShield();
+    initScrollEffects();
+  }
+
+  // Run when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  // Re-render canvases on resize
+  var resizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+      generateHeroHalftone();
+      initCardPatterns();
+    }, 250);
   });
 
-  // Fun: Timeline cards flip entrance
-  const timeObs = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('flip-in');
-        timeObs.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.2 });
-  document.querySelectorAll('.timeline-card').forEach(card => timeObs.observe(card));
-
-  // Fun: Idiom items cascade with staggered flip
-  const idiomObs = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const items = entry.target.querySelectorAll('li');
-        items.forEach((li, i) => {
-          setTimeout(() => li.classList.add('idiom-visible'), i * 150);
-        });
-        idiomObs.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.3 });
-  const idiomList = document.querySelector('.idiom-list');
-  if (idiomList) idiomObs.observe(idiomList);
+})();
 </script>
 </body>
 </html>

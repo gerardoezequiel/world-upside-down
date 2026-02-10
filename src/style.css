@@ -4,14 +4,18 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --paper:  #FAFAF6;
-  --cream:  #F5F2EC;
+  --paper:  #F2EDE4;    /* warm uncoated stock */
+  --cream:  #EDE8E0;
   --bg:     #E2DFD8;
-  --ink:    #C83040;    /* crimson — primary accent */
-  --dark:   #1A1A2E;    /* dark navy */
-  --mid:    #8A7E6E;    /* muted text */
+  --ink:    #000000;    /* black — primary accent (Drum 5) */
+  --teal:   #00838A;    /* Drum 2 */
+  --blue:   #0078BF;    /* Drum 3 */
+  --pink:   #FF48B0;    /* Drum 4 — fluorescent pink */
+  --gray:   #88898A;    /* Drum 1 — light gray */
+  --dark:   #000000;    /* black */
+  --mid:    #88898A;    /* light gray ink */
   --light:  #C4BAA8;    /* subtle elements */
-  --rule:   #C83040;    /* band borders */
+  --rule:   #000000;    /* band borders — black */
   --earth:  #EDE8E0;
 }
 
@@ -66,11 +70,12 @@ body {
 }
 
 #city-title {
-  font-family: 'Instrument Serif', serif;
-  font-weight: 400;
-  font-size: 28px;
-  font-style: italic;
-  letter-spacing: 0.01em;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 22px;
+  font-style: normal;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
   color: var(--dark);
   line-height: 1;
   cursor: pointer;
@@ -125,11 +130,12 @@ body {
 }
 
 #geocoder-input {
-  font-family: 'Instrument Serif', serif;
-  font-weight: 400;
-  font-size: 28px;
-  font-style: italic;
-  letter-spacing: 0.01em;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 22px;
+  font-style: normal;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
   color: var(--dark);
   line-height: 1;
   background: transparent;
@@ -307,7 +313,7 @@ body {
   font-family: 'Instrument Serif', serif;
   font-style: italic;
   font-size: 16px;
-  color: #F8F4EC;
+  color: var(--ink);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.6s ease;
@@ -392,7 +398,7 @@ body {
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   padding: 10px 24px;
-  border: 1px solid rgba(200, 48, 64, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.10);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.4s ease;
@@ -437,7 +443,7 @@ body {
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   padding: 14px 32px;
-  border: 1px solid rgba(200, 48, 64, 0.25);
+  border: 1px solid rgba(0, 0, 0, 0.12);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.4s ease;
@@ -476,14 +482,13 @@ body {
 .grat-label {
   position: absolute;
   font-family: 'Space Mono', monospace;
-  font-size: 8px;
-  letter-spacing: 0.03em;
-  color: rgba(56, 188, 212, 0.70);
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #fdf28c;
+  opacity: 0.55;
   white-space: nowrap;
   line-height: 1;
-  text-shadow:
-    0 0 3px rgba(237, 232, 224, 0.9),
-    0 0 6px rgba(237, 232, 224, 0.6);
 }
 
 .grat-lon {
@@ -681,7 +686,7 @@ body {
   appearance: none;
   width: 44px;
   height: 44px;
-  border: 1px solid rgba(200, 48, 64, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.15);
   background: rgba(250, 250, 246, 0.85);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
@@ -741,11 +746,11 @@ body {
 
   .subtitle { display: none; }
 
-  #city-title { font-size: 22px; }
+  #city-title { font-size: 18px; }
   .search-hint { display: none; }
 
   #geocoder-input {
-    font-size: 22px;
+    font-size: 18px;
     width: 200px;
   }
 
@@ -807,10 +812,10 @@ body {
     padding-top: env(safe-area-inset-top, 0px);
   }
 
-  #city-title { font-size: 18px; }
+  #city-title { font-size: 15px; }
 
   #geocoder-input {
-    font-size: 18px;
+    font-size: 15px;
     width: 140px;
   }
 
@@ -862,8 +867,8 @@ body {
 /* ── Very small phones (iPhone SE 1st gen, Galaxy Fold) ── */
 @media (max-width: 374px) {
   #top-band { padding: 0 8px; }
-  #city-title { font-size: 16px; }
-  #geocoder-input { font-size: 16px; width: 120px; }
+  #city-title { font-size: 13px; }
+  #geocoder-input { font-size: 13px; width: 120px; }
   .geocoder-results { width: 200px; }
   #coords { font-size: 6px; }
   #bot-band { padding: 0 8px; gap: 6px; }

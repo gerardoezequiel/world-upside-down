@@ -1,62 +1,54 @@
 import maplibregl from "maplibre-gl";
-import { Protocol } from "pmtiles";
 import "./analytics";
 import { initDymaxion } from "./dymaxion";
+import { RISO_INKS, PAPER, generateMisregistration, getSessionSeed } from "./riso";
 
-/* ── PMTiles protocol ─────────────────────────────────────── */
-const protocol = new Protocol();
-maplibregl.addProtocol("pmtiles", protocol.tile);
-
-/* ── Risograph palette — 6 bold inks, architectural planning ── */
-// Inspired by urban planning maps & riso overprint: saturated,
-// layered, graphic. Each land use gets its own ink drum.
-// Ink 1: Navy (#1A1848) — structure, roads, rail
-// Ink 2: Cyan (#38BCD4) — buildings, dense urban
-// Ink 3: Hot Pink (#E848A0) — residential, suburban
-// Ink 4: Green (#3EA858) — parks, nature
-// Ink 5: Yellow (#E8D040) — farmland, open land
-// Ink 6: Crimson (#C83040) — boundaries, accents
-// Paper: White (#F8F4EC)
+/* ── 5-Colour Risograph — Official Riso Kagaku Inks ─────────── */
+// Drum 1: Light Gray (#88898A) — land, terrain, secondary roads
+// Drum 2: Teal (#00838A) — water, ocean, rivers, coastline
+// Drum 3: Blue (#0078BF) — buildings, urban fabric
+// Drum 4: Fluorescent Pink (#FF48B0) — parks, green space
+// Drum 5: Black (#000000) — text, road casings, boundaries
+// Paper: warm uncoated stock (#F2EDE4)
 const PALETTE = {
-  // Paper & ocean
-  bg:        "#2838A8",   // bold blue ocean — like blue ink flood fill
-  earth:     "#F8F4EC",   // white paper stock
-  // Cyan ink — buildings, commercial
-  buildings: "#38BCD4",   // bright cyan — dense urban core
-  urban:     "#E8A0D0",   // pink tint — residential/suburban
-  // Green ink — parks, nature
-  park:      "#3EA858",   // vivid green
-  parkAlt:   "#68C078",   // lighter green
-  // Water — deep blue (matches ocean)
-  water:     "#2838A8",   // same as bg — ocean blue
-  waterLine: "#3040B8",   // slightly lighter blue for rivers
-  // Navy ink — infrastructure
-  road:      "#1A1848",   // dark navy-purple
-  roadMajor: "#282460",   // navy
-  roadMinor: "#6860A0",   // purple-grey
-  roadCas:   "#E8E4DC",   // paper showing through
-  rail:      "#1A1848",   // navy
-  // Crimson ink — boundaries
-  boundary:  "#C83040",   // bold crimson
-  // Text — navy ink
-  label:     "#1A1848",   // navy
-  labelHalo: "#F8F4EC",   // white paper
-  // Landcover — bold ink washes
-  grass:     "#E8D040",   // bright yellow — open/farmland
-  farmland:  "#E8D040",   // yellow
-  scrub:     "#D0CC60",   // olive-yellow
-  barren:    "#E8D898",   // pale yellow
-  glacier:   "#F0F4F8",   // blue-white
-  // Special — overprint combinations
-  hospital:  "#F0B0B0",   // pink tint
-  school:    "#B0D8F0",   // cyan tint
-  industrial:"#D0C8E0",   // purple tint
-  beach:     "#F0E4C0",   // sandy yellow
-  zoo:       "#90D8A0",   // green tint
-  aerodrome: "#D8D0D0",   // neutral
-  pier:      "#D8D4CC",   // warm paper
-  pedestrian:"#F0ECE4",   // paper
-  runway:    "#B0A8A0",   // grey
+  // Paper stock
+  bg:        PAPER,        // warm uncoated cream
+  earth:     "#EDE8E0",   // cream paper — land base
+  // Drum 2: TEAL — water
+  water:     RISO_INKS.teal.hex,       // #00838A
+  waterLine: "#006A70",   // darker teal for rivers
+  // Drum 3: BLUE — buildings
+  buildings: RISO_INKS.blue.hex,       // #0078BF
+  urban:     "#7BBCE0",   // diluted blue wash (suburban)
+  // Drum 4: FLUORESCENT PINK — parks
+  park:      RISO_INKS.fluorPink.hex,  // #FF48B0
+  parkAlt:   "#FF80C8",   // lighter pink wash
+  // Drum 1: LIGHT GRAY — land, secondary roads
+  road:      "#000000",   // black for primary roads
+  roadMajor: "#000000",   // black
+  roadMinor: RISO_INKS.lightGray.hex,  // #88898A
+  roadCas:   "#D8D4CC",   // warm grey casing
+  rail:      "#000000",   // black
+  // Drum 5: BLACK — boundaries, text, structure
+  boundary:  "#000000",   // black
+  label:     "#000000",   // black
+  labelHalo: PAPER,       // paper halo
+  // Landcover — light gray wash tones
+  grass:     "#DDD8CC",   // warm sand
+  farmland:  "#E0DCC8",   // warm beige
+  scrub:     "#D4D0C0",   // sage-sand
+  barren:    "#E0DAC8",   // sandy
+  glacier:   "#EEEEEE",   // near white
+  // Special — tints from ink overlap
+  hospital:  "#FFB8D8",   // pink tint
+  school:    "#A0D4F0",   // blue tint
+  industrial:"#D0D4D8",   // gray
+  beach:     "#F0E8D0",   // sandy
+  zoo:       "#FFB0D0",   // pink tint
+  aerodrome: "#D0D0D0",   // neutral grey
+  pier:      "#D8D4CC",   // warm grey
+  pedestrian:"#E0DCD4",   // warm off-white
+  runway:    "#B8B4AC",   // medium grey
 };
 
 /* ── Color replacement map ────────────────────────────────── */
@@ -104,11 +96,11 @@ function recolorStyle(style: maplibregl.StyleSpecification): maplibregl.StyleSpe
       (layer as any).paint["fill-color"] = PALETTE.buildings;
       (layer as any).paint["fill-opacity"] = [
         "interpolate", ["linear"], ["zoom"],
-        12, 0.4,
-        14, 0.65,
-        16, 0.75,
+        12, 0.5,
+        14, 0.70,
+        16, 0.85,
       ];
-      (layer as any).paint["fill-outline-color"] = "rgba(40, 56, 168, 0.25)";
+      (layer as any).paint["fill-outline-color"] = "rgba(0, 120, 191, 0.25)";
       continue;
     }
 
@@ -350,7 +342,7 @@ function updateScaleBar(map: maplibregl.Map): void {
     }
   }
 
-  const ink = '#C83040';
+  const ink = '#000000';
   const svgH = 28;
   const baseline = svgH - 4;
   const tickMajor = 12;
@@ -796,123 +788,233 @@ function setupGeocoder(map: maplibregl.Map): void {
   });
 }
 
-/* ── Dynamic Graticule ────────────────────────────────────── */
+/* ── Dynamic Graticule with Major/Sub lines + inline labels ── */
 function addGraticule(map: maplibregl.Map): void {
-  const GRAT_COLOR = 'rgba(248, 244, 236, 0.30)';
+  const GRAT_COLOR = '#fdf28c';
 
-  function getInterval(zoom: number): number {
-    if (zoom >= 10) return 1;
-    if (zoom >= 7) return 2;
-    if (zoom >= 5) return 5;
-    if (zoom >= 3) return 10;
-    if (zoom >= 2) return 15;
-    return 30;
+  function getIntervals(zoom: number): { major: number; sub: number; labelSpacing: number } {
+    if (zoom >= 10) return { major: 1, sub: 0.25, labelSpacing: 5 };
+    if (zoom >= 7)  return { major: 2, sub: 0.5, labelSpacing: 10 };
+    if (zoom >= 5)  return { major: 5, sub: 1, labelSpacing: 20 };
+    if (zoom >= 3)  return { major: 10, sub: 2, labelSpacing: 30 };
+    if (zoom >= 2)  return { major: 15, sub: 5, labelSpacing: 45 };
+    return { major: 30, sub: 10, labelSpacing: 60 };
   }
 
-  function buildGraticuleGeoJSON(interval: number): GeoJSON.FeatureCollection {
+  function buildGraticuleGeoJSON(major: number, sub: number, labelSpacing: number): GeoJSON.FeatureCollection {
     const features: GeoJSON.Feature[] = [];
 
-    for (let lon = -180; lon <= 180; lon += interval) {
+    // Major longitude lines (vertical)
+    for (let lon = -180; lon <= 180; lon += major) {
       const coords: [number, number][] = [];
       for (let lat = -85; lat <= 85; lat += 2) coords.push([lon, lat]);
-      features.push({ type: 'Feature', properties: { type: 'line' }, geometry: { type: 'LineString', coordinates: coords } });
+      features.push({ type: 'Feature', properties: { rank: 'major' }, geometry: { type: 'LineString', coordinates: coords } });
+
+      // Labels along this longitude line, spaced every labelSpacing degrees of latitude
+      const lonLabel = lon === 0 ? '0°' : `${Math.abs(lon)}°${lon > 0 ? 'E' : 'W'}`;
+      for (let lat = -80; lat <= 80; lat += labelSpacing) {
+        features.push({
+          type: 'Feature',
+          properties: { rank: 'label', text: lonLabel, axis: 'lon' },
+          geometry: { type: 'Point', coordinates: [lon, lat] },
+        });
+      }
     }
 
-    for (let lat = -80; lat <= 80; lat += interval) {
+    // Major latitude lines (horizontal)
+    for (let lat = -80; lat <= 80; lat += major) {
       const coords: [number, number][] = [];
       for (let lon = -180; lon <= 180; lon += 2) coords.push([lon, lat]);
-      features.push({ type: 'Feature', properties: { type: 'line' }, geometry: { type: 'LineString', coordinates: coords } });
+      features.push({ type: 'Feature', properties: { rank: 'major' }, geometry: { type: 'LineString', coordinates: coords } });
+
+      // Labels along this latitude line
+      const latLabel = lat === 0 ? '0°' : `${Math.abs(lat)}°${lat > 0 ? 'N' : 'S'}`;
+      for (let lon = -180; lon <= 180; lon += labelSpacing) {
+        features.push({
+          type: 'Feature',
+          properties: { rank: 'label', text: latLabel, axis: 'lat' },
+          geometry: { type: 'Point', coordinates: [lon, lat] },
+        });
+      }
+    }
+
+    // Sub longitude lines
+    for (let lon = -180; lon <= 180; lon += sub) {
+      if (Number.isInteger(lon / major) && lon % major === 0) continue;
+      const coords: [number, number][] = [];
+      for (let lat = -85; lat <= 85; lat += 2) coords.push([lon, lat]);
+      features.push({ type: 'Feature', properties: { rank: 'sub' }, geometry: { type: 'LineString', coordinates: coords } });
+    }
+
+    // Sub latitude lines
+    for (let lat = -80; lat <= 80; lat += sub) {
+      if (Number.isInteger(lat / major) && lat % major === 0) continue;
+      const coords: [number, number][] = [];
+      for (let lon = -180; lon <= 180; lon += 2) coords.push([lon, lat]);
+      features.push({ type: 'Feature', properties: { rank: 'sub' }, geometry: { type: 'LineString', coordinates: coords } });
     }
 
     return { type: 'FeatureCollection', features };
   }
 
-  let currentInterval = getInterval(map.getZoom());
+  let currentMajor = getIntervals(map.getZoom()).major;
+  const { major, sub, labelSpacing } = getIntervals(map.getZoom());
 
-  // ── Graticule lines (MapLibre layer) ──
   map.addSource('graticule', {
     type: 'geojson',
-    data: buildGraticuleGeoJSON(currentInterval),
+    data: buildGraticuleGeoJSON(major, sub, labelSpacing),
   });
 
+  // Sub lines — very faint
   map.addLayer({
-    id: 'graticule-lines',
+    id: 'graticule-sub',
     type: 'line',
     source: 'graticule',
+    filter: ['==', ['get', 'rank'], 'sub'],
     paint: {
       'line-color': GRAT_COLOR,
-      'line-width': [
-        'interpolate', ['linear'], ['zoom'],
-        1, 0.6, 5, 0.9, 10, 1.2, 14, 1.5,
-      ],
+      'line-opacity': 0.12,
+      'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.3, 5, 0.4, 10, 0.5, 14, 0.6],
     },
   });
 
-  // Update line density on zoom
+  // Major lines — subtle
+  map.addLayer({
+    id: 'graticule-major',
+    type: 'line',
+    source: 'graticule',
+    filter: ['==', ['get', 'rank'], 'major'],
+    paint: {
+      'line-color': GRAT_COLOR,
+      'line-opacity': 0.25,
+      'line-width': ['interpolate', ['linear'], ['zoom'], 1, 0.4, 5, 0.6, 10, 0.8, 14, 1.0],
+    },
+  });
+
+  // Inline labels — sit on the lines, move with the map
+  map.addLayer({
+    id: 'graticule-labels',
+    type: 'symbol',
+    source: 'graticule',
+    filter: ['==', ['get', 'rank'], 'label'],
+    layout: {
+      'text-field': ['get', 'text'],
+      'text-font': ['Open Sans Regular'],
+      'text-size': ['interpolate', ['linear'], ['zoom'], 1, 8, 5, 9, 10, 10],
+      'text-anchor': 'bottom-left',
+      'text-offset': [0.3, -0.2],
+      'text-allow-overlap': false,
+      'text-ignore-placement': false,
+      'text-padding': 20,
+      'symbol-placement': 'point',
+    },
+    paint: {
+      'text-color': GRAT_COLOR,
+      'text-opacity': 0.50,
+      'text-halo-width': 0,
+    },
+  });
+
+  // Update density on zoom
   map.on('zoomend', () => {
-    const newInterval = getInterval(map.getZoom());
-    if (newInterval !== currentInterval) {
-      currentInterval = newInterval;
+    const intervals = getIntervals(map.getZoom());
+    if (intervals.major !== currentMajor) {
+      currentMajor = intervals.major;
       const src = map.getSource('graticule') as maplibregl.GeoJSONSource;
-      if (src) src.setData(buildGraticuleGeoJSON(currentInterval));
+      if (src) src.setData(buildGraticuleGeoJSON(intervals.major, intervals.sub, intervals.labelSpacing));
     }
   });
 
-  // ── Edge labels (HTML overlay — nautical chart style) ──
+  // Clear the old HTML label container (no longer used)
   const labelContainer = document.getElementById('grat-edge-labels');
-  let rafId = 0;
+  if (labelContainer) labelContainer.innerHTML = '';
+}
 
-  function updateEdgeLabels() {
-    if (!labelContainer) return;
+/* ── Riso Misregistration (Approach B — style-level) ──────── */
+function applyRisoMisregistration(map: maplibregl.Map): void {
+  const seed = getSessionSeed();
+  const misreg = generateMisregistration(seed);
+  const style = map.getStyle();
+  if (!style) return;
 
-    const interval = getInterval(map.getZoom());
-    const bounds = map.getBounds();
-    const center = map.getCenter();
-    const el = map.getContainer();
-    const w = el.clientWidth;
-    const h = el.clientHeight;
-    const PAD = 6;
+  // Scale factor — exaggerate sub-pixel offsets for visibility
+  const SCALE = 2.5;
 
-    let html = '';
-
-    // Longitude labels along top & bottom edges
-    const lonW = bounds.getWest();
-    const lonE = bounds.getEast();
-    const lonStart = Math.ceil(lonW / interval) * interval;
-    const lonEnd = Math.floor(lonE / interval) * interval;
-
-    for (let lon = lonStart; lon <= lonEnd; lon += interval) {
-      const px = map.project([lon, center.lat]);
-      if (px.x < 36 || px.x > w - 36) continue;
-      const label = lon === 0 ? '0°' : `${Math.abs(lon)}°${lon > 0 ? 'E' : 'W'}`;
-      html += `<span class="grat-label grat-lon" style="left:${px.x}px;top:${PAD}px">${label}</span>`;
-      html += `<span class="grat-label grat-lon" style="left:${px.x}px;bottom:${PAD}px">${label}</span>`;
-    }
-
-    // Latitude labels along left & right edges
-    const latMin = Math.min(bounds.getSouth(), bounds.getNorth());
-    const latMax = Math.max(bounds.getSouth(), bounds.getNorth());
-    const latStart = Math.ceil(latMin / interval) * interval;
-    const latEnd = Math.floor(latMax / interval) * interval;
-
-    for (let lat = latStart; lat <= latEnd; lat += interval) {
-      if (lat < -85 || lat > 85) continue;
-      const px = map.project([center.lng, lat]);
-      if (px.y < 18 || px.y > h - 18) continue;
-      const label = lat === 0 ? '0°' : `${Math.abs(lat)}°${lat > 0 ? 'N' : 'S'}`;
-      html += `<span class="grat-label grat-lat" style="top:${px.y}px;left:${PAD}px">${label}</span>`;
-      html += `<span class="grat-label grat-lat" style="top:${px.y}px;right:${PAD}px">${label}</span>`;
-    }
-
-    labelContainer.innerHTML = html;
+  // ── Water misregistration (teal) ──
+  const waterLayer = style.layers.find(l => l.id === 'water');
+  if (waterLayer && 'source-layer' in waterLayer) {
+    map.addLayer({
+      id: 'water-riso-offset',
+      type: 'fill',
+      source: (waterLayer as any).source,
+      'source-layer': (waterLayer as any)['source-layer'],
+      paint: {
+        'fill-color': RISO_INKS.teal.hex,
+        'fill-opacity': 0.12,
+        'fill-translate': [misreg.teal.dx * SCALE, misreg.teal.dy * SCALE],
+      },
+    }, 'water');
   }
 
-  map.on('move', () => {
-    cancelAnimationFrame(rafId);
-    rafId = requestAnimationFrame(updateEdgeLabels);
-  });
+  // ── Building misregistration (blue) ──
+  const buildingLayer = style.layers.find(l => l.id === 'buildings');
+  if (buildingLayer && 'source-layer' in buildingLayer) {
+    map.addLayer({
+      id: 'buildings-riso-offset',
+      type: 'fill',
+      source: (buildingLayer as any).source,
+      'source-layer': (buildingLayer as any)['source-layer'],
+      paint: {
+        'fill-color': RISO_INKS.blue.hex,
+        'fill-opacity': 0.10,
+        'fill-translate': [misreg.blue.dx * SCALE, misreg.blue.dy * SCALE],
+      },
+    }, 'buildings');
+  }
 
-  updateEdgeLabels();
+  // ── Park misregistration (fluorescent pink) ──
+  for (const layer of style.layers) {
+    if (layer.id.startsWith('landuse_park') && layer.type === 'fill' && 'source-layer' in layer) {
+      map.addLayer({
+        id: `${layer.id}-riso-offset`,
+        type: 'fill',
+        source: (layer as any).source,
+        'source-layer': (layer as any)['source-layer'],
+        filter: (layer as any).filter,
+        paint: {
+          'fill-color': RISO_INKS.fluorPink.hex,
+          'fill-opacity': 0.12,
+          'fill-translate': [misreg.fluorPink.dx * SCALE, misreg.fluorPink.dy * SCALE],
+        },
+      }, layer.id);
+    }
+  }
+
+  // ── Road/boundary misregistration (black) ──
+  for (const layer of style.layers) {
+    if ((layer.id.startsWith('roads_') || layer.id.startsWith('boundaries')) &&
+        layer.type === 'line' && 'source-layer' in layer &&
+        !layer.id.includes('label') && !layer.id.includes('shield')) {
+      const lineWidth = (layer as any).paint?.['line-width'] || 1;
+      try {
+        map.addLayer({
+          id: `${layer.id}-riso-offset`,
+          type: 'line',
+          source: (layer as any).source,
+          'source-layer': (layer as any)['source-layer'],
+          filter: (layer as any).filter,
+          paint: {
+            'line-color': '#333333',
+            'line-width': lineWidth,
+            'line-opacity': 0.08,
+            'line-translate': [misreg.black.dx * SCALE, misreg.black.dy * SCALE],
+          },
+        }, layer.id);
+      } catch {
+        // Skip if layer can't be duplicated
+      }
+    }
+  }
 }
 
 /* ── Init ──────────────────────────────────────────────────── */
@@ -930,6 +1032,7 @@ async function init() {
     pitch: 0,
     minZoom: 1,
     maxZoom: 18,
+    maxTileCacheSize: 200,
     attributionControl: {},
     hash: true,                // Persist position in URL
   });
@@ -957,6 +1060,9 @@ async function init() {
 
     // Graticule
     addGraticule(map);
+
+    // ── Riso misregistration (Approach B — style-level duplicate layers) ──
+    applyRisoMisregistration(map);
 
     // Show manifesto in top band with a gentle fade-in
     const manifestoEl = document.getElementById('manifesto');
