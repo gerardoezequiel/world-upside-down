@@ -54,7 +54,7 @@ body {
 
 .display-xl {
   font-family: var(--font-display);
-  font-size: clamp(3.5rem, 9vw, 8rem);
+  font-size: clamp(3rem, 8vw, 7rem);
   font-weight: 700;
   line-height: 0.92;
   letter-spacing: -0.03em;
@@ -337,9 +337,9 @@ a.link-underline:hover::after {
   align-items: end;
 }
 
-/* Project name — masthead at top-left */
+/* Project name — large title at top-left */
 .hero-masthead {
-  grid-column: 1 / 6;
+  grid-column: 1 / 8;
   grid-row: 1;
   align-self: start;
   padding-top: 40px;
@@ -347,14 +347,14 @@ a.link-underline:hover::after {
 
 .masthead-name {
   font-family: var(--font-display);
-  font-size: clamp(0.875rem, 1.2vw, 1.125rem);
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
   font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  letter-spacing: -0.02em;
   color: var(--ink-black);
   display: inline-flex;
   align-items: baseline;
-  gap: 0.25em;
+  gap: 0.2em;
+  line-height: 1;
 }
 
 .masthead-flipped {
@@ -378,7 +378,7 @@ a.link-underline:hover::after {
   grid-column: 1 / 9;
   grid-row: 2;
   color: var(--ink-black);
-  margin-top: 120px;
+  margin-top: 48px;
   position: relative;
 }
 
@@ -1339,7 +1339,7 @@ a.link-underline:hover::after {
 
   .hero-title {
     grid-column: 1 / -1;
-    margin-top: 60px;
+    margin-top: 32px;
     font-size: clamp(2.5rem, 10vw, 4rem);
   }
 
