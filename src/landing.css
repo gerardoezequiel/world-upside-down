@@ -208,6 +208,75 @@ a.link-underline:hover::after {
   z-index: 2;
 }
 
+/* ══════════════════════════════════════
+   PAGE INDEX — Fixed side navigation
+   ══════════════════════════════════════ */
+
+.page-index {
+  position: fixed;
+  left: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.page-index-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--ink-light-gray);
+  cursor: pointer;
+}
+
+.page-index-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ink-light-gray);
+  flex-shrink: 0;
+  transition: background 0.25s, transform 0.25s;
+  opacity: 0.5;
+}
+
+.page-index-label {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  color: var(--ink-dark);
+}
+
+/* Hover — reveal label */
+.page-index-item:hover .page-index-label {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.page-index-item:hover .page-index-dot {
+  background: var(--ink-teal);
+  opacity: 1;
+  transform: scale(1.5);
+}
+
+/* Active section */
+.page-index-item.active .page-index-dot {
+  background: var(--ink-fluor-pink);
+  opacity: 1;
+  transform: scale(1.4);
+}
+
+.page-index-item.active .page-index-label {
+  color: var(--ink-fluor-pink);
+}
+
 /* Visible grid overlay — teal registration lines */
 .grid-overlay {
   position: fixed;
@@ -1806,6 +1875,16 @@ section, .section-divider, .pull-quote, footer.colophon {
    ══════════════════════════════════════ */
 
 @media (max-width: 1024px) {
+  .page-index {
+    left: 0.5rem;
+    gap: 10px;
+  }
+
+  .page-index-dot {
+    width: 5px;
+    height: 5px;
+  }
+
   .page-grid {
     grid-template-columns: repeat(8, 1fr);
     padding: 0 1.5rem;
@@ -2000,6 +2079,10 @@ section, .section-divider, .pull-quote, footer.colophon {
    ══════════════════════════════════════ */
 
 @media (max-width: 768px) {
+  .page-index {
+    display: none;
+  }
+
   .page-grid {
     grid-template-columns: repeat(4, 1fr);
     padding: 0 1rem;

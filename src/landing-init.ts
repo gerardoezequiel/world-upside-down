@@ -189,6 +189,37 @@ function initScrollProgress(): void {
   }, { passive: true });
 }
 
+/* ── Page index scroll-spy + smooth scroll ── */
+function initPageIndex(): void {
+  const items = document.querySelectorAll<HTMLAnchorElement>('.page-index-item');
+  if (items.length === 0) return;
+
+  // Smooth scroll on click
+  items.forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = document.querySelector(item.getAttribute('href')!);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // Scroll-spy: highlight active section
+  const sectionIds = Array.from(items).map(item => item.dataset.section!);
+  const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean) as HTMLElement[];
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const id = entry.target.id;
+      const item = document.querySelector(`.page-index-item[data-section="${id}"]`);
+      if (item) {
+        item.classList.toggle('active', entry.isIntersecting);
+      }
+    });
+  }, { threshold: 0.2, rootMargin: '-10% 0px -60% 0px' });
+
+  sections.forEach(section => observer.observe(section));
+}
+
 /* ══════════════════════════════════════
    INIT — all landing page systems
    ══════════════════════════════════════ */
@@ -208,6 +239,7 @@ function init(): void {
   initMapShield();
   initScrollEffects();
   initScrollProgress();
+  initPageIndex();
 }
 
 if (document.readyState === 'loading') {
