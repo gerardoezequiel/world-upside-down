@@ -220,6 +220,17 @@ function initPageIndex(): void {
   sections.forEach(section => observer.observe(section));
 }
 
+/* ── Colophon card flip ── */
+function initCardFlip(): void {
+  document.querySelectorAll('.colophon-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      // Don't flip if clicking a link
+      if ((e.target as HTMLElement).closest('a')) return;
+      card.classList.toggle('flipped');
+    });
+  });
+}
+
 /* ══════════════════════════════════════
    INIT — all landing page systems
    ══════════════════════════════════════ */
@@ -240,6 +251,7 @@ function init(): void {
   initScrollEffects();
   initScrollProgress();
   initPageIndex();
+  initCardFlip();
 }
 
 if (document.readyState === 'loading') {

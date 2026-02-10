@@ -754,51 +754,72 @@ again.">Look<br>again.</h2>
 <div class="section-divider"></div>
 
 <!-- ==========================================
-     COLOPHON — Risograph Card System
+     COLOPHON — Flippable Risograph Cards
      ========================================== -->
 <footer class="colophon" id="colophon">
   <div class="page-grid">
-    <div class="colophon-header meta">Colophon</div>
+    <div class="colophon-header">
+      <span class="meta reveal">Colophon</span>
+      <p class="body reveal reveal-d1" style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.8125rem;">Click any card to flip it over and read the details.</p>
+    </div>
 
     <div class="colophon-cards">
 
       <!-- ── Card 1: Print Specification ── -->
       <div class="colophon-card reveal" data-accent="teal">
         <div class="card-accent"></div>
-        <h3 class="data-label">Print Specification</h3>
-        <div class="card-inner">
-          <div class="card-col">
-            <span class="card-sublabel">Ink System</span>
-            <p class="card-note">5-colour Riso Kagaku spot inks on warm uncoated stock. Each colour is a separate pass through the drum&thinsp;&mdash;&thinsp;misregistration is not a bug, it&rsquo;s the soul of the print.</p>
-            <div class="ink-row"><div class="ink-swatch" style="--swatch: #000000"></div><span class="meta">Black &middot; Pantone Black U</span></div>
-            <div class="ink-row"><div class="ink-swatch" style="--swatch: #88898A"></div><span class="meta">Light Gray &middot; Pantone 424 U</span></div>
-            <div class="ink-row"><div class="ink-swatch" style="--swatch: #00838A"></div><span class="meta">Teal &middot; Pantone 321 U</span></div>
-            <div class="ink-row"><div class="ink-swatch" style="--swatch: #0078BF"></div><span class="meta">Blue &middot; Pantone 3005 U</span></div>
-            <div class="ink-row"><div class="ink-swatch" style="--swatch: #FF48B0"></div><span class="meta">Fluor Pink &middot; Pantone 806 U</span></div>
+        <div class="card-flipper">
+          <div class="card-front">
+            <h3 class="data-label">Print Specification</h3>
+            <div class="card-front-swatches">
+              <div class="ink-swatch" style="--swatch: #000000"></div>
+              <div class="ink-swatch" style="--swatch: #88898A"></div>
+              <div class="ink-swatch" style="--swatch: #00838A"></div>
+              <div class="ink-swatch" style="--swatch: #0078BF"></div>
+              <div class="ink-swatch" style="--swatch: #FF48B0"></div>
+            </div>
+            <span class="card-front-sub">5-colour Riso Kagaku spot inks</span>
+            <span class="card-front-sub">Bayer 8&times;8 ordered dithering</span>
+            <span class="card-front-sub">Space Grotesk &middot; Inter &middot; JetBrains Mono</span>
+            <span class="card-flip-hint">&#x21BB; flip</span>
           </div>
-          <div class="card-col">
-            <span class="card-sublabel">Paper Stock</span>
-            <div class="ink-row"><div class="ink-swatch" style="--swatch: #F2EDE4"></div><span class="data-value">#F2EDE4</span></div>
-            <span class="meta">Warm uncoated cream</span>
+          <div class="card-back">
+            <h3 class="data-label">Print Specification</h3>
+            <div class="card-inner">
+              <div class="card-col">
+                <span class="card-sublabel">Ink System</span>
+                <p class="card-note">5-colour Riso Kagaku spot inks on warm uncoated stock. Each colour is a separate pass through the drum&thinsp;&mdash;&thinsp;misregistration is not a bug, it&rsquo;s the soul of the print.</p>
+                <div class="ink-row"><div class="ink-swatch" style="--swatch: #000000"></div><span class="meta">Black &middot; Pantone Black U</span></div>
+                <div class="ink-row"><div class="ink-swatch" style="--swatch: #88898A"></div><span class="meta">Light Gray &middot; Pantone 424 U</span></div>
+                <div class="ink-row"><div class="ink-swatch" style="--swatch: #00838A"></div><span class="meta">Teal &middot; Pantone 321 U</span></div>
+                <div class="ink-row"><div class="ink-swatch" style="--swatch: #0078BF"></div><span class="meta">Blue &middot; Pantone 3005 U</span></div>
+                <div class="ink-row"><div class="ink-swatch" style="--swatch: #FF48B0"></div><span class="meta">Fluor Pink &middot; Pantone 806 U</span></div>
+              </div>
+              <div class="card-col">
+                <span class="card-sublabel">Paper Stock</span>
+                <div class="ink-row"><div class="ink-swatch" style="--swatch: #F2EDE4"></div><span class="data-value">#F2EDE4 &middot; warm uncoated cream</span></div>
 
-            <span class="card-sublabel" style="margin-top: 1.25rem;">Print Order</span>
-            <ol class="card-list-ordered">
-              <li><span class="meta">Light Gray &middot; terrain base</span></li>
-              <li><span class="meta">Teal &middot; water &amp; coastlines</span></li>
-              <li><span class="meta">Blue &middot; buildings &amp; urban</span></li>
-              <li><span class="meta">Fluor Pink &middot; parks &amp; green</span></li>
-              <li><span class="meta">Black &middot; text &amp; boundaries</span></li>
-            </ol>
+                <span class="card-sublabel" style="margin-top: 1rem;">Print Order</span>
+                <ol class="card-list-ordered">
+                  <li><span class="meta">Light Gray &middot; terrain base</span></li>
+                  <li><span class="meta">Teal &middot; water &amp; coastlines</span></li>
+                  <li><span class="meta">Blue &middot; buildings &amp; urban</span></li>
+                  <li><span class="meta">Fluor Pink &middot; parks &amp; green</span></li>
+                  <li><span class="meta">Black &middot; text &amp; boundaries</span></li>
+                </ol>
 
-            <span class="card-sublabel" style="margin-top: 1.25rem;">Typefaces</span>
-            <span class="data-value">Space Grotesk <span class="meta">(display)</span></span>
-            <span class="data-value">Inter <span class="meta">(body)</span></span>
-            <span class="data-value">JetBrains Mono <span class="meta">(data)</span></span>
+                <span class="card-sublabel" style="margin-top: 1rem;">Typefaces</span>
+                <span class="data-value">Space Grotesk <span class="meta">(display)</span></span>
+                <span class="data-value">Inter <span class="meta">(body)</span></span>
+                <span class="data-value">JetBrains Mono <span class="meta">(data)</span></span>
 
-            <span class="card-sublabel" style="margin-top: 1.25rem;">Rendering</span>
-            <span class="meta">Bayer 8&times;8 ordered dithering</span>
-            <span class="meta">Seeded PRNG misregistration</span>
-            <span class="meta">Halftone dot matrix at 3&times;DPR</span>
+                <span class="card-sublabel" style="margin-top: 1rem;">Rendering</span>
+                <span class="meta">Bayer 8&times;8 ordered dithering</span>
+                <span class="meta">Seeded PRNG misregistration</span>
+                <span class="meta">Halftone dot matrix at 3&times;DPR</span>
+              </div>
+            </div>
+            <span class="card-flip-hint">&#x21BB; flip back</span>
           </div>
         </div>
       </div>
@@ -806,41 +827,51 @@ again.">Look<br>again.</h2>
       <!-- ── Card 2: Cartographic Notes ── -->
       <div class="colophon-card reveal reveal-d1" data-accent="blue">
         <div class="card-accent"></div>
-        <h3 class="data-label">Cartographic Notes</h3>
-        <div class="card-inner">
-          <div class="card-col">
-            <span class="card-sublabel">Default Projection</span>
-            <span class="data-value">Web Mercator &middot; bearing 180&deg;</span>
-            <p class="card-note">The same projection that distorts the world&thinsp;&mdash;&thinsp;turned on its head. South is up. Antarctica crowns the frame. The familiar becomes unfamiliar.</p>
-
-            <span class="card-sublabel" style="margin-top: 1.25rem;">Alternative Projections</span>
-            <span class="meta">Gall-Peters &middot; Equal Earth &middot; Robinson &middot; Mollweide &middot; Dymaxion (Airocean) &middot; Waterman Butterfly &middot; Goode&rsquo;s Homolosine &middot; Azimuthal Equidistant</span>
-            <span class="meta" style="margin-top: 0.25rem;">All rotated 180&deg;&thinsp;&mdash;&thinsp;south-up.</span>
-
-            <span class="card-sublabel" style="margin-top: 1.25rem;">Globe Animation</span>
-            <p class="card-note">Morphs between five projections at ~5.5&thinsp;fps via phase-shifted Bayer matrix. Each frame is a new dither pattern. The globe breathes.</p>
+        <div class="card-flipper">
+          <div class="card-front">
+            <h3 class="data-label">Cartographic Notes</h3>
+            <span class="card-front-title">WGS84 &middot; EPSG:4326</span>
+            <span class="card-front-sub">Web Mercator at bearing 180&deg;</span>
+            <span class="card-front-sub">9 alternative projections, all south-up</span>
+            <span class="card-front-sub">Dynamic graticule &middot; Natural Earth 110m</span>
+            <p class="card-front-pull">Every projection encodes a worldview.</p>
+            <span class="card-flip-hint">&#x21BB; flip</span>
           </div>
-          <div class="card-col">
-            <span class="card-sublabel">Coordinate Reference System</span>
-            <span class="data-value">WGS84 (EPSG:4326)</span>
-            <span class="meta">Latitude / longitude pairs</span>
-            <span class="meta">&minus;180&deg; to 180&deg; longitude</span>
-            <span class="meta">&minus;85&deg; to 85&deg; latitude</span>
+          <div class="card-back">
+            <h3 class="data-label">Cartographic Notes</h3>
+            <div class="card-inner">
+              <div class="card-col">
+                <span class="card-sublabel">Default Projection</span>
+                <span class="data-value">Web Mercator &middot; bearing 180&deg;</span>
+                <p class="card-note">The same projection that distorts the world&thinsp;&mdash;&thinsp;turned on its head. South is up. Antarctica crowns the frame.</p>
 
-            <span class="card-sublabel" style="margin-top: 1.25rem;">Graticule</span>
-            <span class="meta">Dynamic density: 30&deg; &rarr; 0.25&deg;</span>
-            <span class="meta">12 zoom-responsive levels</span>
-            <span class="meta">Pale yellow grid lines</span>
+                <span class="card-sublabel" style="margin-top: 1rem;">Alternative Projections</span>
+                <span class="meta">Gall-Peters &middot; Equal Earth &middot; Robinson &middot; Mollweide &middot; Dymaxion (Airocean) &middot; Waterman Butterfly &middot; Goode&rsquo;s Homolosine &middot; Azimuthal Equidistant</span>
+                <span class="meta" style="margin-top: 0.25rem;">All rotated 180&deg;&thinsp;&mdash;&thinsp;south-up.</span>
 
-            <span class="card-sublabel" style="margin-top: 1.25rem;">Scale</span>
-            <span class="meta">Dynamic metres-per-pixel</span>
-            <span class="meta">Two-tier detail + major segments</span>
+                <span class="card-sublabel" style="margin-top: 1rem;">Globe Animation</span>
+                <p class="card-note">Morphs between five projections at ~5.5&thinsp;fps via phase-shifted Bayer matrix. Each frame is a new dither pattern. The globe breathes.</p>
+              </div>
+              <div class="card-col">
+                <span class="card-sublabel">Coordinate Reference System</span>
+                <span class="data-value">WGS84 (EPSG:4326)</span>
+                <span class="meta">&minus;180&deg; to 180&deg; lon &middot; &minus;85&deg; to 85&deg; lat</span>
 
-            <span class="card-sublabel" style="margin-top: 1.25rem;">Geographic Data</span>
-            <span class="data-value">Natural Earth 110m</span>
-            <span class="meta">Land polygons, country boundaries, coastlines. TopoJSON encoded.</span>
+                <span class="card-sublabel" style="margin-top: 1rem;">Graticule</span>
+                <span class="meta">Dynamic density: 30&deg; &rarr; 0.25&deg;</span>
+                <span class="meta">12 zoom-responsive levels</span>
 
-            <p class="card-closing">Every projection encodes a worldview. There is no neutral map.</p>
+                <span class="card-sublabel" style="margin-top: 1rem;">Scale</span>
+                <span class="meta">Dynamic metres-per-pixel &middot; two-tier segments</span>
+
+                <span class="card-sublabel" style="margin-top: 1rem;">Geographic Data</span>
+                <span class="data-value">Natural Earth 110m</span>
+                <span class="meta">Land polygons, country boundaries, coastlines. TopoJSON encoded.</span>
+
+                <p class="card-closing">There is no neutral map.</p>
+              </div>
+            </div>
+            <span class="card-flip-hint">&#x21BB; flip back</span>
           </div>
         </div>
       </div>
@@ -848,79 +879,139 @@ again.">Look<br>again.</h2>
       <!-- ── Card 3: Technology ── -->
       <div class="colophon-card reveal reveal-d2" data-accent="pink">
         <div class="card-accent"></div>
-        <h3 class="data-label">Technology</h3>
-        <div class="card-inner">
-          <div class="card-col">
-            <span class="card-sublabel">Mapping</span>
-            <span class="data-value">MapLibre GL JS <span class="meta">v4.7</span></span>
-            <span class="meta">WebGL vector tile renderer. Community fork of Mapbox GL JS. BSD-3 licence.</span>
-
-            <span class="data-value" style="margin-top: 0.75rem;">PMTiles <span class="meta">v4.4</span></span>
-            <span class="meta">Single-file tile archives via HTTP range requests. No tile server needed. BSD-3 licence.</span>
-
-            <span class="card-sublabel" style="margin-top: 1.25rem;">Encoding</span>
-            <span class="data-value">TopoJSON <span class="meta">v3.1</span></span>
-            <span class="meta">Topology-aware geographic encoding. ISC licence.</span>
-
-            <span class="card-sublabel" style="margin-top: 1.25rem;">Analytics</span>
-            <span class="data-value">Vercel Analytics</span>
-            <span class="meta">Privacy-friendly, no cookies.</span>
+        <div class="card-flipper">
+          <div class="card-front">
+            <h3 class="data-label">Technology</h3>
+            <span class="card-front-title">100% Open Source</span>
+            <span class="card-front-sub">MapLibre GL JS &middot; D3.js &middot; Three.js</span>
+            <span class="card-front-sub">PMTiles &middot; TopoJSON &middot; Vite</span>
+            <span class="card-front-sub">WebGL &middot; GLSL &middot; TypeScript</span>
+            <p class="card-front-pull">Every library is open source.</p>
+            <span class="card-flip-hint">&#x21BB; flip</span>
           </div>
-          <div class="card-col">
-            <span class="card-sublabel">Rendering</span>
-            <span class="data-value">Three.js <span class="meta">v0.160</span></span>
-            <span class="meta">Custom GLSL shaders for Bayer dithering, texture morphing, and interactive ripples. MIT licence.</span>
+          <div class="card-back">
+            <h3 class="data-label">Technology</h3>
+            <div class="card-inner">
+              <div class="card-col">
+                <span class="card-sublabel">Mapping</span>
+                <span class="data-value">MapLibre GL JS <span class="meta">v4.7</span></span>
+                <span class="meta">WebGL vector tile renderer. Community fork of Mapbox GL JS. BSD-3.</span>
+                <span class="data-value" style="margin-top: 0.5rem;">PMTiles <span class="meta">v4.4</span></span>
+                <span class="meta">Single-file tile archives. HTTP range requests. No tile server. BSD-3.</span>
 
-            <span class="card-sublabel" style="margin-top: 1.25rem;">Projections</span>
-            <span class="data-value">D3.js &middot; d3-geo <span class="meta">v3.1</span></span>
-            <span class="meta">Geographic path generation, projection mathematics, graticule construction. ISC licence.</span>
-            <span class="data-value" style="margin-top: 0.5rem;">d3-geo-polygon <span class="meta">v2.0</span></span>
-            <span class="meta">Polyhedral projections: Airocean / Dymaxion.</span>
-            <span class="data-value" style="margin-top: 0.5rem;">d3-geo-projection</span>
-            <span class="meta">Robinson, Mollweide, Homolosine, Waterman, et al.</span>
+                <span class="card-sublabel" style="margin-top: 1rem;">Encoding</span>
+                <span class="data-value">TopoJSON <span class="meta">v3.1</span></span>
+                <span class="meta">Topology-aware geographic encoding. ISC.</span>
 
-            <span class="card-sublabel" style="margin-top: 1.25rem;">Build &amp; Deploy</span>
-            <span class="data-value">Vite <span class="meta">v6.1</span> &middot; TypeScript <span class="meta">v5.7</span></span>
-            <span class="meta">Vercel &middot; auto-deploy from main</span>
+                <span class="card-sublabel" style="margin-top: 1rem;">Analytics</span>
+                <span class="data-value">Vercel Analytics</span>
+                <span class="meta">Privacy-friendly, no cookies.</span>
+              </div>
+              <div class="card-col">
+                <span class="card-sublabel">Rendering</span>
+                <span class="data-value">Three.js <span class="meta">v0.160</span></span>
+                <span class="meta">Custom GLSL shaders for Bayer dithering, texture morphing, interactive ripples. MIT.</span>
 
-            <p class="card-closing">Every library listed here is open source.</p>
+                <span class="card-sublabel" style="margin-top: 1rem;">Projections</span>
+                <span class="data-value">D3.js &middot; d3-geo <span class="meta">v3.1</span></span>
+                <span class="meta">Projection maths, path gen, graticules. ISC.</span>
+                <span class="data-value" style="margin-top: 0.35rem;">d3-geo-polygon <span class="meta">v2.0</span></span>
+                <span class="meta">Polyhedral: Airocean / Dymaxion.</span>
+                <span class="data-value" style="margin-top: 0.35rem;">d3-geo-projection</span>
+                <span class="meta">Robinson, Mollweide, Homolosine, Waterman.</span>
+
+                <span class="card-sublabel" style="margin-top: 1rem;">Build &amp; Deploy</span>
+                <span class="data-value">Vite <span class="meta">v6.1</span> &middot; TypeScript <span class="meta">v5.7</span></span>
+                <span class="meta">Vercel &middot; auto-deploy from main</span>
+              </div>
+            </div>
+            <span class="card-flip-hint">&#x21BB; flip back</span>
           </div>
         </div>
       </div>
 
-      <!-- ── Card 4: Open Data & Acknowledgments ── -->
-      <div class="colophon-card colophon-card--wide reveal reveal-d3" data-accent="black">
+      <!-- ── Card 4: Open Data ── -->
+      <div class="colophon-card reveal reveal-d1" data-accent="black">
         <div class="card-accent"></div>
-        <h3 class="data-label">Open Data &amp; Acknowledgments</h3>
-        <div class="card-inner">
-          <div class="card-col">
-            <span class="card-sublabel">Map Data</span>
-            <span class="data-value">OpenStreetMap</span>
-            <p class="card-note">Every road, building, park, and coastline rendered on this map was drawn by volunteers. Over two million contributors worldwide, mapping their neighbourhoods, one edit at a time.</p>
-            <span class="meta">&copy; OpenStreetMap contributors &middot; ODbL licence</span>
-
-            <span class="card-sublabel" style="margin-top: 1.25rem;">Geographic Boundaries</span>
-            <span class="data-value">Natural Earth</span>
-            <p class="card-note">Public domain dataset at 110m scale. Land polygons, country boundaries, and coastlines. Made by Tom Patterson &amp; Nathaniel Kelso.</p>
-            <span class="meta">naturalearthdata.com</span>
+        <div class="card-flipper">
+          <div class="card-front">
+            <h3 class="data-label">Open Data</h3>
+            <span class="card-front-title">Shared Freely</span>
+            <span class="card-front-sub">OpenStreetMap &middot; Protomaps &middot; Natural Earth</span>
+            <span class="card-front-sub">2M+ volunteer contributors</span>
+            <p class="card-front-pull">Without open data, this map would not exist.</p>
+            <span class="card-flip-hint">&#x21BB; flip</span>
           </div>
-          <div class="card-col">
-            <span class="card-sublabel">Basemap Tiles</span>
-            <span class="data-value">Protomaps</span>
-            <p class="card-note">Open source vector tile system by Brandon Liu. PMTiles format serves tiles from a single file via HTTP range requests&thinsp;&mdash;&thinsp;no tile server, no vendor lock-in.</p>
-            <span class="meta">protomaps.com</span>
+          <div class="card-back">
+            <h3 class="data-label">Open Data &amp; Acknowledgments</h3>
+            <div class="card-inner">
+              <div class="card-col">
+                <span class="card-sublabel">Map Data</span>
+                <span class="data-value">OpenStreetMap</span>
+                <p class="card-note">Every road, building, park, and coastline was drawn by volunteers. Over two million contributors worldwide, mapping their neighbourhoods, one edit at a time.</p>
+                <span class="meta">&copy; OpenStreetMap &middot; ODbL</span>
 
-            <span class="card-sublabel" style="margin-top: 1.25rem;">Geocoding</span>
-            <span class="data-value">Nominatim</span>
-            <p class="card-note">OpenStreetMap&rsquo;s geocoding service. Reverse and forward search powered by community-maintained geographic data.</p>
+                <span class="card-sublabel" style="margin-top: 1rem;">Geographic Boundaries</span>
+                <span class="data-value">Natural Earth</span>
+                <p class="card-note">Public domain 110m dataset. Land polygons, country boundaries, coastlines. Tom Patterson &amp; Nathaniel Kelso.</p>
+              </div>
+              <div class="card-col">
+                <span class="card-sublabel">Basemap Tiles</span>
+                <span class="data-value">Protomaps</span>
+                <p class="card-note">Open source vector tiles by Brandon Liu. PMTiles serves from a single file&thinsp;&mdash;&thinsp;no tile server, no vendor lock-in.</p>
+
+                <span class="card-sublabel" style="margin-top: 1rem;">Geocoding</span>
+                <span class="data-value">Nominatim</span>
+                <p class="card-note">OSM&rsquo;s geocoding service. Community-maintained geographic search.</p>
+              </div>
+            </div>
+            <div class="card-disclaimer">
+              <p>This project exists because of open source software and open data. Every pixel was contributed by volunteers, maintained by communities, and shared freely. None of it is proprietary. All of it is a gift from people who believe geographic knowledge should be free.</p>
+              <p class="card-thanks">Thank you to the OpenStreetMap community, Protomaps, Natural Earth, the D3.js and MapLibre maintainers, and every contributor who has ever drawn a line on a map and shared it with the world.</p>
+            </div>
+            <span class="card-flip-hint">&#x21BB; flip back</span>
           </div>
         </div>
+      </div>
 
-        <div class="card-disclaimer">
-          <p>This project exists because of open source software and open data.</p>
-          <p>Every pixel on this map was contributed by volunteers, maintained by communities, and shared freely. The libraries that render these projections, the tiles that paint the basemap, the boundaries that define the coastlines&thinsp;&mdash;&thinsp;none of it is proprietary. All of it is a gift from people who believe geographic knowledge should be free.</p>
-          <p>Without their contribution, this project would not be possible.<br>Without open data, this map would not exist.</p>
-          <p class="card-thanks">Thank you to the OpenStreetMap community, Protomaps, Natural Earth, the D3.js and MapLibre maintainers, and every contributor who has ever drawn a line on a map and shared it with the world.</p>
+      <!-- ── Card 5: About ── -->
+      <div class="colophon-card colophon-card--about reveal reveal-d2" data-accent="teal">
+        <div class="card-accent"></div>
+        <div class="card-flipper">
+          <div class="card-front">
+            <h3 class="data-label">About</h3>
+            <span class="card-front-name">Gerardo Mart&iacute;n Carre&ntilde;o</span>
+            <span class="card-front-sub">Full-Stack Spatial Data Scientist</span>
+            <span class="card-front-sub">Urbanist &middot; Cyclist &middot; Street Photographer</span>
+            <span class="card-front-sub">Clapton, East London &middot; 51.5&deg;N</span>
+            <p class="card-front-pull">The kind of person who rotates every map before reading it.</p>
+            <span class="card-flip-hint">&#x21BB; flip</span>
+          </div>
+          <div class="card-back">
+            <h3 class="data-label">About</h3>
+            <div class="about-body">
+              <p>I build things that sit between data and geography. Full-stack spatial data scientist, urbanist, and the kind of person who rotates every map before reading it.</p>
+              <p>My work spans the full pipeline&thinsp;&mdash;&thinsp;from spatial analysis and machine learning to data engineering and the visualisations that make it all legible. I&rsquo;ve quantified urban metabolism at Metabolism of Cities, modelled circularity with Metabolic, mapped real-time air quality at MIT&rsquo;s Senseable City Lab in Amsterdam, and now translate geospatial data into business insight at TJX.</p>
+              <p>I studied Urban Spatial Science at UCL, advocated for housing equity and environmental justice in Barcelona, and have been certified by more institutions than fit on one card&thinsp;&mdash;&thinsp;Google, IBM, HarvardX, the usual suspects.</p>
+              <p>Outside of data: bikes, street photography, long walks in nature, and too much time thinking about how cities feel on foot.</p>
+            </div>
+            <div class="about-journey">
+              <span class="card-sublabel">Migrating North (or South?)</span>
+              <p class="card-note">I&rsquo;ve spent my life moving steadily away from the equator. On this map, that means I&rsquo;ve been heading downward the whole time.</p>
+              <div class="journey-list">
+                <div class="journey-row"><span class="data-value">Las Palmas</span><span class="meta">28.1&deg;N</span></div>
+                <div class="journey-row"><span class="data-value">Granada</span><span class="meta">37.2&deg;N</span></div>
+                <div class="journey-row"><span class="data-value">Barcelona</span><span class="meta">41.4&deg;N</span></div>
+                <div class="journey-row"><span class="data-value">Amsterdam</span><span class="meta">52.4&deg;N</span></div>
+                <div class="journey-row journey-row--current"><span class="data-value">London</span><span class="meta">51.5&deg;N &larr; current</span></div>
+              </div>
+            </div>
+            <a href="https://www.linkedin.com/in/gerardoezequielmc/" target="_blank" rel="noopener" class="linkedin-link" onclick="event.stopPropagation();">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              <span>Connect on LinkedIn</span>
+            </a>
+            <span class="card-flip-hint">&#x21BB; flip back</span>
+          </div>
         </div>
       </div>
 
@@ -929,10 +1020,6 @@ again.">Look<br>again.</h2>
     <div class="colophon-footer">
       <p class="meta">Upside Down &middot; A project by Gerardo Mart&iacute;n Carre&ntilde;o &middot; 2026</p>
       <p class="meta">Built with love from Clapton, East London, a place that looks different at bearing 180&deg;</p>
-      <a href="https://www.linkedin.com/in/gerardoezequielmc/" target="_blank" rel="noopener" class="linkedin-link">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-        <span>Connect on LinkedIn</span>
-      </a>
     </div>
   </div>
 </footer>
