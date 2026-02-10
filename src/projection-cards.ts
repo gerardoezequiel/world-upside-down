@@ -1,7 +1,8 @@
 /* ══════════════════════════════════════════════════════════════
-   Projection Cards — Two-layer map rendering
-   Layer 1: Subtle vector fill + thin coastline outlines
-   Layer 2: Bayer-dithered halftone dots in complementary color
+   Projection Cards — Animated two-ink riso dithered maps
+   Layer 1: Subtle vector fill + coastline outlines (static)
+   Layer 2: Ocean ink dither + land ink dither (animated)
+   Animation: Phase-shifted Bayer matrix creates morphing dither
    ══════════════════════════════════════════════════════════════ */
 
 import {
@@ -30,6 +31,7 @@ interface ProjCardDef {
   fill: string;
   outline: string;
   dither: string;
+  oceanInk: string;
   factory: () => GeoProjection;
 }
 
@@ -39,6 +41,7 @@ const PROJ_DEFS: ProjCardDef[] = [
     fill: 'rgba(0,131,138, 0.13)',
     outline: 'rgba(0,131,138, 0.32)',
     dither: '#C46B50',
+    oceanInk: 'rgba(100,155,190, 0.45)',
     factory: () => geoMercator().rotate([0, 0, 180]),
   },
   {
@@ -46,6 +49,7 @@ const PROJ_DEFS: ProjCardDef[] = [
     fill: 'rgba(0,120,191, 0.13)',
     outline: 'rgba(0,120,191, 0.32)',
     dither: '#C4883A',
+    oceanInk: 'rgba(80,155,165, 0.45)',
     factory: () => (geoCylindricalEqualArea().parallel(45) as unknown as GeoProjection).rotate([0, 0, 180]),
   },
   {
@@ -53,6 +57,7 @@ const PROJ_DEFS: ProjCardDef[] = [
     fill: 'rgba(0,131,138, 0.13)',
     outline: 'rgba(0,131,138, 0.32)',
     dither: '#C46B50',
+    oceanInk: 'rgba(100,155,190, 0.45)',
     factory: () => geoEqualEarth().rotate([0, 0, 180]),
   },
   {
@@ -60,6 +65,7 @@ const PROJ_DEFS: ProjCardDef[] = [
     fill: 'rgba(90,75,60, 0.12)',
     outline: 'rgba(90,75,60, 0.28)',
     dither: '#5A7A8A',
+    oceanInk: 'rgba(170,155,130, 0.4)',
     factory: () => geoRobinson().rotate([0, 0, 180]) as unknown as GeoProjection,
   },
   {
@@ -67,6 +73,7 @@ const PROJ_DEFS: ProjCardDef[] = [
     fill: 'rgba(0,120,191, 0.13)',
     outline: 'rgba(0,120,191, 0.32)',
     dither: '#C4883A',
+    oceanInk: 'rgba(80,155,165, 0.45)',
     factory: () => geoMollweide().rotate([0, 0, 180]),
   },
   {
@@ -74,6 +81,7 @@ const PROJ_DEFS: ProjCardDef[] = [
     fill: 'rgba(0,131,138, 0.13)',
     outline: 'rgba(0,131,138, 0.32)',
     dither: '#C46B50',
+    oceanInk: 'rgba(100,155,190, 0.45)',
     factory: () => geoAirocean() as unknown as GeoProjection,
   },
   {
@@ -81,6 +89,7 @@ const PROJ_DEFS: ProjCardDef[] = [
     fill: 'rgba(0,120,191, 0.13)',
     outline: 'rgba(0,120,191, 0.32)',
     dither: '#C4883A',
+    oceanInk: 'rgba(80,155,165, 0.45)',
     factory: () => geoPolyhedralWaterman().rotate([0, 0, 180]) as unknown as GeoProjection,
   },
   {
@@ -88,6 +97,7 @@ const PROJ_DEFS: ProjCardDef[] = [
     fill: 'rgba(90,75,60, 0.12)',
     outline: 'rgba(90,75,60, 0.28)',
     dither: '#5A7A8A',
+    oceanInk: 'rgba(170,155,130, 0.4)',
     factory: () => geoInterruptedHomolosine().rotate([0, 0, 180]) as unknown as GeoProjection,
   },
   {
@@ -95,6 +105,7 @@ const PROJ_DEFS: ProjCardDef[] = [
     fill: 'rgba(0,131,138, 0.13)',
     outline: 'rgba(0,131,138, 0.32)',
     dither: '#C46B50',
+    oceanInk: 'rgba(100,155,190, 0.45)',
     factory: () => geoAzimuthalEquidistant().rotate([0, 0, 180]),
   },
 ];
@@ -130,18 +141,35 @@ function loadGeoData() {
   return geoDataPromise;
 }
 
-/* ── Render a single card ── */
+/* ── Per-card animation state ── */
 
-function renderCard(
+interface CardState {
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  def: ProjCardDef;
+  landPixels: Uint8ClampedArray;
+  oceanPixels: Uint8ClampedArray;
+  vectorCanvas: HTMLCanvasElement;
+  cw: number;
+  ch: number;
+  dpr: number;
+  visible: boolean;
+  phase: number;
+}
+
+const cardStates: CardState[] = [];
+
+/* ── Initialize a card (one-time d3-geo setup) ── */
+
+function initCard(
   canvas: HTMLCanvasElement,
   def: ProjCardDef,
   land: any,
   borders: any,
   graticule: any,
-): void {
-  const parent = canvas.parentElement;
-  if (!parent) return;
-
+  index: number,
+): CardState {
+  const parent = canvas.parentElement!;
   const w = parent.offsetWidth;
   const h = parent.offsetHeight;
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -154,130 +182,173 @@ function renderCard(
   canvas.style.height = h + 'px';
 
   const ctx = canvas.getContext('2d')!;
-
-  // Configure projection to fit canvas
   const proj = def.factory();
   proj.fitSize([cw * 0.86, ch * 0.86], { type: 'Sphere' })
     .translate([cw / 2, ch / 2]);
 
-  /* ── Layer 1: Subtle vector fill + thin outline ── */
+  // Pre-render vector fill (static base layer)
+  const vectorCanvas = document.createElement('canvas');
+  vectorCanvas.width = cw;
+  vectorCanvas.height = ch;
+  const vCtx = vectorCanvas.getContext('2d')!;
+  const vPath = geoPath(proj, vCtx);
 
-  const path = geoPath(proj, ctx);
+  vCtx.beginPath();
+  vPath(land);
+  vCtx.fillStyle = def.fill;
+  vCtx.fill();
 
-  // Land fill (very subtle)
-  ctx.beginPath();
-  path(land);
-  ctx.fillStyle = def.fill;
-  ctx.fill();
+  vCtx.beginPath();
+  vPath(land);
+  vCtx.strokeStyle = def.outline;
+  vCtx.lineWidth = 1.0 * dpr;
+  vCtx.stroke();
 
-  // Coastline outlines (thin)
-  ctx.beginPath();
-  path(land);
-  ctx.strokeStyle = def.outline;
-  ctx.lineWidth = 1.0 * dpr;
-  ctx.stroke();
+  // Land grayscale (bright land, dark ocean)
+  const landCanvas = document.createElement('canvas');
+  landCanvas.width = cw;
+  landCanvas.height = ch;
+  const lCtx = landCanvas.getContext('2d')!;
+  const lPath = geoPath(proj, lCtx);
 
-  /* ── Layer 2: Bayer dither from grayscale source ── */
+  lCtx.fillStyle = '#000';
+  lCtx.fillRect(0, 0, cw, ch);
+  lCtx.beginPath(); lPath({ type: 'Sphere' }); lCtx.fillStyle = 'rgb(15,15,15)'; lCtx.fill();
+  lCtx.beginPath(); lPath(graticule); lCtx.strokeStyle = 'rgb(40,40,40)'; lCtx.lineWidth = 0.4; lCtx.stroke();
+  lCtx.beginPath(); lPath(land); lCtx.fillStyle = 'rgb(190,190,190)'; lCtx.fill();
+  lCtx.beginPath(); lPath(borders); lCtx.strokeStyle = 'rgb(80,80,80)'; lCtx.lineWidth = 0.4; lCtx.stroke();
+  lCtx.beginPath(); lPath(land); lCtx.strokeStyle = 'rgb(230,230,230)'; lCtx.lineWidth = 1.2; lCtx.stroke();
 
-  // Offscreen grayscale at same pixel resolution
-  const offscreen = document.createElement('canvas');
-  offscreen.width = cw;
-  offscreen.height = ch;
-  const offCtx = offscreen.getContext('2d')!;
-  const offPath = geoPath(proj, offCtx);
+  const landPixels = lCtx.getImageData(0, 0, cw, ch).data;
 
-  offCtx.fillStyle = '#000';
-  offCtx.fillRect(0, 0, cw, ch);
+  // Ocean grayscale (bright ocean, dark land)
+  const oceanCanvas = document.createElement('canvas');
+  oceanCanvas.width = cw;
+  oceanCanvas.height = ch;
+  const oCtx = oceanCanvas.getContext('2d')!;
+  const oPath = geoPath(proj, oCtx);
 
-  // Ocean sphere
-  offCtx.beginPath();
-  offPath({ type: 'Sphere' });
-  offCtx.fillStyle = 'rgb(15,15,15)';
-  offCtx.fill();
+  oCtx.fillStyle = '#000';
+  oCtx.fillRect(0, 0, cw, ch);
+  oCtx.beginPath(); oPath({ type: 'Sphere' }); oCtx.fillStyle = 'rgb(120,120,120)'; oCtx.fill();
+  oCtx.beginPath(); oPath(land); oCtx.fillStyle = '#000'; oCtx.fill();
 
-  // Graticule
-  offCtx.beginPath();
-  offPath(graticule);
-  offCtx.strokeStyle = 'rgb(40,40,40)';
-  offCtx.lineWidth = 0.4;
-  offCtx.stroke();
+  const oceanPixels = oCtx.getImageData(0, 0, cw, ch).data;
 
-  // Land
-  offCtx.beginPath();
-  offPath(land);
-  offCtx.fillStyle = 'rgb(190,190,190)';
-  offCtx.fill();
+  const state: CardState = {
+    canvas, ctx, def, landPixels, oceanPixels, vectorCanvas,
+    cw, ch, dpr, visible: false, phase: index * 1.7,
+  };
 
-  // Borders
-  offCtx.beginPath();
-  offPath(borders);
-  offCtx.strokeStyle = 'rgb(80,80,80)';
-  offCtx.lineWidth = 0.4;
-  offCtx.stroke();
+  renderDither(state);
+  return state;
+}
 
-  // Coastlines
-  offCtx.beginPath();
-  offPath(land);
-  offCtx.strokeStyle = 'rgb(230,230,230)';
-  offCtx.lineWidth = 1.2;
-  offCtx.stroke();
+/* ── Render one dither frame (called per animation tick) ── */
 
-  // Sample offscreen → draw dither dots on visible canvas
+function renderDither(state: CardState): void {
+  const { ctx, cw, ch, dpr, def, landPixels, oceanPixels, vectorCanvas, phase } = state;
   const cellSize = 3 * dpr;
-  const imageData = offCtx.getImageData(0, 0, cw, ch);
-  const pixels = imageData.data;
   const dotRadius = cellSize * 0.36;
-  const offX = 1.5 * dpr;   // riso misregistration offset
-  const offY = 1.0 * dpr;
-
-  ctx.fillStyle = def.dither;
-
+  const misX = 1.5 * dpr;
+  const misY = 1.0 * dpr;
   const cols = Math.floor(cw / cellSize);
   const rows = Math.floor(ch / cellSize);
+  const twoPi = Math.PI * 2;
 
+  // Phase offsets — shift at different rates for organic feel
+  const phX = Math.floor(phase * 0.7) % 8;
+  const phY = Math.floor(phase * 0.5) % 8;
+
+  // Clear and stamp vector base
+  ctx.clearRect(0, 0, cw, ch);
+  ctx.drawImage(vectorCanvas, 0, 0);
+
+  // Ocean dither pass (batched Path2D)
+  const oceanPath = new Path2D();
+  const oceanR = dotRadius * 0.65;
   for (let gy = 0; gy < rows; gy++) {
     for (let gx = 0; gx < cols; gx++) {
       const cx = gx * cellSize + cellSize / 2;
       const cy = gy * cellSize + cellSize / 2;
-      const px = Math.floor(cx);
-      const py = Math.floor(cy);
-      const idx = (py * cw + px) * 4;
-      const brightness = pixels[idx] / 255;
-      const threshold = BAYER_8[gy % 8][gx % 8];
-
+      const idx = (Math.floor(cy) * cw + Math.floor(cx)) * 4;
+      const brightness = oceanPixels[idx] / 255;
+      const threshold = BAYER_8[(gy + phY) % 8][(gx + phX) % 8];
       if (brightness > threshold) {
-        // Misregistered echo (drawn first, behind main dot)
-        ctx.globalAlpha = 0.25;
-        ctx.beginPath();
-        ctx.arc(cx + offX, cy + offY, dotRadius * 0.85, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Main dither dot
-        ctx.globalAlpha = 1.0;
-        ctx.beginPath();
-        ctx.arc(cx, cy, dotRadius, 0, Math.PI * 2);
-        ctx.fill();
+        oceanPath.moveTo(cx + oceanR, cy);
+        oceanPath.arc(cx, cy, oceanR, 0, twoPi);
       }
     }
   }
+  ctx.fillStyle = def.oceanInk;
+  ctx.fill(oceanPath);
+
+  // Land dither pass — echo (misregistration) + main (batched)
+  const echoPath = new Path2D();
+  const mainPath = new Path2D();
+  const echoR = dotRadius * 0.85;
+  for (let gy = 0; gy < rows; gy++) {
+    for (let gx = 0; gx < cols; gx++) {
+      const cx = gx * cellSize + cellSize / 2;
+      const cy = gy * cellSize + cellSize / 2;
+      const idx = (Math.floor(cy) * cw + Math.floor(cx)) * 4;
+      const brightness = landPixels[idx] / 255;
+      const threshold = BAYER_8[(gy + phY) % 8][(gx + phX) % 8];
+      if (brightness > threshold) {
+        echoPath.moveTo(cx + misX + echoR, cy + misY);
+        echoPath.arc(cx + misX, cy + misY, echoR, 0, twoPi);
+        mainPath.moveTo(cx + dotRadius, cy);
+        mainPath.arc(cx, cy, dotRadius, 0, twoPi);
+      }
+    }
+  }
+  ctx.fillStyle = def.dither;
+  ctx.globalAlpha = 0.25;
+  ctx.fill(echoPath);
   ctx.globalAlpha = 1.0;
+  ctx.fill(mainPath);
 }
 
-/* ── Build lookup from id → def ── */
+/* ── Animation loop (~5.5 fps for quirky riso feel) ── */
 
-const PROJ_MAP = new Map(PROJ_DEFS.map(d => [d.id, d]));
+let animRunning = false;
+let lastFrame = 0;
 
-/* ── Setup dither drift animation via IntersectionObserver ── */
+function startAnim(): void {
+  if (animRunning) return;
+  animRunning = true;
+  requestAnimationFrame(animLoop);
+}
 
-function setupAnimation(): void {
+function animLoop(now: number): void {
+  if (!cardStates.some(s => s.visible)) {
+    animRunning = false;
+    return;
+  }
+  requestAnimationFrame(animLoop);
+
+  if (now - lastFrame < 180) return;
+  lastFrame = now;
+
+  for (const state of cardStates) {
+    if (!state.visible) continue;
+    state.phase += 0.4;
+    renderDither(state);
+  }
+}
+
+/* ── Visibility tracking ── */
+
+function setupVisibility(): void {
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      const canvas = entry.target.querySelector('.proj-card-canvas');
-      if (canvas) {
-        canvas.classList.toggle('animating', entry.isIntersecting);
-      }
+      const canvas = entry.target.querySelector('.proj-card-canvas') as HTMLCanvasElement;
+      if (!canvas) return;
+      const state = cardStates.find(s => s.canvas === canvas);
+      if (state) state.visible = entry.isIntersecting;
     });
-  }, { threshold: 0.15 });
+    if (cardStates.some(s => s.visible)) startAnim();
+  }, { threshold: 0.1 });
 
   document.querySelectorAll('.proj-card').forEach(card => observer.observe(card));
 }
@@ -288,8 +359,10 @@ export function initProjectionCards(): void {
   const cards = document.querySelectorAll<HTMLElement>('.proj-card');
   if (cards.length === 0) return;
 
+  const PROJ_MAP = new Map(PROJ_DEFS.map(d => [d.id, d]));
+
   loadGeoData().then(({ land, borders, graticule }) => {
-    cards.forEach(card => {
+    cards.forEach((card, i) => {
       const canvas = card.querySelector<HTMLCanvasElement>('.proj-card-canvas');
       const projId = card.dataset.proj;
       if (!canvas || !projId) return;
@@ -297,10 +370,10 @@ export function initProjectionCards(): void {
       const def = PROJ_MAP.get(projId);
       if (!def) return;
 
-      renderCard(canvas, def, land, borders, graticule);
+      cardStates.push(initCard(canvas, def, land, borders, graticule, i));
     });
 
-    setupAnimation();
+    setupVisibility();
   }).catch(err => {
     console.warn('Projection cards: failed to load geo data', err);
   });

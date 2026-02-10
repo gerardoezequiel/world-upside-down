@@ -212,14 +212,17 @@ a.link-underline:hover::after {
    PAGE INDEX — Fixed side navigation
    ══════════════════════════════════════ */
 
+/* ── Page Index — right-side fixed nav with riso ink colors ── */
+
 .page-index {
   position: fixed;
-  left: 1.25rem;
+  right: 1.25rem;
   top: 50%;
   transform: translateY(-50%);
   z-index: 100;
   display: flex;
   flex-direction: column;
+  align-items: flex-end;
   gap: 14px;
 }
 
@@ -228,19 +231,24 @@ a.link-underline:hover::after {
   align-items: center;
   gap: 10px;
   text-decoration: none;
-  color: var(--ink-light-gray);
   cursor: pointer;
 }
 
 .page-index-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: var(--ink-light-gray);
   flex-shrink: 0;
-  transition: background 0.25s, transform 0.25s;
-  opacity: 0.5;
+  transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+  opacity: 0.45;
 }
+
+/* Riso ink dot colors via data-ink */
+.page-index-item[data-ink="black"]  .page-index-dot { background: var(--ink-black); }
+.page-index-item[data-ink="gray"]   .page-index-dot { background: var(--ink-light-gray); }
+.page-index-item[data-ink="teal"]   .page-index-dot { background: var(--ink-teal); }
+.page-index-item[data-ink="blue"]   .page-index-dot { background: var(--ink-blue); }
+.page-index-item[data-ink="pink"]   .page-index-dot { background: var(--ink-fluor-pink); }
 
 .page-index-label {
   font-family: var(--font-mono);
@@ -249,32 +257,32 @@ a.link-underline:hover::after {
   text-transform: uppercase;
   white-space: nowrap;
   opacity: 0;
-  transform: translateX(-6px);
+  transform: translateX(6px);
   transition: opacity 0.25s ease, transform 0.25s ease;
-  color: var(--ink-dark);
+  color: var(--text-secondary);
 }
 
-/* Hover — reveal label */
+/* Hover — reveal label, enlarge dot */
 .page-index-item:hover .page-index-label {
   opacity: 1;
   transform: translateX(0);
 }
 
 .page-index-item:hover .page-index-dot {
-  background: var(--ink-teal);
   opacity: 1;
-  transform: scale(1.5);
+  transform: scale(1.6);
 }
 
-/* Active section */
+/* Active section — always show label, full ink dot */
 .page-index-item.active .page-index-dot {
-  background: var(--ink-fluor-pink);
   opacity: 1;
-  transform: scale(1.4);
+  transform: scale(1.5);
+  box-shadow: 0 0 0 3px rgba(255, 72, 176, 0.15);
 }
 
 .page-index-item.active .page-index-label {
-  color: var(--ink-fluor-pink);
+  opacity: 1;
+  transform: translateX(0);
 }
 
 /* Visible grid overlay — teal registration lines */
@@ -1183,21 +1191,9 @@ section, .section-divider, .pull-quote, footer.colophon {
   will-change: transform;
 }
 
-@keyframes projCardDrift {
-  0%, 100% { transform: scale(1.0)   translate(0, 0); }
-  25%      { transform: scale(1.02)  translate(0.8px, -0.5px); }
-  50%      { transform: scale(1.01)  translate(-0.3px, 0.8px); }
-  75%      { transform: scale(1.025) translate(-0.6px, -0.3px); }
-}
-
-.proj-card-canvas.animating {
-  animation: projCardDrift 7s ease-in-out infinite;
-}
-
 .proj-card:hover .proj-card-canvas {
-  animation-play-state: paused;
-  transform: scale(1.03);
-  transition: transform 0.3s ease;
+  filter: brightness(1.08);
+  transition: filter 0.3s ease;
 }
 
 /* ── Card text ── */
@@ -1876,7 +1872,7 @@ section, .section-divider, .pull-quote, footer.colophon {
 
 @media (max-width: 1024px) {
   .page-index {
-    left: 0.5rem;
+    right: 0.5rem;
     gap: 10px;
   }
 
