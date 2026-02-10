@@ -584,6 +584,90 @@ a.link-underline:hover::after {
 }
 
 /* ══════════════════════════════════════
+   HISTORY OF ORIENTATION
+   ══════════════════════════════════════ */
+
+.orientation-section {
+  padding: 4rem 0;
+  position: relative;
+}
+
+.orientation-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 100%;
+  background-image: radial-gradient(circle, var(--ink-teal) 0.7px, transparent 0.7px);
+  background-size: 8px 8px;
+  opacity: 0.05;
+  pointer-events: none;
+  mask-image: linear-gradient(135deg, black 0%, transparent 70%);
+  -webkit-mask-image: linear-gradient(135deg, black 0%, transparent 70%);
+}
+
+.orientation-section .section-header {
+  grid-column: 1 / 8;
+  margin-bottom: 3rem;
+}
+
+.orientation-section .section-header .meta {
+  display: inline-block;
+  margin-bottom: 1rem;
+  padding: 4px 10px;
+  background: rgba(0, 131, 138, 0.08);
+  border-left: 3px solid var(--ink-teal);
+}
+
+.orientation-body {
+  grid-column: 1 / 7;
+}
+
+.orientation-body p {
+  margin-bottom: 1rem;
+}
+
+.orientation-body p:last-child {
+  margin-bottom: 0;
+}
+
+.orientation-list {
+  grid-column: 8 / 13;
+  grid-row: 1 / 4;
+  align-self: start;
+}
+
+.orient-item {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--gray-20);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  opacity: 0;
+  transform: translateX(12px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.orient-item:first-child {
+  border-top: 1px solid var(--gray-20);
+}
+
+.orient-item.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.orient-dir {
+  color: var(--ink-teal);
+}
+
+.orient-reason {
+  color: var(--text-secondary);
+  font-size: clamp(0.75rem, 0.9vw, 0.875rem);
+}
+
+/* ══════════════════════════════════════
    PROVOCATION — Quote + Body + Data Block
    ══════════════════════════════════════ */
 
@@ -769,6 +853,60 @@ a.link-underline:hover::after {
   font-size: 2rem;
   color: var(--ink-light-gray);
   flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════
+   THE MERCATOR PROBLEM
+   ══════════════════════════════════════ */
+
+.mercator-section {
+  padding: 4rem 0;
+  position: relative;
+}
+
+.mercator-section::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 50%;
+  height: 60%;
+  background-image:
+    radial-gradient(circle, var(--ink-fluor-pink) 0.6px, transparent 0.6px),
+    radial-gradient(circle, var(--ink-blue) 0.5px, transparent 0.5px);
+  background-size: 10px 10px, 8px 8px;
+  background-position: 0 0, 3px 3px;
+  opacity: 0.04;
+  pointer-events: none;
+}
+
+.mercator-section .section-header {
+  grid-column: 1 / 10;
+  margin-bottom: 3rem;
+}
+
+.mercator-section .section-header .meta {
+  display: inline-block;
+  margin-bottom: 1rem;
+  padding: 4px 10px;
+  background: rgba(255, 72, 176, 0.08);
+  border-left: 3px solid var(--ink-fluor-pink);
+}
+
+.mercator-body {
+  grid-column: 1 / 7;
+}
+
+.mercator-body p {
+  margin-bottom: 1rem;
+}
+
+.mercator-body p:last-child {
+  margin-bottom: 0;
+}
+
+.mercator-data {
+  grid-column: 8 / 13;
 }
 
 /* ══════════════════════════════════════
@@ -1294,6 +1432,33 @@ a.link-underline:hover::after {
     grid-column: 1 / -1;
   }
 
+  /* Orientation */
+  .orientation-section .section-header {
+    grid-column: 1 / -1;
+  }
+
+  .orientation-body {
+    grid-column: 1 / 5;
+  }
+
+  .orientation-list {
+    grid-column: 5 / -1;
+    grid-row: 2 / 4;
+  }
+
+  /* Mercator */
+  .mercator-section .section-header {
+    grid-column: 1 / -1;
+  }
+
+  .mercator-body {
+    grid-column: 1 / 5;
+  }
+
+  .mercator-data {
+    grid-column: 5 / -1;
+  }
+
   .psych-header {
     grid-column: 1 / -1;
   }
@@ -1430,14 +1595,25 @@ a.link-underline:hover::after {
     gap: 1rem;
   }
 
+  /* Orientation */
+  .orientation-section .section-header {
+    grid-column: 1 / -1;
+  }
+
+  .orientation-body {
+    grid-column: 1 / -1;
+  }
+
+  .orientation-list {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    margin-top: 2rem;
+  }
+
   /* Provocation */
   .provocation-quote {
     grid-column: 1 / -1;
     font-size: clamp(1.25rem, 4vw, 1.75rem);
-  }
-
-  .provocation-body {
-    grid-column: 1 / -1;
   }
 
   .data-block {
@@ -1448,6 +1624,20 @@ a.link-underline:hover::after {
   /* Marble */
   .marble-section .section-header {
     grid-column: 1 / -1;
+  }
+
+  /* Mercator */
+  .mercator-section .section-header {
+    grid-column: 1 / -1;
+  }
+
+  .mercator-body {
+    grid-column: 1 / -1;
+  }
+
+  .mercator-data {
+    grid-column: 1 / -1;
+    margin-top: 2rem;
   }
 
   .marble-body {

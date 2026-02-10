@@ -114,14 +114,55 @@ North.">
 <div class="section-divider"></div>
 
 <!-- ==========================================
-     PROVOCATION — Standalone Pull Quote
+     HISTORY OF UP — Why north won
      ========================================== -->
-<section class="provocation-section" id="provocation">
+<section class="orientation-section" id="orientation">
   <div class="page-grid">
-    <blockquote class="provocation-quote heading-lg reveal">
-      <div class="quote-accent-bar"></div>
-      &ldquo;Every world map is a political statement. This one just admits it.&rdquo;
-    </blockquote>
+    <div class="section-header">
+      <span class="meta reveal">The History of Orientation</span>
+      <h2 class="heading-lg reveal reveal-d1">The word &lsquo;orientation&rsquo; comes from Latin <em>oriens</em>&thinsp;&mdash;&thinsp;&lsquo;east.&rsquo;</h2>
+    </div>
+
+    <div class="orientation-body body reveal reveal-d2">
+      <p>
+        Medieval maps placed east at the top because that&rsquo;s where Paradise was.
+        Arab cartographers put south at the top because Mecca was to the south.
+        Ancient Egyptians followed the Nile: south was upstream, south was up.
+      </p>
+      <p>
+        North claimed the top of the map around 500 years ago, when European navigators
+        standardised their compass-centric view and the printing press locked it in place.
+        It was never inevitable. It was a decision&thinsp;&mdash;&thinsp;and like all decisions, it carried politics.
+      </p>
+    </div>
+
+    <div class="orientation-list">
+      <div class="orient-item reveal">
+        <span class="orient-culture meta">Ancient Egypt</span>
+        <span class="orient-dir heading-sm">South &uarr;</span>
+        <span class="orient-reason body">The Nile flows north&thinsp;&mdash;&thinsp;upstream was south, so south was up</span>
+      </div>
+      <div class="orient-item reveal reveal-d1">
+        <span class="orient-culture meta">Islamic Cartography</span>
+        <span class="orient-dir heading-sm">South &uarr;</span>
+        <span class="orient-reason body">Al-Idrisi&rsquo;s Tabula Rogeriana (1154) placed Mecca toward the top</span>
+      </div>
+      <div class="orient-item reveal reveal-d1">
+        <span class="orient-culture meta">Ancient China</span>
+        <span class="orient-dir heading-sm">South &uarr;</span>
+        <span class="orient-reason body">Chinese compasses were &ldquo;south-pointing needles&rdquo;</span>
+      </div>
+      <div class="orient-item reveal reveal-d2">
+        <span class="orient-culture meta">Medieval Europe</span>
+        <span class="orient-dir heading-sm">East &uarr;</span>
+        <span class="orient-reason body">T-O maps placed Paradise &amp; the rising sun at top</span>
+      </div>
+      <div class="orient-item reveal reveal-d2">
+        <span class="orient-culture meta">Post-1500s Europe</span>
+        <span class="orient-dir heading-sm">North &uarr;</span>
+        <span class="orient-reason body">Compass + printing press + colonial expansion</span>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -163,6 +204,66 @@ North.">
       <div class="marble-item">
         <img src="/maps/blue-marble-nasa.jpg" alt="Blue Marble NASA version, north on top" class="marble-img marble-flipped" loading="lazy" />
         <span class="meta">&ldquo;Corrected&rdquo; by NASA</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Divider ── -->
+<div class="section-divider"></div>
+
+<!-- ==========================================
+     THE MERCATOR PROBLEM
+     ========================================== -->
+<section class="mercator-section" id="mercator">
+  <div class="page-grid">
+    <div class="section-header">
+      <span class="meta reveal">The Mercator Problem</span>
+      <h2 class="heading-lg reveal reveal-d1">On a Mercator map, Greenland looks roughly the size of Africa. In reality, Africa is fourteen times larger.</h2>
+    </div>
+
+    <div class="mercator-body body reveal reveal-d2">
+      <p>
+        You could fit the United States, China, India, and most of Europe inside Africa&thinsp;&mdash;&thinsp;with
+        room to spare. Brazil appears insignificant next to North America; it&rsquo;s actually larger
+        than the contiguous United States. Alaska looks as large as Brazil&thinsp;&mdash;&thinsp;Brazil is nearly five times bigger.
+      </p>
+      <p>
+        Mercator designed his projection in 1569 for sailors. It was never meant to represent the world.
+        But classrooms, newsrooms, and tech companies adopted it as the default, and for centuries it has
+        inflated the Northern Hemisphere while shrinking the Global South&thinsp;&mdash;&thinsp;the same territories
+        that were colonised by the people who made the maps.
+      </p>
+      <p>
+        Every projection distorts something. But not every distortion has been so convenient for power.
+      </p>
+    </div>
+
+    <div class="data-block mercator-data reveal reveal-d2">
+      <div class="data-block-title meta">True Size Comparisons</div>
+      <div class="data-row">
+        <span class="data-label">Africa</span>
+        <span class="data-value">30.4M km&sup2;</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Greenland</span>
+        <span class="data-value">2.2M km&sup2;</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">True Ratio</span>
+        <span class="data-value">Africa is 14&times; larger</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Brazil vs USA</span>
+        <span class="data-value">Brazil is larger</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Alaska vs Brazil</span>
+        <span class="data-value">Brazil is 5&times; bigger</span>
+      </div>
+      <div class="data-row">
+        <span class="data-label">Greenland Error</span>
+        <span class="data-value">73.9% inflated</span>
       </div>
     </div>
   </div>
@@ -727,6 +828,27 @@ again.">Look<br>again.</h2>
   }
 
   /* ══════════════════════════════════════
+     ORIENTATION ITEMS STAGGER
+     ══════════════════════════════════════ */
+
+  function initOrientationAnimation() {
+    var list = document.querySelector('.orientation-list');
+    if (!list) return;
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          var items = entry.target.querySelectorAll('.orient-item');
+          items.forEach(function(item, i) {
+            setTimeout(function() { item.classList.add('visible'); }, i * 200);
+          });
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2 });
+    observer.observe(list);
+  }
+
+  /* ══════════════════════════════════════
      INIT
      ══════════════════════════════════════ */
 
@@ -736,6 +858,7 @@ again.">Look<br>again.</h2>
     initScrollReveal();
     initMarbleFlip();
     initIdiomAnimation();
+    initOrientationAnimation();
     initMapShield();
     initScrollEffects();
   }
