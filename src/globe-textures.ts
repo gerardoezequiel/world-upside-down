@@ -10,11 +10,11 @@ import {
   geoGraticule10,
   geoMercator,
   geoEqualEarth,
-  geoNaturalEarth1,
   geoOrthographic,
   geoAzimuthalEqualArea,
   type GeoProjection,
 } from 'd3-geo';
+import { geoMollweide } from 'd3-geo-projection';
 import { geoAirocean } from 'd3-geo-polygon';
 import * as topojson from 'topojson-client';
 import type { Topology } from 'topojson-specification';
@@ -69,10 +69,10 @@ const PROJECTIONS: ProjDef[] = [
     w: TEX_W, h: TEX_H,
   },
   {
-    name: 'naturalearth',
-    label: 'Natural Earth · The Compromise',
+    name: 'mollweide',
+    label: 'Mollweide · Equal-Area Ellipse',
     color: RISO_PINK,
-    factory: () => geoNaturalEarth1().rotate([0, 0, 180]) as GeoProjection,
+    factory: () => geoMollweide().rotate([0, 0, 180]) as GeoProjection,
     w: TEX_W, h: TEX_H,
   },
   {
