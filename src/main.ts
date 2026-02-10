@@ -1169,10 +1169,13 @@ function updateScreenprintText(name: string): void {
    ══════════════════════════════════════════════════════════════ */
 function setupToolTitle(map: maplibregl.Map): void {
   const btn = document.getElementById('tool-title');
-  const colorStrip = document.getElementById('color-strip');
-  const spL1 = document.getElementById('screenprint-l1');
-  const spL2 = document.getElementById('screenprint-l2');
-  if (!btn || !colorStrip || !spL1 || !spL2) return;
+  const colorStripEl = document.getElementById('color-strip');
+  const spL1El = document.getElementById('screenprint-l1');
+  const spL2El = document.getElementById('screenprint-l2');
+  if (!btn || !colorStripEl || !spL1El || !spL2El) return;
+  const colorStrip: HTMLElement = colorStripEl;
+  const spL1: HTMLElement = spL1El;
+  const spL2: HTMLElement = spL2El;
 
   btn.addEventListener('click', () => {
     closeAllMenus();
