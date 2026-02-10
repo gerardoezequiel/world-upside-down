@@ -662,13 +662,6 @@ function applyOrientation(map: maplibregl.Map, target: Orientation): void {
   // Toast
   showFlipToast(getOrientationToast(target));
 
-  // Screenprint: briefly flash on orientation change, then dim again
-  const sp = document.getElementById('screenprint-overlay');
-  if (sp) {
-    sp.classList.remove('dimmed', 'faded', 'hidden');
-    setTimeout(() => sp.classList.add('dimmed'), 2500);
-  }
-
   // Hide hint
   document.getElementById('flip-hint')?.classList.remove('visible');
 }
@@ -1202,17 +1195,30 @@ async function init() {
       }
     })();
 
-    // ── Screenprint overlay — dim on first interaction ──
+    // ── Screenprint overlay — hide on interaction, show "LOST IN [city]" after 10s idle ──
     const spOverlayEl = document.getElementById('screenprint-overlay');
-    let spDimmed = false;
+    const spL1 = document.getElementById('screenprint-l1');
+    const spL2 = document.getElementById('screenprint-l2');
+    let idleTimer: ReturnType<typeof setTimeout> | null = null;
 
-    function dimScreenprint() {
-      if (spDimmed || !spOverlayEl) return;
-      spDimmed = true;
-      spOverlayEl.classList.add('dimmed');
+    function hideScreenprint() {
+      if (!spOverlayEl) return;
+      spOverlayEl.classList.add('hidden');
+      // Reset idle timer
+      if (idleTimer) clearTimeout(idleTimer);
+      idleTimer = setTimeout(showIdleScreenprint, 10000);
     }
-    map.on('movestart', dimScreenprint);
-    map.on('zoomstart', dimScreenprint);
+
+    function showIdleScreenprint() {
+      if (!spOverlayEl || !spL1 || !spL2) return;
+      // Update text to "LOST IN / [city]"
+      spL1.textContent = 'LOST IN';
+      spL2.textContent = currentCityName ? currentCityName.toUpperCase() : 'NOWHERE';
+      spOverlayEl.classList.remove('hidden');
+    }
+
+    map.on('movestart', hideScreenprint);
+    map.on('zoomstart', hideScreenprint);
 
     // ── Periodic ambient toasts ──
     const ambientMessages = [
@@ -1284,17 +1290,9 @@ async function init() {
     window.addEventListener('resize', () => dymaxion.resize());
   });
 
-  // ── Screenprint fade on zoom ──
   map.on('zoom', () => {
     updateScaleBar(map);
     updateCoords(map);
-    // Progressively fade screenprint at higher zooms
-    const sp = document.getElementById('screenprint-overlay');
-    if (sp) {
-      const z = map.getZoom();
-      sp.classList.toggle('faded', z > 14);
-      sp.classList.toggle('hidden', z > 16);
-    }
   });
 
   map.on('moveend', () => {

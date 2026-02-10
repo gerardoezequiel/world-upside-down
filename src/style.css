@@ -377,14 +377,6 @@ body {
   gap: 0;
 }
 
-#screenprint-overlay.dimmed {
-  opacity: 0.35;
-}
-
-#screenprint-overlay.faded {
-  opacity: 0.15;
-}
-
 #screenprint-overlay.hidden {
   opacity: 0;
 }
