@@ -150,20 +150,20 @@ void main() {
 
   // ── Morph with scatter effect ──
   float morphEase = smoothstep(0.0, 1.0, uMorph);
-  
+
   // Scatter intensity peaks at mid-transition
-  float scatterAmount = sin(uMorph * 3.14159) * 0.25;
+  float scatterAmount = sin(uMorph * 3.14159) * 0.06;
   float scatter = vnoise(vec3(uv * 4.0, uTime * 0.8)) * scatterAmount;
-  
+
   // Blend map values
   float mapVal = mix(mapA, mapB, morphEase) + scatter;
 
   // ── Add subtle organic noise (keeps it alive) ──
-  float organic = fbm(uv * 0.4, uTime * 0.15) * 0.06;
+  float organic = fbm(uv * 0.4, uTime * 0.15) * 0.02;
   mapVal += organic;
 
   // ── Subtle breathing pulse on overall density ──
-  float pulse = sin(uTime * 0.2) * 0.015;
+  float pulse = sin(uTime * 0.2) * 0.005;
   mapVal += pulse;
 
   // ── Click ripple effects ──

@@ -32,12 +32,12 @@ const RISO_TEAL:  [number, number, number] = [0.0, 0.514, 0.541];   // #00838A
 const RISO_PINK:  [number, number, number] = [1.0, 0.282, 0.690];   // #FF48B0
 const RISO_BLACK: [number, number, number] = [0.05, 0.05, 0.05];
 
-/* ── Grayscale values for map features ── */
-const OCEAN_VAL      = 0.12;
-const LAND_VAL       = 0.50;
-const COAST_VAL      = 0.70;
-const GRATICULE_VAL  = 0.22;
-const BORDER_VAL     = 0.30;
+/* ── Grayscale values for map features (0-255 direct fill) ── */
+const OCEAN_VAL      = 20;
+const LAND_VAL       = 180;
+const COAST_VAL      = 220;
+const GRATICULE_VAL  = 50;
+const BORDER_VAL     = 80;
 
 /* ── Canvas size ── */
 const TEX_W = 1024;
@@ -111,47 +111,52 @@ function renderProjection(
 
   const path = geoPath(proj, ctx);
 
-  // Black background (ocean = low value)
-  ctx.fillStyle = `rgba(255, 255, 255, ${OCEAN_VAL})`;
+  // Black background
+  ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, w, h);
 
-  // Ocean sphere outline (for non-rectangular projections)
+  // Ocean sphere fill (for non-rectangular projections)
   ctx.beginPath();
   path({ type: 'Sphere' });
-  ctx.fillStyle = `rgba(255, 255, 255, ${OCEAN_VAL})`;
+  const oc = OCEAN_VAL;
+  ctx.fillStyle = `rgb(${oc},${oc},${oc})`;
   ctx.fill();
 
   // Graticule
   ctx.beginPath();
   path(graticule);
-  ctx.strokeStyle = `rgba(255, 255, 255, ${GRATICULE_VAL})`;
+  const gr = GRATICULE_VAL;
+  ctx.strokeStyle = `rgb(${gr},${gr},${gr})`;
   ctx.lineWidth = 0.5;
   ctx.stroke();
 
   // Land fill
   ctx.beginPath();
   path(land);
-  ctx.fillStyle = `rgba(255, 255, 255, ${LAND_VAL})`;
+  const la = LAND_VAL;
+  ctx.fillStyle = `rgb(${la},${la},${la})`;
   ctx.fill();
 
   // Country borders
   ctx.beginPath();
   path(borders);
-  ctx.strokeStyle = `rgba(255, 255, 255, ${BORDER_VAL})`;
+  const bo = BORDER_VAL;
+  ctx.strokeStyle = `rgb(${bo},${bo},${bo})`;
   ctx.lineWidth = 0.4;
   ctx.stroke();
 
   // Coastlines (bright)
   ctx.beginPath();
   path(land);
-  ctx.strokeStyle = `rgba(255, 255, 255, ${COAST_VAL})`;
+  const co = COAST_VAL;
+  ctx.strokeStyle = `rgb(${co},${co},${co})`;
   ctx.lineWidth = 1.5;
   ctx.stroke();
 
   // Sphere outline
   ctx.beginPath();
   path({ type: 'Sphere' });
-  ctx.strokeStyle = `rgba(255, 255, 255, 0.6)`;
+  ctx.strokeStyle = 'rgb(150,150,150)';
   ctx.lineWidth = 1.0;
   ctx.stroke();
 
