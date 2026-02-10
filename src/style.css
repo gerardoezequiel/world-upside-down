@@ -68,9 +68,43 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   border-bottom: 2px solid var(--rule);
   background: var(--paper);
   z-index: 10;
+}
+
+/* ── Top-band toolbar ── */
+#toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+  margin-right: 16px;
+}
+
+.tb-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  appearance: none;
+  background: none;
+  border: 1.5px solid transparent;
+  border-radius: 0;
+  cursor: pointer;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--mid);
+  text-decoration: none;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.tb-btn:hover {
+  color: var(--ink);
+  border-color: var(--rule);
 }
 
 .title-group {
@@ -574,132 +608,16 @@ body {
 /* ══════════════════════════════════════
    ⊕ REGISTRATION MARK & TOOL MENU
    ══════════════════════════════════════ */
+/* ── Registration mark (decorative) ── */
 .reg-mark {
   position: absolute;
   bottom: 16px;
   right: 16px;
   z-index: 6;
-  appearance: none;
-  background: none;
-  border: none;
   padding: 8px;
-  cursor: pointer;
-  color: var(--mid);
-  transition: color 0.2s ease, opacity 0.6s ease;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.reg-mark.visible {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.reg-mark:hover {
-  color: var(--ink);
-}
-
-/* First-visit pulse */
-@keyframes regMarkPulse {
-  0%   { opacity: 0.4; }
-  50%  { opacity: 1; }
-  100% { opacity: 0.4; }
-}
-
-.reg-mark.discovery-pulse {
-  animation: regMarkPulse 2.5s ease-in-out 1;
-}
-
-/* ── TOOL MENU ── */
-.tool-menu {
-  position: absolute;
-  bottom: 56px;
-  right: 16px;
-  z-index: 6;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
-  pointer-events: none;
-  opacity: 0;
-}
-
-.tool-menu.open {
-  pointer-events: auto;
-  opacity: 1;
-}
-
-.tool-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  height: 32px;
-  padding: 0 4px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 0.25s ease, transform 0.25s ease;
-}
-
-.tool-menu.open .tool-item {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Staggered entrance — bottom to top */
-.tool-menu.open .tool-item:nth-child(6) { transition-delay: 0ms; }
-.tool-menu.open .tool-item:nth-child(5) { transition-delay: 60ms; }
-.tool-menu.open .tool-item:nth-child(4) { transition-delay: 120ms; }
-.tool-menu.open .tool-item:nth-child(3) { transition-delay: 180ms; }
-.tool-menu.open .tool-item:nth-child(2) { transition-delay: 240ms; }
-.tool-menu.open .tool-item:nth-child(1) { transition-delay: 300ms; }
-
-/* Staggered exit — top to bottom */
-.tool-menu:not(.open) .tool-item:nth-child(1) { transition-delay: 0ms; transition-duration: 0.15s; }
-.tool-menu:not(.open) .tool-item:nth-child(2) { transition-delay: 40ms; transition-duration: 0.15s; }
-.tool-menu:not(.open) .tool-item:nth-child(3) { transition-delay: 80ms; transition-duration: 0.15s; }
-.tool-menu:not(.open) .tool-item:nth-child(4) { transition-delay: 120ms; transition-duration: 0.15s; }
-.tool-menu:not(.open) .tool-item:nth-child(5) { transition-delay: 160ms; transition-duration: 0.15s; }
-.tool-menu:not(.open) .tool-item:nth-child(6) { transition-delay: 200ms; transition-duration: 0.15s; }
-
-.tool-item:hover .tool-label,
-.tool-item:hover .tool-icon {
-  color: var(--ink);
-}
-
-.tool-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  font-family: 'Space Mono', monospace;
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--mid);
-  transition: color 0.2s;
-}
-
-.tool-label {
-  font-family: 'Space Mono', monospace;
-  font-size: 9px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--mid);
-  transition: color 0.2s;
-  white-space: nowrap;
-}
-
-/* "Make it yours" first-visit whisper */
-.tool-label.whisper {
-  font-family: 'Instrument Serif', serif;
-  font-style: italic;
-  text-transform: none;
-  letter-spacing: 0;
   color: var(--light);
+  opacity: 0.35;
+  pointer-events: none;
 }
 
 /* ══════════════════════════════════════
@@ -1139,7 +1057,7 @@ body {
   display: none;
   position: absolute;
   bottom: 16px;
-  right: 60px;
+  right: 16px;
   z-index: 5;
   flex-direction: column;
   gap: 8px;
@@ -1380,14 +1298,15 @@ body {
     right: 10px;
   }
 
-  .tool-menu {
+  .download-formats {
     bottom: 50px;
     right: 10px;
   }
 
-  .download-formats {
-    bottom: 50px;
-    right: 10px;
+  .tb-btn {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
   }
 }
 

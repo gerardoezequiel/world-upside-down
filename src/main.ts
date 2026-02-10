@@ -346,7 +346,6 @@ function setMode(mode: Mode, map?: maplibregl.Map) {
   currentMode = mode;
 
   const overlay = document.getElementById('screenprint-overlay');
-  const regMark = document.getElementById('reg-mark');
   const touchControls = document.getElementById('touch-controls');
   const flipHint = document.getElementById('flip-hint');
 
@@ -354,7 +353,6 @@ function setMode(mode: Mode, map?: maplibregl.Map) {
     root.style.setProperty('--overlay-transition', '1.2s cubic-bezier(0.4, 0, 0.2, 1)');
     setOverlayOpacity(0.90);
     overlay?.classList.add('poster-mode');
-    regMark?.classList.remove('visible');
     touchControls?.classList.remove('visible');
     flipHint?.classList.remove('visible');
     clearIdleTimer();
@@ -368,23 +366,14 @@ function setMode(mode: Mode, map?: maplibregl.Map) {
     overlay?.classList.remove('poster-mode');
 
     // Staggered entrance
-    setTimeout(() => regMark?.classList.add('visible'), 0);
     setTimeout(() => touchControls?.classList.add('visible'), 150);
     setTimeout(() => {
       // Show flip hint on desktop, first visit only
       if (flipHint && !localStorage.getItem('wud-explored')) {
         flipHint.classList.add('visible');
+        localStorage.setItem('wud-explored', '1');
       }
     }, 300);
-
-    // Discovery cue for ⊕
-    if (!localStorage.getItem('wud-explored')) {
-      localStorage.setItem('wud-explored', '1');
-      regMark?.classList.add('discovery-pulse');
-      regMark?.addEventListener('animationend', () => {
-        regMark.classList.remove('discovery-pulse');
-      }, { once: true });
-    }
 
     startIdleTimer(map);
   }
@@ -409,7 +398,6 @@ function startIdleTimer(map?: maplibregl.Map) {
         if (currentMode === 'explore') {
           currentMode = 'poster';
           document.getElementById('screenprint-overlay')?.classList.add('poster-mode');
-          document.getElementById('reg-mark')?.classList.remove('visible');
           document.getElementById('touch-controls')?.classList.remove('visible');
         }
       }, 3000);
@@ -663,7 +651,7 @@ function setupFlip(map: maplibregl.Map): void {
       case 'ArrowRight': applyOrientation(map, 'mirrored'); break;
       case 'ArrowLeft': applyOrientation(map, 'normal'); break;
       case 'Escape':
-        closeAllMenus();
+        closeAllPanels();
         if (currentMode === 'explore' || currentMode === 'maker') {
           setMode('poster', map);
         }
@@ -1021,64 +1009,20 @@ function applyRisoMisregistration(map: maplibregl.Map): void {
 /* ══════════════════════════════════════════════════════════════
    ⊕ REGISTRATION MARK & TOOL MENU
    ══════════════════════════════════════════════════════════════ */
-let menuOpen = false;
 let formatsOpen = false;
 
-function closeAllMenus() {
-  const toolMenu = document.getElementById('tool-menu');
+function closeAllPanels() {
   const downloadFormats = document.getElementById('download-formats');
   const colorStrip = document.getElementById('color-strip');
   const exportPreview = document.getElementById('export-preview');
 
-  toolMenu?.classList.remove('open');
   downloadFormats?.classList.remove('open');
   colorStrip?.classList.remove('visible');
   exportPreview?.classList.remove('visible');
-  menuOpen = false;
   formatsOpen = false;
 }
 
-function setupRegMark(map: maplibregl.Map): void {
-  const regMark = document.getElementById('reg-mark')!;
-  const toolMenu = document.getElementById('tool-menu')!;
-
-  // ⊕ click → toggle menu
-  regMark.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (formatsOpen) {
-      // Close format picker, return to menu
-      document.getElementById('download-formats')?.classList.remove('open');
-      formatsOpen = false;
-      toolMenu.classList.add('open');
-      menuOpen = true;
-      return;
-    }
-    if (menuOpen) {
-      closeAllMenus();
-    } else {
-      toolMenu.classList.add('open');
-      menuOpen = true;
-
-      // First-visit "Make it yours" whisper
-      if (!localStorage.getItem('wud-menu-opened')) {
-        localStorage.setItem('wud-menu-opened', '1');
-        const titleLabel = document.querySelector('[data-tool="title"] .tool-label');
-        if (titleLabel) {
-          titleLabel.textContent = 'Make it yours';
-          titleLabel.classList.add('whisper');
-        }
-      }
-    }
-  });
-
-  // Close on click outside
-  document.addEventListener('click', (e) => {
-    if (menuOpen && !toolMenu.contains(e.target as Node) && e.target !== regMark) {
-      closeAllMenus();
-    }
-  });
-
-  // Wire up tool items
+function setupTools(map: maplibregl.Map): void {
   setupToolLocate(map);
   setupToolTitle(map);
   setupToolDownload(map);
@@ -1093,7 +1037,7 @@ function setupToolLocate(map: maplibregl.Map): void {
   if (!btn) return;
 
   btn.addEventListener('click', () => {
-    closeAllMenus();
+    closeAllPanels();
 
     if (!navigator.geolocation) {
       showFlipToast("Couldn't find you — try searching instead");
@@ -1178,7 +1122,7 @@ function setupToolTitle(map: maplibregl.Map): void {
   const spL2: HTMLElement = spL2El;
 
   btn.addEventListener('click', () => {
-    closeAllMenus();
+    closeAllPanels();
     setMode('maker', map);
 
     // Make text editable
@@ -1293,22 +1237,33 @@ function setupToolTitle(map: maplibregl.Map): void {
 function setupToolDownload(map: maplibregl.Map): void {
   const btn = document.getElementById('tool-download');
   const downloadFormats = document.getElementById('download-formats');
-  const toolMenu = document.getElementById('tool-menu');
-  if (!btn || !downloadFormats || !toolMenu) return;
+  if (!btn || !downloadFormats) return;
 
   btn.addEventListener('click', () => {
-    // Hide tool menu, show format picker
-    toolMenu.classList.remove('open');
-    menuOpen = false;
-    downloadFormats.classList.add('open');
-    formatsOpen = true;
+    // Toggle format picker
+    if (formatsOpen) {
+      downloadFormats.classList.remove('open');
+      formatsOpen = false;
+    } else {
+      closeAllPanels();
+      downloadFormats.classList.add('open');
+      formatsOpen = true;
+    }
+  });
+
+  // Close format picker on click outside
+  document.addEventListener('click', (e) => {
+    if (formatsOpen && !downloadFormats.contains(e.target as Node) && e.target !== btn) {
+      downloadFormats.classList.remove('open');
+      formatsOpen = false;
+    }
   });
 
   // Format card clicks
   downloadFormats.querySelectorAll('.dl-format').forEach(card => {
     card.addEventListener('click', () => {
       const format = (card as HTMLElement).dataset.format!;
-      closeAllMenus();
+      closeAllPanels();
       openExportPreview(map, format);
     });
   });
@@ -1496,7 +1451,7 @@ async function captureAndExport(map: maplibregl.Map, format: string, action: 'do
       // Hide UI elements
       const hideEls = [
         document.getElementById('reg-mark'),
-        document.getElementById('tool-menu'),
+        document.getElementById('toolbar'),
         document.getElementById('touch-controls'),
         document.getElementById('flip-toast'),
         document.getElementById('download-formats'),
@@ -1673,7 +1628,7 @@ function setupToolShare(map: maplibregl.Map): void {
   if (!btn) return;
 
   btn.addEventListener('click', async () => {
-    closeAllMenus();
+    closeAllPanels();
 
     const url = window.location.href;
     const text = "I flipped the world upside down.";
@@ -1876,7 +1831,7 @@ async function init() {
     setupFlip(map);
     addGraticule(map);
     applyRisoMisregistration(map);
-    setupRegMark(map);
+    setupTools(map);
 
     // Apply shareable URL params
     applyShareableParams();

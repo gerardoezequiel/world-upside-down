@@ -44,6 +44,15 @@
       </div>
       <span class="subtitle" id="subtitle"><a href="/story" id="subtitle-link"><span id="subtitle-text">an exercise in unlearning north</span></a><span class="subtitle-cursor" aria-hidden="true"></span></span>
     </div>
+    <!-- ── Tool bar (always visible) ── -->
+    <div id="toolbar">
+      <button class="tb-btn" data-tool="locate" id="tool-locate" aria-label="Find me">&#x2316;</button>
+      <button class="tb-btn" data-tool="title" id="tool-title" aria-label="Make it yours">T</button>
+      <button class="tb-btn" data-tool="download" id="tool-download" aria-label="Download">&darr;</button>
+      <button class="tb-btn" data-tool="share" id="tool-share" aria-label="Share">&nearr;</button>
+      <a href="/story" class="tb-btn" aria-label="The story">?</a>
+    </div>
+
     <div id="coords">
       <span id="coords-lat">51.51° N</span>
       <span class="coord-sep">/</span>
@@ -85,40 +94,13 @@
       Protomaps &middot; OpenStreetMap
     </div>
 
-    <!-- ── Registration mark + tool menu ── -->
-    <button class="reg-mark" id="reg-mark" aria-label="Print tools">
+    <!-- ── Registration mark (decorative) ── -->
+    <div class="reg-mark" id="reg-mark" aria-hidden="true">
       <svg width="28" height="28" viewBox="0 0 28 28">
         <circle cx="14" cy="14" r="10" fill="none" stroke="currentColor" stroke-width="0.8"/>
         <line x1="14" y1="2" x2="14" y2="26" stroke="currentColor" stroke-width="0.8"/>
         <line x1="2" y1="14" x2="26" y2="14" stroke="currentColor" stroke-width="0.8"/>
       </svg>
-    </button>
-
-    <div class="tool-menu" id="tool-menu">
-      <a href="/story" class="tool-item" data-tool="story">
-        <span class="tool-icon">?</span>
-        <span class="tool-label">The story</span>
-      </a>
-      <a href="/" class="tool-item" data-tool="home">
-        <span class="tool-icon">&larr;</span>
-        <span class="tool-label">Home</span>
-      </a>
-      <button class="tool-item" data-tool="share" id="tool-share">
-        <span class="tool-icon">&nearr;</span>
-        <span class="tool-label">Share</span>
-      </button>
-      <button class="tool-item" data-tool="download" id="tool-download">
-        <span class="tool-icon">&darr;</span>
-        <span class="tool-label">Download</span>
-      </button>
-      <button class="tool-item" data-tool="title" id="tool-title">
-        <span class="tool-icon">T</span>
-        <span class="tool-label">Make it yours</span>
-      </button>
-      <button class="tool-item" data-tool="locate" id="tool-locate">
-        <span class="tool-icon">&#x2316;</span>
-        <span class="tool-label">Find me</span>
-      </button>
     </div>
 
     <!-- ── Color strip (title editor) ── -->
