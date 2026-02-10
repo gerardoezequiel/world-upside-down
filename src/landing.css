@@ -252,7 +252,7 @@ a.link-underline:hover::after {
 
 .page-index-label {
   font-family: var(--font-mono);
-  font-size: 0.55rem;
+  font-size: 0.7rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   white-space: nowrap;
