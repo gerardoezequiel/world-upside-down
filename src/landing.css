@@ -352,6 +352,15 @@ a.link-underline:hover::after {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink-black);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.25em;
+}
+
+.masthead-flipped {
+  display: inline-block;
+  transform: rotate(180deg);
+  color: var(--ink-teal);
 }
 
 .hero-meta {
