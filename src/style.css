@@ -120,16 +120,16 @@ body {
 }
 
 #geocoder-input {
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 500;
-  font-size: 18px;
-  font-style: normal;
-  letter-spacing: -0.01em;
+  font-family: 'Instrument Serif', serif;
+  font-weight: 400;
+  font-size: 20px;
+  font-style: italic;
+  letter-spacing: 0.01em;
   color: var(--dark);
   line-height: 1;
   background: transparent;
   border: none;
-  border-bottom: 2px solid var(--ink);
+  border-bottom: 1.5px solid var(--ink);
   outline: none;
   padding: 0 0 3px;
   width: 280px;
@@ -138,7 +138,7 @@ body {
 
 #geocoder-input::placeholder {
   color: var(--light);
-  font-weight: 400;
+  font-style: italic;
 }
 
 .geocoder-results {
@@ -201,10 +201,29 @@ body {
   font-weight: 400;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--ink);
-  display: inline-block;
+  color: var(--mid);
+  display: inline-flex;
+  align-items: baseline;
   vertical-align: middle;
   margin-bottom: -2px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.subtitle-cursor {
+  display: inline-block;
+  width: 1px;
+  height: 0.9em;
+  background: var(--ink);
+  margin-left: 1px;
+  vertical-align: baseline;
+  animation: subtitleBlink 0.7s step-end infinite;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.subtitle.typing .subtitle-cursor {
+  opacity: 1;
 }
 
 /* ── COORDINATES ── */
@@ -358,8 +377,16 @@ body {
   gap: 0;
 }
 
+#screenprint-overlay.dimmed {
+  opacity: 0.35;
+}
+
 #screenprint-overlay.faded {
-  opacity: 0.3;
+  opacity: 0.15;
+}
+
+#screenprint-overlay.hidden {
+  opacity: 0;
 }
 
 .screenprint-line {
@@ -374,83 +401,15 @@ body {
   text-shadow: 5px 4px 0 #FF48B0;
 }
 
-/* ── MANIFESTO TYPEWRITER (map overlay) ── */
-#manifesto {
-  position: absolute;
-  bottom: 36px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 12;
-  font-family: 'Playfair Display', serif;
-  font-style: italic;
-  font-size: 18px;
-  line-height: 1.4;
-  color: var(--dark);
-  background: rgba(242, 237, 228, 0.88);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  padding: 12px 28px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.5s ease;
-  white-space: nowrap;
-  text-align: center;
-  max-width: 90vw;
-  letter-spacing: 0.01em;
-}
-
-#manifesto.visible {
-  opacity: 1;
-}
-
-#manifesto-text::after {
-  content: '|';
-  font-weight: 300;
-  font-style: normal;
-  color: var(--ink);
-  animation: cursorBlink 0.7s step-end infinite;
-  margin-left: 1px;
-}
 
 @keyframes cursorBlink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
 }
 
-/* ── Typewriter search hint (in map frame) ── */
-#search-typewriter {
-  position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 12;
-  font-family: 'Instrument Serif', serif;
-  font-style: italic;
-  font-size: 22px;
-  color: var(--dark);
-  background: rgba(250, 250, 246, 0.92);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  padding: 10px 24px;
-  border: 1px solid rgba(0, 0, 0, 0.10);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s ease;
-  white-space: nowrap;
-  text-align: center;
-}
-
-#search-typewriter.visible {
-  opacity: 1;
-}
-
-#typewriter-text::after {
-  content: '|';
-  font-weight: 300;
-  color: var(--ink);
-  animation: cursorBlink 0.7s step-end infinite;
-  margin-left: 1px;
+@keyframes subtitleBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 /* Title pulse to draw attention to geocoder */
@@ -472,18 +431,20 @@ body {
   z-index: 15;
   font-family: 'Instrument Serif', serif;
   font-style: italic;
-  font-size: 28px;
+  font-size: 24px;
   color: var(--dark);
-  background: rgba(250, 250, 246, 0.88);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  padding: 14px 32px;
-  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 12px 28px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.4s ease;
   text-align: center;
   white-space: nowrap;
+  letter-spacing: 0.01em;
+  line-height: 1.3;
 }
 
 #flip-toast.show {
@@ -675,21 +636,29 @@ body {
 .bot-links {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 8px;
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  color: var(--light);
+}
+
+.bot-sep {
+  opacity: 0.4;
+  user-select: none;
 }
 
 .bot-button {
   font-family: 'Space Mono', monospace;
   font-size: 8px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-weight: 400;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   text-decoration: none;
-  color: var(--paper);
-  background: var(--ink);
-  padding: 5px 12px;
-  border: 1.5px solid var(--ink);
-  transition: background 0.2s, color 0.2s;
+  color: var(--mid);
+  background: transparent;
+  padding: 0;
+  border: none;
+  transition: color 0.2s;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -697,7 +666,6 @@ body {
 }
 
 .bot-button:hover {
-  background: transparent;
   color: var(--ink);
 }
 
@@ -855,13 +823,6 @@ body {
 
   .subtitle { display: none; }
 
-  #manifesto {
-    font-size: 15px;
-    padding: 10px 20px;
-    max-width: 85vw;
-    white-space: normal;
-  }
-
   .screenprint-line {
     font-size: 22vw;
   }
@@ -904,17 +865,10 @@ body {
 
   /* Toast: smaller, allow wrapping */
   #flip-toast {
-    font-size: 20px;
+    font-size: 18px;
     padding: 10px 20px;
     white-space: normal;
     max-width: 80vw;
-  }
-
-  #search-typewriter {
-    font-size: 18px;
-    padding: 8px 18px;
-    max-width: 85vw;
-    white-space: normal;
   }
 
   /* Hide keyboard hint, show touch controls */
@@ -969,14 +923,9 @@ body {
   .bot-link svg { width: 10px; height: 10px; }
 
   #flip-toast {
-    font-size: 16px;
+    font-size: 15px;
     padding: 8px 16px;
     max-width: 85vw;
-  }
-
-  #search-typewriter {
-    font-size: 15px;
-    padding: 7px 14px;
   }
 
   .touch-controls {
@@ -1009,7 +958,7 @@ body {
   #bot-band { padding: 0 8px; gap: 6px; }
   .north-arrow svg { width: 20px; height: 20px; }
   .bot-link { font-size: 6px; }
-  #flip-toast { font-size: 14px; padding: 6px 12px; }
+  #flip-toast { font-size: 13px; padding: 6px 12px; }
   .flip-btn { width: 36px; height: 36px; }
   .flip-btn-arrow { font-size: 16px; }
 }
@@ -1018,5 +967,5 @@ body {
 @media print {
   body { background: white; }
   #page { width: 100vw; height: 100vh; box-shadow: none; margin: 0; }
-  #manifesto { display: none; }
+  #flip-toast { display: none; }
 }

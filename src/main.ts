@@ -434,6 +434,7 @@ function updateCoords(map: maplibregl.Map): void {
 
 /* ── Reverse geocode for city name ───────────────────────── */
 let geocodeTimeout: ReturnType<typeof setTimeout> | null = null;
+let currentCityName = ''; // stored for location-aware toasts
 
 function updateCityTitle(map: maplibregl.Map): void {
   if (geocodeTimeout) clearTimeout(geocodeTimeout);
@@ -446,6 +447,7 @@ function updateCityTitle(map: maplibregl.Map): void {
     // Only show place names at zoom >= 5
     if (z < 5) {
       titleEl.textContent = 'Upside Down';
+      currentCityName = '';
       return;
     }
 
@@ -459,6 +461,7 @@ function updateCityTitle(map: maplibregl.Map): void {
       const name = addr?.city || addr?.town || addr?.village || addr?.state || addr?.country || '';
       if (name) {
         titleEl.textContent = name;
+        currentCityName = name;
       }
     } catch {
       // Silently fail — keep last known name
@@ -525,6 +528,35 @@ const toastMessages: Record<Orientation, string[]> = {
   ],
 };
 
+/* Location-aware toast templates — {city} replaced at runtime */
+const locationToasts: Record<Orientation, string[]> = {
+  'normal': [
+    "{city} looks boringly correct now",
+    "The people of {city} feel safe again",
+    "{city}: back to the atlas version",
+    "Bet you feel at home in {city} now",
+    "{city} just went back to normal. How sad.",
+  ],
+  'upside-down': [
+    "Did you get lost in {city}?",
+    "{city} looks different from down here",
+    "Even locals in {city} wouldn't recognise this",
+    "Welcome to {city}... upside down",
+    "Trying to find your way around {city}?",
+    "Is that really {city}?",
+    "{city} has never looked so confused",
+    "Good luck giving directions in {city} now",
+    "Your Airbnb in {city} is... somewhere",
+  ],
+  'mirrored': [
+    "{city} through the looking glass",
+    "Try finding your hotel in {city} now",
+    "{city} but make it backwards",
+    "The street signs in {city} are lying to you",
+    "Good luck navigating {city} like this",
+  ],
+};
+
 /* ── Toggle map text labels (hide when mirrored to avoid backwards text) ── */
 function toggleMapLabels(map: maplibregl.Map, show: boolean): void {
   const style = map.getStyle();
@@ -536,12 +568,30 @@ function toggleMapLabels(map: maplibregl.Map, show: boolean): void {
   }
 }
 
+let lastToastTime = 0;
+const TOAST_COOLDOWN = 3000; // min ms between toasts
+
 function showFlipToast(text: string): void {
+  const now = Date.now();
+  if (now - lastToastTime < TOAST_COOLDOWN) return;
+  lastToastTime = now;
+
   const toast = document.getElementById('flip-toast');
   if (!toast) return;
   toast.textContent = text;
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2000);
+  setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+function getOrientationToast(target: Orientation): string {
+  // ~40% chance of location-aware toast if city name is known
+  if (currentCityName && Math.random() < 0.4) {
+    const locMsgs = locationToasts[target];
+    const template = locMsgs[Math.floor(Math.random() * locMsgs.length)];
+    return template.replace('{city}', currentCityName);
+  }
+  const msgs = toastMessages[target];
+  return msgs[Math.floor(Math.random() * msgs.length)];
 }
 
 function applyOrientation(map: maplibregl.Map, target: Orientation): void {
@@ -610,8 +660,14 @@ function applyOrientation(map: maplibregl.Map, target: Orientation): void {
   }
 
   // Toast
-  const msgs = toastMessages[target];
-  showFlipToast(msgs[Math.floor(Math.random() * msgs.length)]);
+  showFlipToast(getOrientationToast(target));
+
+  // Screenprint: briefly flash on orientation change, then dim again
+  const sp = document.getElementById('screenprint-overlay');
+  if (sp) {
+    sp.classList.remove('dimmed', 'faded', 'hidden');
+    setTimeout(() => sp.classList.add('dimmed'), 2500);
+  }
 
   // Hide hint
   document.getElementById('flip-hint')?.classList.remove('visible');
@@ -1087,132 +1143,76 @@ async function init() {
     // ── Riso misregistration (Approach B — style-level duplicate layers) ──
     applyRisoMisregistration(map);
 
-    // ── Manifesto typewriter (cycling quotes) ──
-    const manifestoEl = document.getElementById('manifesto');
-    const manifestoText = document.getElementById('manifesto-text');
+    // ── Animated subtitle (top band — cycling phrases) ──
+    const subtitleEl = document.getElementById('subtitle');
+    const subtitleText = document.getElementById('subtitle-text');
 
-    const manifestoQuotes = [
-      'North is not a fact. It is a decision.',
-      'Every map is a portrait of power disguised as geography.',
-      'There is no up in space.',
-      'The first photo of Earth had south on top.',
-      "You've been holding the map wrong.",
-      "Orientation comes from orient — it means east, not north.",
+    const subtitlePhrases = [
+      'an exercise in unlearning north',
+      'north is a decision, not a fact',
+      'every map is a portrait of power',
+      'the first photo of earth had south on top',
+      'orientation means east, not north',
+      'there is no up in space',
+      'you\'ve been holding the map wrong',
+      'cartography is never neutral',
+      'who decided north was up?',
+      'the earth doesn\'t care which way you hold it',
+      'south is just north with confidence',
+      'tap the title to search a place',
     ];
 
-    let manifestoCancelled = false;
+    let subtitleCancelled = false;
 
-    // Cancel manifesto on user interaction
-    const cancelManifesto = () => {
-      manifestoCancelled = true;
-      manifestoEl?.classList.remove('visible');
-    };
-    map.on('movestart', cancelManifesto);
-
-    async function typeManifesto(el: HTMLElement, text: string, speed = 45): Promise<void> {
+    async function typeSubtitle(el: HTMLElement, text: string, speed = 35): Promise<void> {
       el.textContent = '';
       for (let i = 0; i < text.length; i++) {
-        if (manifestoCancelled) return;
+        if (subtitleCancelled) return;
         el.textContent += text[i];
         await new Promise(r => setTimeout(r, speed));
       }
     }
 
-    async function deleteManifesto(el: HTMLElement, speed = 25): Promise<void> {
+    async function deleteSubtitle(el: HTMLElement, speed = 20): Promise<void> {
       const text = el.textContent || '';
       for (let i = text.length; i > 0; i--) {
-        if (manifestoCancelled) return;
+        if (subtitleCancelled) return;
         el.textContent = text.substring(0, i - 1);
         await new Promise(r => setTimeout(r, speed));
       }
     }
 
     (async () => {
-      await new Promise(r => setTimeout(r, 2000));
-      if (manifestoCancelled || !manifestoEl || !manifestoText) return;
+      if (!subtitleEl || !subtitleText) return;
 
-      let quoteIdx = 0;
-      while (!manifestoCancelled) {
-        manifestoEl.classList.add('visible');
-        await typeManifesto(manifestoText, manifestoQuotes[quoteIdx]);
-        await new Promise(r => setTimeout(r, 3500));
-        if (manifestoCancelled) return;
-        await deleteManifesto(manifestoText);
-        await new Promise(r => setTimeout(r, 600));
-        quoteIdx = (quoteIdx + 1) % manifestoQuotes.length;
+      // Show initial text for a while before starting the cycle
+      await new Promise(r => setTimeout(r, 8000));
+
+      let phraseIdx = 1; // skip first phrase (already showing)
+      while (!subtitleCancelled) {
+        subtitleEl.classList.add('typing');
+        await deleteSubtitle(subtitleText);
+        await new Promise(r => setTimeout(r, 400));
+        if (subtitleCancelled) return;
+        await typeSubtitle(subtitleText, subtitlePhrases[phraseIdx]);
+        subtitleEl.classList.remove('typing');
+        await new Promise(r => setTimeout(r, 6000));
+        if (subtitleCancelled) return;
+        phraseIdx = (phraseIdx + 1) % subtitlePhrases.length;
       }
     })();
 
-    // ── Typewriter search hint (after 12s) ──
-    const twEl = document.getElementById('search-typewriter');
-    const twText = document.getElementById('typewriter-text');
-    let searchHintCancelled = false;
+    // ── Screenprint overlay — dim on first interaction ──
+    const spOverlayEl = document.getElementById('screenprint-overlay');
+    let spDimmed = false;
 
-    // Cancel if user already found the geocoder
-    const cancelHint = () => {
-      searchHintCancelled = true;
-      twEl?.classList.remove('visible');
-    };
-    document.getElementById('city-title')?.addEventListener('click', cancelHint, { once: true });
-
-    async function typewrite(el: HTMLElement, text: string, speed = 55): Promise<void> {
-      el.textContent = '';
-      for (let i = 0; i < text.length; i++) {
-        if (searchHintCancelled) return;
-        el.textContent += text[i];
-        await new Promise(r => setTimeout(r, speed));
-      }
+    function dimScreenprint() {
+      if (spDimmed || !spOverlayEl) return;
+      spDimmed = true;
+      spOverlayEl.classList.add('dimmed');
     }
-
-    setTimeout(async () => {
-      if (searchHintCancelled || !twEl || !twText) return;
-
-      const sequences = [
-        [
-          { text: 'Did you get lost?', pause: 1800 },
-          { text: "Good. That's the whole point.", pause: 2000 },
-          { text: 'Tap the title to search.', pause: 3000 },
-        ],
-        [
-          { text: 'Nothing looks familiar?', pause: 1800 },
-          { text: 'Congratulations, you broke your brain.', pause: 2200 },
-          { text: 'Tap the title to find yourself.', pause: 3000 },
-        ],
-        [
-          { text: "Where's your country?", pause: 1800 },
-          { text: 'Exactly.', pause: 1600 },
-          { text: 'Tap the title to search.', pause: 3000 },
-        ],
-        [
-          { text: 'Feeling disoriented?', pause: 1800 },
-          { text: 'Fun fact: "orient" means east, not north.', pause: 2400 },
-          { text: 'Tap the title to search.', pause: 3000 },
-        ],
-        [
-          { text: 'Lost already?', pause: 1600 },
-          { text: "Your GPS is having an existential crisis too.", pause: 2200 },
-          { text: 'Tap the title to search.', pause: 3000 },
-        ],
-      ];
-      const messages = sequences[Math.floor(Math.random() * sequences.length)];
-
-      for (const msg of messages) {
-        if (searchHintCancelled) return;
-        twEl.classList.add('visible');
-        await typewrite(twText, msg.text);
-        await new Promise(r => setTimeout(r, msg.pause));
-        if (searchHintCancelled) return;
-        twEl.classList.remove('visible');
-        await new Promise(r => setTimeout(r, 400));
-      }
-
-      // Brief pulse on title to draw attention
-      const titleEl = document.getElementById('city-title');
-      if (titleEl && !searchHintCancelled) {
-        titleEl.classList.add('hint-pulse');
-        setTimeout(() => titleEl.classList.remove('hint-pulse'), 2000);
-      }
-    }, 12000);
+    map.on('movestart', dimScreenprint);
+    map.on('zoomstart', dimScreenprint);
 
     // ── Periodic ambient toasts ──
     const ambientMessages = [
@@ -1237,17 +1237,32 @@ async function init() {
       "North was a marketing decision",
       "Copernicus would have loved this",
     ];
+
+    const ambientLocationMessages = [
+      "The residents of {city} have questions",
+      "{city}: now 100% more disorienting",
+      "If you're in {city}, look out the window",
+      "Somewhere in {city}, a compass is crying",
+      "{city} didn't sign up for this",
+    ];
+
     let ambientIdx = Math.floor(Math.random() * ambientMessages.length);
 
     function showAmbientToast() {
-      showFlipToast(ambientMessages[ambientIdx]);
-      ambientIdx = (ambientIdx + 1) % ambientMessages.length;
+      // ~30% chance of location-aware ambient toast
+      if (currentCityName && Math.random() < 0.3) {
+        const template = ambientLocationMessages[Math.floor(Math.random() * ambientLocationMessages.length)];
+        showFlipToast(template.replace('{city}', currentCityName));
+      } else {
+        showFlipToast(ambientMessages[ambientIdx]);
+        ambientIdx = (ambientIdx + 1) % ambientMessages.length;
+      }
       // Next toast in 25-40s
       setTimeout(showAmbientToast, 25000 + Math.random() * 15000);
     }
 
-    // First ambient toast after 12s
-    setTimeout(showAmbientToast, 12000);
+    // First ambient toast after 15s
+    setTimeout(showAmbientToast, 15000);
   });
 
   // ── Dymaxion projection crossfade on zoom out ──
@@ -1270,13 +1285,15 @@ async function init() {
   });
 
   // ── Screenprint fade on zoom ──
-  const spOverlay = document.getElementById('screenprint-overlay');
   map.on('zoom', () => {
     updateScaleBar(map);
     updateCoords(map);
-    // Fade screenprint at high zoom (detailed work)
-    if (spOverlay) {
-      spOverlay.classList.toggle('faded', map.getZoom() > 14);
+    // Progressively fade screenprint at higher zooms
+    const sp = document.getElementById('screenprint-overlay');
+    if (sp) {
+      const z = map.getZoom();
+      sp.classList.toggle('faded', z > 14);
+      sp.classList.toggle('hidden', z > 16);
     }
   });
 
