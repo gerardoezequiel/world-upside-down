@@ -14,7 +14,7 @@
   <!-- ── TOP BAND ── -->
   <div id="top-band">
     <div class="title-group">
-      <h1 id="city-title">Upside Down</h1>
+      <h1 id="city-title">Upside Down<span class="search-hint" aria-hidden="true">&#x2315;</span></h1>
       <div id="geocoder" class="geocoder">
         <input id="geocoder-input" type="text" placeholder="Search a place..." autocomplete="off" spellcheck="false" />
         <div id="geocoder-results" class="geocoder-results"></div>
@@ -25,11 +25,11 @@
       <p>"North is not a fact. It is a decision. Every map is a portrait of power disguised as geography."</p>
     </div>
     <div id="coords">
-      <span id="coords-lat">0.00° N</span>
+      <span id="coords-lat">51.51° N</span>
       <span class="coord-sep">/</span>
-      <span id="coords-lon">0.00° E</span>
+      <span id="coords-lon">0.13° W</span>
       <span class="coord-sep">/</span>
-      <span id="coords-zoom">z2.5</span>
+      <span id="coords-zoom">z11.0</span>
     </div>
   </div>
 
@@ -52,11 +52,14 @@
       <span>mirror</span>
     </div>
 
-    <!-- ── Touch controls (mobile) ── -->
+    <!-- ── Touch controls (mobile) — two flip buttons ── -->
     <div class="touch-controls" id="touch-controls">
-      <button class="touch-btn" data-orient="normal" aria-label="Normal orientation">&#8593;</button>
-      <button class="touch-btn active" data-orient="upside-down" aria-label="Upside down">&#8595;</button>
-      <button class="touch-btn" data-orient="mirrored" aria-label="Mirror">&#8596;</button>
+      <button class="flip-btn" data-orient="upside-down" aria-label="Upside down">
+        <span class="flip-btn-arrow">&#8595;</span>
+      </button>
+      <button class="flip-btn" data-orient="normal" aria-label="Normal orientation">
+        <span class="flip-btn-arrow">&#8593;</span>
+      </button>
     </div>
   </div>
 

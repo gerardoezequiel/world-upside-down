@@ -595,22 +595,16 @@ function applyOrientation(map: maplibregl.Map, target: Orientation): void {
 }
 
 function setupFlip(map: maplibregl.Map): void {
-  // Show hints after a delay
+  // Show hints after a short delay (persistent on desktop until first key press)
+  const flipHint = document.getElementById('flip-hint');
   setTimeout(() => {
-    document.getElementById('flip-hint')?.classList.add('visible');
-  }, 4000);
+    flipHint?.classList.add('visible');
+  }, 2000);
 
-  // Show mobile touch controls after a longer delay (don't spoil the surprise)
+  // Show mobile flip buttons after a short delay
   setTimeout(() => {
     document.getElementById('touch-controls')?.classList.add('visible');
-  }, 20000);
-
-  // Hide hint on first map interaction
-  const hideHint = () => {
-    document.getElementById('flip-hint')?.classList.remove('visible');
-    map.off('movestart', hideHint);
-  };
-  map.on('movestart', hideHint);
+  }, 2000);
 
   document.addEventListener('keydown', (e) => {
     if ((e.target as HTMLElement).tagName === 'INPUT') return;
@@ -632,60 +626,31 @@ function setupFlip(map: maplibregl.Map): void {
         return;
     }
     e.preventDefault();
+    // Hide hint after first arrow key use
+    flipHint?.classList.remove('visible');
   });
 
-  // ── Touch controls (mobile buttons) ──
-  function updateTouchButtons() {
-    document.querySelectorAll('.touch-btn').forEach(btn => {
-      const orient = (btn as HTMLElement).dataset.orient;
-      btn.classList.toggle('active', orient === orientation);
+  // ── Mobile flip buttons ──
+  function updateFlipButtons() {
+    document.querySelectorAll('.flip-btn').forEach(btn => {
+      const orient = (btn as HTMLElement).dataset.orient as Orientation;
+      // Flip the arrow icon when its orientation is active
+      btn.classList.toggle('flipped', orient === orientation);
     });
   }
 
-  document.querySelectorAll('.touch-btn').forEach(btn => {
+  document.querySelectorAll('.flip-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const orient = (btn as HTMLElement).dataset.orient as Orientation;
       if (orient) {
         applyOrientation(map, orient);
-        updateTouchButtons();
+        updateFlipButtons();
       }
     });
   });
 
-  // ── Swipe gestures (mobile) ──
-  let touchStartX = 0;
-  let touchStartY = 0;
-
-  const mapFrame = document.getElementById('map-frame');
-  if (mapFrame) {
-    mapFrame.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 2) {
-        touchStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-        touchStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-      }
-    }, { passive: true });
-
-    mapFrame.addEventListener('touchend', (e) => {
-      if (e.changedTouches.length === 2 || (touchStartX !== 0 && e.changedTouches.length > 0)) {
-        const endX = e.changedTouches[0].clientX;
-        const endY = e.changedTouches[0].clientY;
-        const dx = endX - touchStartX;
-        const dy = endY - touchStartY;
-
-        // Only trigger on significant two-finger swipes
-        if (Math.abs(dy) > 60 && Math.abs(dy) > Math.abs(dx)) {
-          if (dy < 0) applyOrientation(map, 'upside-down');
-          else applyOrientation(map, 'normal');
-          updateTouchButtons();
-        } else if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
-          applyOrientation(map, 'mirrored');
-          updateTouchButtons();
-        }
-        touchStartX = 0;
-        touchStartY = 0;
-      }
-    }, { passive: true });
-  }
+  // Set initial state
+  updateFlipButtons();
 }
 
 /* ── Geocoder search ─────────────────────────────────────── */
@@ -975,8 +940,8 @@ async function init() {
   const map = new maplibregl.Map({
     container: "map",
     style,
-    center: [0, 20],          // World view
-    zoom: 2.5,
+    center: [-0.128, 51.507], // London
+    zoom: 11,
     bearing: 180,              // THE FLIP — south is up
     pitch: 0,
     minZoom: 1,
