@@ -707,7 +707,7 @@ again.">Look<br>again.</h2>
 
   /* ══════════════════════════════════════
      BAYER DITHERING BACKGROUND (Three.js)
-     Ported from USS — riso teal diamond dots
+     Riso blue halftone circles — slow organic noise
      ══════════════════════════════════════ */
 
   var bayerVertexShader = 'void main(){gl_Position=vec4(position,1.0);}';
@@ -758,9 +758,11 @@ again.">Look<br>again.</h2>
     '  return sum*0.5+0.5;',
     '}',
     '',
-    'float maskDiamond(vec2 p,float cov){',
-    '  float r=sqrt(cov)*0.5;',
-    '  return cov*step(abs(p.x-0.5)+abs(p.y-0.5),r);',
+    'float maskCircle(vec2 p,float cov){',
+    '  float r=sqrt(cov)*0.3;',
+    '  float d=length(p-0.5)-r;',
+    '  float aa=0.5*fwidth(d);',
+    '  return cov*(1.0-smoothstep(-aa,aa,d*2.0));',
     '}',
     '',
     'void main(){',
@@ -774,19 +776,17 @@ again.">Look<br>again.</h2>
     '  vec2 cellCoord=cellId*cellPixelSize;',
     '  vec2 uv=cellCoord/uResolution*vec2(aspectRatio,1.0);',
     '',
-    '  float t=uTime*0.15;',
-    '  vec2 swirl1=vec2(sin(t*0.5+uv.y*4.0)*0.2,cos(t*0.6+uv.x*4.0)*0.2);',
-    '  vec2 swirl2=vec2(cos(t*0.7+uv.y*2.5)*0.25,sin(t*0.8+uv.x*2.5)*0.25);',
-    '  vec2 swirl3=vec2(sin(t*0.9-uv.y*3.0)*0.15,cos(t*1.0-uv.x*3.0)*0.15);',
-    '  float flock1=fbm(uv*0.5+swirl1,t*0.8);flock1=smoothstep(0.25,0.75,flock1);',
-    '  float flock2=fbm(uv*0.9+swirl2,t*1.1);flock2=smoothstep(0.3,0.7,flock2);',
-    '  float flock3=fbm(uv*1.4+swirl3,t*1.4);flock3=smoothstep(0.35,0.65,flock3);',
-    '  vec2 swirl4=vec2(sin(t*1.2)*0.1,cos(t*1.3)*0.1);',
-    '  float flock4=fbm(uv*2.0+swirl4,t*1.8);flock4=smoothstep(0.4,0.6,flock4);',
-    '  float feed=flock1*0.35+flock2*0.3+flock3*0.2+flock4*0.15;',
-    '  float breath=sin(uTime*0.4)*0.08;',
+    '  float t=uTime*0.06;',
+    '  vec2 swirl1=vec2(sin(t*0.3+uv.y*3.0)*0.12,cos(t*0.35+uv.x*3.0)*0.12);',
+    '  vec2 swirl2=vec2(cos(t*0.4+uv.y*2.0)*0.15,sin(t*0.45+uv.x*2.0)*0.15);',
+    '  vec2 swirl3=vec2(sin(t*0.5-uv.y*2.5)*0.1,cos(t*0.55-uv.x*2.5)*0.1);',
+    '  float flock1=fbm(uv*0.4+swirl1,t*0.5);flock1=smoothstep(0.2,0.8,flock1);',
+    '  float flock2=fbm(uv*0.7+swirl2,t*0.7);flock2=smoothstep(0.25,0.75,flock2);',
+    '  float flock3=fbm(uv*1.1+swirl3,t*0.9);flock3=smoothstep(0.3,0.7,flock3);',
+    '  float feed=flock1*0.4+flock2*0.35+flock3*0.25;',
+    '  float breath=sin(uTime*0.15)*0.04;',
     '  feed+=breath;',
-    '  feed=feed*0.6-0.45;',
+    '  feed=feed*0.45-0.52;',
     '',
     '  for(int i=0;i<MAX_CLICKS;i++){',
     '    vec2 pos=uClickPos[i];',
@@ -813,8 +813,8 @@ again.">Look<br>again.</h2>
     '  float bayer=Bayer8(fragCoord/pixelSize)-0.5;',
     '  float bw=step(0.5,feed+bayer);',
     '  float coverage=bw;',
-    '  float M=maskDiamond(pixelUV,coverage);',
-    '  gl_FragColor=vec4(uColor,M);',
+    '  float M=maskCircle(pixelUV,coverage);',
+    '  gl_FragColor=vec4(uColor,M*0.32);',
     '}'
   ].join('\n');
 
@@ -844,7 +844,7 @@ again.">Look<br>again.</h2>
       var uniforms = {
         uResolution:  { value: new THREE.Vector2() },
         uTime:        { value: 0 },
-        uColor:       { value: new THREE.Color('#00838A') },
+        uColor:       { value: new THREE.Color('#0078BF') },
         uPixelSize:   { value: 4 },
         uMouse:       { value: new THREE.Vector2() },
         uMouseActive: { value: 0.0 },
