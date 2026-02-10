@@ -36,64 +36,64 @@ interface ProjCardDef {
 const PROJ_DEFS: ProjCardDef[] = [
   {
     id: 'mercator',
-    fill: 'rgba(0,131,138, 0.07)',
-    outline: 'rgba(0,131,138, 0.18)',
+    fill: 'rgba(0,131,138, 0.13)',
+    outline: 'rgba(0,131,138, 0.32)',
     dither: '#C46B50',
     factory: () => geoMercator().rotate([0, 0, 180]),
   },
   {
     id: 'gall-peters',
-    fill: 'rgba(0,120,191, 0.07)',
-    outline: 'rgba(0,120,191, 0.18)',
+    fill: 'rgba(0,120,191, 0.13)',
+    outline: 'rgba(0,120,191, 0.32)',
     dither: '#C4883A',
     factory: () => (geoCylindricalEqualArea().parallel(45) as unknown as GeoProjection).rotate([0, 0, 180]),
   },
   {
     id: 'equal-earth',
-    fill: 'rgba(0,131,138, 0.07)',
-    outline: 'rgba(0,131,138, 0.18)',
+    fill: 'rgba(0,131,138, 0.13)',
+    outline: 'rgba(0,131,138, 0.32)',
     dither: '#C46B50',
     factory: () => geoEqualEarth().rotate([0, 0, 180]),
   },
   {
     id: 'robinson',
-    fill: 'rgba(90,75,60, 0.06)',
-    outline: 'rgba(90,75,60, 0.15)',
+    fill: 'rgba(90,75,60, 0.12)',
+    outline: 'rgba(90,75,60, 0.28)',
     dither: '#5A7A8A',
     factory: () => geoRobinson().rotate([0, 0, 180]) as unknown as GeoProjection,
   },
   {
     id: 'mollweide',
-    fill: 'rgba(0,120,191, 0.07)',
-    outline: 'rgba(0,120,191, 0.18)',
+    fill: 'rgba(0,120,191, 0.13)',
+    outline: 'rgba(0,120,191, 0.32)',
     dither: '#C4883A',
     factory: () => geoMollweide().rotate([0, 0, 180]),
   },
   {
     id: 'dymaxion',
-    fill: 'rgba(0,131,138, 0.07)',
-    outline: 'rgba(0,131,138, 0.18)',
+    fill: 'rgba(0,131,138, 0.13)',
+    outline: 'rgba(0,131,138, 0.32)',
     dither: '#C46B50',
     factory: () => geoAirocean() as unknown as GeoProjection,
   },
   {
     id: 'waterman',
-    fill: 'rgba(0,120,191, 0.07)',
-    outline: 'rgba(0,120,191, 0.18)',
+    fill: 'rgba(0,120,191, 0.13)',
+    outline: 'rgba(0,120,191, 0.32)',
     dither: '#C4883A',
     factory: () => geoPolyhedralWaterman().rotate([0, 0, 180]) as unknown as GeoProjection,
   },
   {
     id: 'homolosine',
-    fill: 'rgba(90,75,60, 0.06)',
-    outline: 'rgba(90,75,60, 0.15)',
+    fill: 'rgba(90,75,60, 0.12)',
+    outline: 'rgba(90,75,60, 0.28)',
     dither: '#5A7A8A',
     factory: () => geoInterruptedHomolosine().rotate([0, 0, 180]) as unknown as GeoProjection,
   },
   {
     id: 'azimuthal',
-    fill: 'rgba(0,131,138, 0.07)',
-    outline: 'rgba(0,131,138, 0.18)',
+    fill: 'rgba(0,131,138, 0.13)',
+    outline: 'rgba(0,131,138, 0.32)',
     dither: '#C46B50',
     factory: () => geoAzimuthalEquidistant().rotate([0, 0, 180]),
   },
@@ -174,7 +174,7 @@ function renderCard(
   ctx.beginPath();
   path(land);
   ctx.strokeStyle = def.outline;
-  ctx.lineWidth = 0.7 * dpr;
+  ctx.lineWidth = 1.0 * dpr;
   ctx.stroke();
 
   /* ── Layer 2: Bayer dither from grayscale source ── */
