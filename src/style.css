@@ -371,10 +371,9 @@ body {
   align-items: center;
   justify-content: center;
   pointer-events: none;
-  mix-blend-mode: multiply;
-  opacity: 0.95;
+  opacity: 1;
   transition: opacity 1.2s ease;
-  gap: 0;
+  gap: 4px;
 }
 
 #screenprint-overlay.hidden {
@@ -383,14 +382,20 @@ body {
 
 .screenprint-line {
   font-family: 'Anton', sans-serif;
-  font-size: 21vw;
+  font-size: 14vw;
   font-weight: 400;
   text-transform: uppercase;
-  line-height: 0.84;
-  letter-spacing: -0.04em;
-  color: #F7FF00;
-  /* Single misregistration: pink pass offset behind yellow — tight, like a real screenprint */
-  text-shadow: 5px 4px 0 #FF48B0;
+  line-height: 0.88;
+  letter-spacing: 0.06em;
+  color: rgba(0, 0, 0, 0.12);
+  text-shadow:
+    /* Pink misregistration — offset pass */
+    6px 5px 0 rgba(255, 72, 176, 0.25),
+    /* Deep shadow — letterpress depth */
+    2px 2px 0 rgba(0, 0, 0, 0.08),
+    10px 8px 0 rgba(0, 0, 0, 0.04),
+    /* Subtle yellow ink ghost */
+    -3px -2px 0 rgba(247, 255, 0, 0.10);
 }
 
 
@@ -816,7 +821,7 @@ body {
   .subtitle { display: none; }
 
   .screenprint-line {
-    font-size: 22vw;
+    font-size: 16vw;
   }
 
   #city-title { font-size: 18px; }
