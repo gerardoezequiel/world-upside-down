@@ -8,11 +8,11 @@ import { RISO_INKS, PAPER, generateMisregistration, getSessionSeed } from "./ris
 // Drum 3: Blue (#0078BF) — buildings, urban fabric
 // Drum 4: Fluorescent Pink (#FF48B0) — parks, green space
 // Drum 5: Black (#000000) — text, road casings, boundaries
-// Paper: light stock (#FAFAF8)
+// Paper: white (#FFFFFF)
 const PALETTE = {
     // Paper stock
-    bg: PAPER, // light paper
-    earth: "#F0EFED", // light paper — land base
+    bg: PAPER, // white paper
+    earth: "#F5F5F5", // white paper — land base
     // Drum 2: TEAL — water
     water: RISO_INKS.teal.hex, // #00838A
     waterLine: "#006A70", // darker teal for rivers
