@@ -7,50 +7,52 @@ import { initDymaxion } from "./dymaxion";
 const protocol = new Protocol();
 maplibregl.addProtocol("pmtiles", protocol.tile);
 
-/* ── Color palette — "Deep Cartography" ───────────────────── */
-// Colorblind-safe: avoids red/green distinction. Uses blue-orange
-// contrast (safe for protanopia, deuteranopia, tritanopia).
-// At low zoom, the ocean-to-land transition matches the Dymaxion.
+/* ── Risograph palette — 3 inks on cream stock ────────────── */
+// Inspired by riso printing: limited inks, high contrast, tactile.
+// Ink 1: Navy (#1A1A2E) — roads, labels, structure
+// Ink 2: Riso Blue (#5B9EAD) — buildings, water, institutions
+// Ink 3: Coral (#E87461) — parks, nature, accents
+// Paper: Cream (#F2EDE4) — land, background warmth
 const PALETTE = {
-  // Base tones (ocean & land)
-  bg:        "#2B3A4E",   // deep slate-blue ocean
-  earth:     "#E8E4DA",   // warm parchment land
-  // Urban fabric
-  buildings: "#7BA7BC",   // muted teal — clear against parchment
-  urban:     "#D4DDE4",   // pale blue-grey urban tint
-  // Parks & nature → warm amber/ochre (colorblind-safe vs blue)
-  park:      "#D4944C",   // warm amber — distinct from blue
-  parkAlt:   "#DBA86A",   // lighter amber for secondary green
-  // Water → deep blue (continuous with ocean)
-  water:     "#2B3A4E",   // same as bg for seamless ocean
-  waterLine: "#3D5166",   // slightly lighter for rivers
-  // Infrastructure
-  road:      "#1C2030",   // very dark navy
-  roadMajor: "#2E3448",   // dark blue-grey
-  roadMinor: "#8890A0",   // cool mid-grey
-  roadCas:   "#D4D0C8",   // warm light grey casing
-  rail:      "#1C2030",   // rail lines
-  // Boundaries
-  boundary:  "#B08070",   // warm terracotta for borders
-  // Text
-  label:     "#1C2030",   // dark navy labels
-  labelHalo: "#E8E4DA",   // parchment halo
-  // Landcover (low zoom — must match Dymaxion transition)
-  grass:     "#C8CEB4",   // sage-grey (safe vs blue)
-  farmland:  "#DDD8C6",   // warm wheat
-  scrub:     "#C4C8B4",   // grey-sage
-  barren:    "#D8D2C0",   // sandy grey
-  glacier:   "#EDF0F4",   // blue-white
-  // Special
-  hospital:  "#E0C8B8",   // warm sand
-  school:    "#CCC8D8",   // light lavender
-  industrial:"#C8CCD4",   // cool grey
-  beach:     "#E4DCC4",   // sandy
-  zoo:       "#D8B888",   // warm gold
-  aerodrome: "#C8C8C8",   // neutral grey
-  pier:      "#CCC8C0",   // warm grey
-  pedestrian:"#DCD8D0",   // warm off-white
-  runway:    "#A8A8A4",   // medium grey
+  // Paper stock & ocean
+  bg:        "#C8C2B8",   // warm grey ocean — like unprinted paper edge
+  earth:     "#F2EDE4",   // cream paper stock — the "land"
+  // Ink 2: Riso Blue — urban, water, civic
+  buildings: "#5B9EAD",   // riso blue — the signature ink
+  urban:     "#D8E4E8",   // blue tint at 15% — urban areas
+  // Ink 3: Coral — nature, parks, highlights
+  park:      "#E87461",   // riso coral/fluorescent pink
+  parkAlt:   "#F09E8C",   // coral at 60% — secondary nature
+  // Water — desaturated blue-grey (riso overprint feel)
+  water:     "#8EA8AC",   // blue-grey — like blue ink on grey paper
+  waterLine: "#7A9498",   // darker blue-grey for rivers
+  // Ink 1: Navy — infrastructure, structure
+  road:      "#1A1A2E",   // full navy ink
+  roadMajor: "#2A2A3C",   // navy at 90%
+  roadMinor: "#7A7A8C",   // navy at 40%
+  roadCas:   "#E4E0D8",   // cream paper showing through
+  rail:      "#1A1A2E",   // full navy
+  // Boundaries — coral at reduced opacity
+  boundary:  "#D4948C",   // coral overprint — muted
+  // Text — navy ink
+  label:     "#1A1A2E",   // full navy
+  labelHalo: "#F2EDE4",   // cream paper
+  // Landcover — very muted tints (like diluted ink washes)
+  grass:     "#E4E8D8",   // faintest sage wash
+  farmland:  "#ECE8DC",   // cream with warm tint
+  scrub:     "#DDE0D0",   // grey-sage wash
+  barren:    "#E8E2D4",   // sandy cream
+  glacier:   "#F4F4F0",   // near-white
+  // Special — single ink tints
+  hospital:  "#F0D4CC",   // coral at 20%
+  school:    "#D0D8E0",   // blue at 15%
+  industrial:"#D8D8DC",   // navy at 10%
+  beach:     "#F0E8D4",   // warm cream
+  zoo:       "#F0C8B4",   // coral at 30%
+  aerodrome: "#D8D4D0",   // neutral
+  pier:      "#DCD8D0",   // warm paper
+  pedestrian:"#EAE6DE",   // cream
+  runway:    "#B8B4AC",   // grey
 };
 
 /* ── Color replacement map ────────────────────────────────── */
@@ -792,7 +794,7 @@ function setupGeocoder(map: maplibregl.Map): void {
 
 /* ── Dynamic Graticule ────────────────────────────────────── */
 function addGraticule(map: maplibregl.Map): void {
-  const GRAT_COLOR = 'rgba(123, 167, 188, 0.45)';
+  const GRAT_COLOR = 'rgba(91, 158, 173, 0.45)';
 
   function getInterval(zoom: number): number {
     if (zoom >= 10) return 1;
