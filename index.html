@@ -23,8 +23,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/src/landing.css" />
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 </head>
 <body>
+
+<div class="dither-bg" id="ditherBg" aria-hidden="true"></div>
 
 <!-- ── Ink registration strip — 5 drums ── -->
 <div class="ink-strip" aria-hidden="true">
@@ -49,8 +52,6 @@
      HERO — Typography + Stochastic halftone
      ========================================== -->
 <section class="hero" id="hero">
-  <canvas class="hero-halftone" id="hero-halftone" aria-hidden="true"></canvas>
-
   <div class="page-grid hero-grid">
     <div class="hero-masthead">
       <span class="masthead-name">Upside <span class="masthead-flipped">Down</span></span>
@@ -705,118 +706,244 @@ again.">Look<br>again.</h2>
   'use strict';
 
   /* ══════════════════════════════════════
-     REACTION-DIFFUSION HALFTONE — Hero background
-     Blue metaball pattern on hex grid, dense at bottom
+     BAYER DITHERING BACKGROUND (Three.js)
+     Ported from USS — riso teal diamond dots
      ══════════════════════════════════════ */
 
-  function generateHeroHalftone() {
-    var canvas = document.getElementById('hero-halftone');
-    if (!canvas) return;
-    var ctx = canvas.getContext('2d');
+  var bayerVertexShader = 'void main(){gl_Position=vec4(position,1.0);}';
 
-    // Size canvas to hero
-    var hero = canvas.parentElement;
-    var dpr = Math.min(window.devicePixelRatio || 1, 2);
-    var w = hero.offsetWidth;
-    var h = hero.offsetHeight;
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    canvas.style.width = w + 'px';
-    canvas.style.height = h + 'px';
-    ctx.scale(dpr, dpr);
+  var bayerFragmentShader = [
+    'precision highp float;',
+    'uniform vec3 uColor;',
+    'uniform vec2 uResolution;',
+    'uniform float uTime;',
+    'uniform float uPixelSize;',
+    'uniform vec2 uMouse;',
+    'uniform float uMouseActive;',
+    '#define MAX_CLICKS 10',
+    'uniform vec2 uClickPos[MAX_CLICKS];',
+    'uniform float uClickTimes[MAX_CLICKS];',
+    '',
+    'float Bayer2(vec2 a){a=floor(a);return fract(a.x/2.0+a.y*a.y*0.75);}',
+    '#define Bayer4(a)(Bayer2(0.5*(a))*0.25+Bayer2(a))',
+    '#define Bayer8(a)(Bayer4(0.5*(a))*0.25+Bayer2(a))',
+    '',
+    'float hash11(float n){return fract(sin(n)*43758.5453);}',
+    '',
+    'float vnoise(vec3 p){',
+    '  vec3 ip=floor(p);vec3 fp=fract(p);',
+    '  float n000=hash11(dot(ip+vec3(0,0,0),vec3(1,57,113)));',
+    '  float n100=hash11(dot(ip+vec3(1,0,0),vec3(1,57,113)));',
+    '  float n010=hash11(dot(ip+vec3(0,1,0),vec3(1,57,113)));',
+    '  float n110=hash11(dot(ip+vec3(1,1,0),vec3(1,57,113)));',
+    '  float n001=hash11(dot(ip+vec3(0,0,1),vec3(1,57,113)));',
+    '  float n101=hash11(dot(ip+vec3(1,0,1),vec3(1,57,113)));',
+    '  float n011=hash11(dot(ip+vec3(0,1,1),vec3(1,57,113)));',
+    '  float n111=hash11(dot(ip+vec3(1,1,1),vec3(1,57,113)));',
+    '  vec3 w=fp*fp*fp*(fp*(fp*6.0-15.0)+10.0);',
+    '  float x00=mix(n000,n100,w.x);float x10=mix(n010,n110,w.x);',
+    '  float x01=mix(n001,n101,w.x);float x11=mix(n011,n111,w.x);',
+    '  float y0=mix(x00,x10,w.y);float y1=mix(x01,x11,w.y);',
+    '  return mix(y0,y1,w.z)*2.0-1.0;',
+    '}',
+    '',
+    '#define FBM_OCTAVES 5',
+    '#define FBM_LACUNARITY 1.25',
+    '#define FBM_GAIN 1.0',
+    '#define FBM_SCALE 4.0',
+    '',
+    'float fbm(vec2 uv,float t){',
+    '  vec3 p=vec3(uv*FBM_SCALE,t);float amp=1.0;float freq=1.0;float sum=1.0;',
+    '  for(int i=0;i<FBM_OCTAVES;i++){sum+=amp*vnoise(p*freq);freq*=FBM_LACUNARITY;amp*=FBM_GAIN;}',
+    '  return sum*0.5+0.5;',
+    '}',
+    '',
+    'float maskDiamond(vec2 p,float cov){',
+    '  float r=sqrt(cov)*0.5;',
+    '  return cov*step(abs(p.x-0.5)+abs(p.y-0.5),r);',
+    '}',
+    '',
+    'void main(){',
+    '  float pixelSize=uPixelSize;',
+    '  vec2 fragCoord=gl_FragCoord.xy-uResolution*0.5;',
+    '  float aspectRatio=uResolution.x/uResolution.y;',
+    '  vec2 pixelId=floor(fragCoord/pixelSize);',
+    '  vec2 pixelUV=fract(fragCoord/pixelSize);',
+    '  float cellPixelSize=8.0*pixelSize;',
+    '  vec2 cellId=floor(fragCoord/cellPixelSize);',
+    '  vec2 cellCoord=cellId*cellPixelSize;',
+    '  vec2 uv=cellCoord/uResolution*vec2(aspectRatio,1.0);',
+    '',
+    '  float t=uTime*0.15;',
+    '  vec2 swirl1=vec2(sin(t*0.5+uv.y*4.0)*0.2,cos(t*0.6+uv.x*4.0)*0.2);',
+    '  vec2 swirl2=vec2(cos(t*0.7+uv.y*2.5)*0.25,sin(t*0.8+uv.x*2.5)*0.25);',
+    '  vec2 swirl3=vec2(sin(t*0.9-uv.y*3.0)*0.15,cos(t*1.0-uv.x*3.0)*0.15);',
+    '  float flock1=fbm(uv*0.5+swirl1,t*0.8);flock1=smoothstep(0.25,0.75,flock1);',
+    '  float flock2=fbm(uv*0.9+swirl2,t*1.1);flock2=smoothstep(0.3,0.7,flock2);',
+    '  float flock3=fbm(uv*1.4+swirl3,t*1.4);flock3=smoothstep(0.35,0.65,flock3);',
+    '  vec2 swirl4=vec2(sin(t*1.2)*0.1,cos(t*1.3)*0.1);',
+    '  float flock4=fbm(uv*2.0+swirl4,t*1.8);flock4=smoothstep(0.4,0.6,flock4);',
+    '  float feed=flock1*0.35+flock2*0.3+flock3*0.2+flock4*0.15;',
+    '  float breath=sin(uTime*0.4)*0.08;',
+    '  feed+=breath;',
+    '  feed=feed*0.6-0.45;',
+    '',
+    '  for(int i=0;i<MAX_CLICKS;i++){',
+    '    vec2 pos=uClickPos[i];',
+    '    if(pos.x>=0.0){',
+    '      vec2 cuv=((pos-uResolution*0.5)/uResolution)*vec2(aspectRatio,1.0);',
+    '      float timeSince=max(uTime-uClickTimes[i],0.0);',
+    '      float dist=distance(uv,cuv);',
+    '      float ripple=0.0;',
+    '      float wave1=0.35*timeSince;ripple+=exp(-pow((dist-wave1)/0.08,2.0))*0.8;',
+    '      float wave2=0.28*timeSince;ripple+=exp(-pow((dist-wave2)/0.06,2.0))*0.5;',
+    '      float wave3=0.2*timeSince;ripple+=exp(-pow((dist-wave3)/0.04,2.0))*0.3;',
+    '      float centerGlow=exp(-dist*8.0)*exp(-timeSince*2.0)*0.6;',
+    '      ripple+=centerGlow;',
+    '      float fade=exp(-timeSince*0.6)*exp(-dist*3.0);',
+    '      feed=max(feed,ripple*fade);',
+    '    }',
+    '  }',
+    '',
+    '  vec2 mouseUV=((uMouse-uResolution*0.5)/uResolution)*vec2(aspectRatio,1.0);',
+    '  float mouseDist=distance(uv,mouseUV);',
+    '  float mouseRing=exp(-pow(mouseDist-0.02,2.0)*200.0)*0.4*uMouseActive;',
+    '  feed=max(feed,mouseRing);',
+    '',
+    '  float bayer=Bayer8(fragCoord/pixelSize)-0.5;',
+    '  float bw=step(0.5,feed+bayer);',
+    '  float coverage=bw;',
+    '  float M=maskDiamond(pixelUV,coverage);',
+    '  gl_FragColor=vec4(uColor,M);',
+    '}'
+  ].join('\n');
 
-    // ── 2D value noise (hash-based) ──
-    function hash2d(ix, iy) {
-      var n = Math.sin(ix * 127.1 + iy * 311.7) * 43758.5453;
-      return n - Math.floor(n);
-    }
+  function initBayerDithering() {
+    var container = document.getElementById('ditherBg');
+    if (typeof THREE === 'undefined' || !container) return;
 
-    function smoothNoise(x, y) {
-      var ix = Math.floor(x), iy = Math.floor(y);
-      var fx = x - ix, fy = y - iy;
-      // Smoothstep interpolation
-      fx = fx * fx * (3 - 2 * fx);
-      fy = fy * fy * (3 - 2 * fy);
-      var a = hash2d(ix, iy), b = hash2d(ix + 1, iy);
-      var c = hash2d(ix, iy + 1), d = hash2d(ix + 1, iy + 1);
-      return a + (b - a) * fx + (c - a) * fy + (a - b - c + d) * fx * fy;
-    }
+    try {
+      var renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
+      renderer.setClearColor(0x000000, 0);
+      container.appendChild(renderer.domElement);
 
-    // Fractal Brownian Motion — 4 octaves
-    function fbm(x, y) {
-      var val = 0, amp = 0.5;
-      for (var o = 0; o < 4; o++) {
-        val += amp * smoothNoise(x, y);
-        x *= 2.0; y *= 2.0; amp *= 0.5;
+      var canvas = renderer.domElement;
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      canvas.style.position = 'absolute';
+      canvas.style.top = '0';
+      canvas.style.left = '0';
+
+      var MAX_CLICKS = 10;
+      var clickPositions = [];
+      var clickTimesArr = new Float32Array(MAX_CLICKS);
+      for (var ci = 0; ci < MAX_CLICKS; ci++) {
+        clickPositions.push(new THREE.Vector2(-1, -1));
       }
-      return val;
-    }
 
-    // ── Build hex-grid dots with noise-modulated sizes ──
-    var INK = '#0078BF'; // Riso blue
-    var spacing = 14;
-    var rowH = spacing * 0.866; // sin(60°)
-    var freq = 0.022; // noise frequency — controls blob size
-    var dots = [];
+      var uniforms = {
+        uResolution:  { value: new THREE.Vector2() },
+        uTime:        { value: 0 },
+        uColor:       { value: new THREE.Color('#00838A') },
+        uPixelSize:   { value: 4 },
+        uMouse:       { value: new THREE.Vector2() },
+        uMouseActive: { value: 0.0 },
+        uClickPos:    { value: clickPositions },
+        uClickTimes:  { value: clickTimesArr }
+      };
 
-    for (var row = -1; row * rowH < h + spacing; row++) {
-      var yPos = row * rowH;
-      var xOff = (row % 2) ? spacing * 0.5 : 0;
+      var mouseTarget = new THREE.Vector2(window.innerWidth / 2, window.innerHeight / 2);
+      var mouseCurrent = new THREE.Vector2(window.innerWidth / 2, window.innerHeight / 2);
+      var lastMouseMove = 0;
+      var isMouseActive = false;
+      var idleThreshold = 1500;
 
-      for (var col = -1; col * spacing < w + spacing; col++) {
-        var xPos = col * spacing + xOff;
+      document.addEventListener('mousemove', function(e) {
+        mouseTarget.set(e.clientX, window.innerHeight - e.clientY);
+        lastMouseMove = Date.now();
+        isMouseActive = true;
+      });
 
-        // Fractal noise for organic blobs
-        var n = fbm(xPos * freq, yPos * freq);
-
-        // Y gradient: pattern starts at ~35% from top, dense at bottom
-        var yNorm = yPos / h;
-        var gradStart = 0.30;
-        var yDensity = Math.max(0, (yNorm - gradStart) / (1 - gradStart));
-        yDensity = yDensity * yDensity; // ease-in curve
-
-        // Combine noise + gradient
-        var combined = n * 0.55 + yDensity * 0.50;
-
-        // Threshold — below this, no dot
-        var threshold = 0.30;
-        if (combined > threshold) {
-          var t = (combined - threshold) / (1 - threshold);
-          // Radius grows with intensity — large enough to merge with neighbors
-          var radius = 1.5 + t * (spacing * 0.52);
-          dots.push({ x: xPos, y: yPos, r: radius });
+      document.addEventListener('touchmove', function(e) {
+        if (e.touches.length > 0) {
+          var touch = e.touches[0];
+          mouseTarget.set(touch.clientX, window.innerHeight - touch.clientY);
+          lastMouseMove = Date.now();
+          isMouseActive = true;
         }
+      });
+
+      var clickIndex = 0;
+      document.addEventListener('pointerdown', function(e) {
+        var fx = e.clientX;
+        var fy = window.innerHeight - e.clientY;
+        uniforms.uClickPos.value[clickIndex].set(fx, fy);
+        uniforms.uClickTimes.value[clickIndex] = uniforms.uTime.value;
+        clickIndex = (clickIndex + 1) % MAX_CLICKS;
+      });
+
+      document.addEventListener('touchstart', function(e) {
+        if (e.touches.length > 0) {
+          var touch = e.touches[0];
+          var fx = touch.clientX;
+          var fy = window.innerHeight - touch.clientY;
+          uniforms.uClickPos.value[clickIndex].set(fx, fy);
+          uniforms.uClickTimes.value[clickIndex] = uniforms.uTime.value;
+          clickIndex = (clickIndex + 1) % MAX_CLICKS;
+        }
+      });
+
+      var scene = new THREE.Scene();
+      var camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+      var material = new THREE.ShaderMaterial({
+        vertexShader: bayerVertexShader,
+        fragmentShader: bayerFragmentShader,
+        uniforms: uniforms,
+        transparent: true,
+        depthTest: false,
+        depthWrite: false
+      });
+      var quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material);
+      scene.add(quad);
+
+      var resize = function() {
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        renderer.setSize(w, h);
+        uniforms.uResolution.value.set(w, h);
+      };
+      window.addEventListener('resize', resize);
+      resize();
+
+      var clock = new THREE.Clock();
+      var mouseActiveValue = 0.0;
+
+      function animate() {
+        var elapsedTime = clock.getElapsedTime();
+        uniforms.uTime.value = elapsedTime;
+
+        var timeSinceMouseMove = Date.now() - lastMouseMove;
+        if (timeSinceMouseMove > idleThreshold) {
+          isMouseActive = false;
+        }
+
+        var targetActiveValue = isMouseActive ? 1.0 : 0.0;
+        mouseActiveValue += (targetActiveValue - mouseActiveValue) * 0.03;
+        uniforms.uMouseActive.value = mouseActiveValue;
+
+        if (isMouseActive) {
+          mouseCurrent.x += (mouseTarget.x - mouseCurrent.x) * 0.1;
+          mouseCurrent.y += (mouseTarget.y - mouseCurrent.y) * 0.1;
+        }
+
+        uniforms.uMouse.value.copy(mouseCurrent);
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
       }
+      animate();
+    } catch (err) {
+      // Silently fail — page works without dithering
     }
-
-    // ── Animate: sweep reveal from bottom to top over 1.5s ──
-    // Sort dots by y descending (bottom first)
-    dots.sort(function(a, b) { return b.y - a.y; });
-
-    var totalFrames = 90; // ~1.5s at 60fps
-    var dotsPerFrame = Math.ceil(dots.length / totalFrames);
-    var drawn = 0;
-
-    ctx.fillStyle = INK;
-    ctx.globalAlpha = 1;
-
-    function drawBatch() {
-      var end = Math.min(drawn + dotsPerFrame, dots.length);
-
-      for (var k = drawn; k < end; k++) {
-        var dot = dots[k];
-        ctx.beginPath();
-        ctx.arc(dot.x, dot.y, dot.r, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      drawn = end;
-      if (drawn < dots.length) {
-        requestAnimationFrame(drawBatch);
-      }
-    }
-
-    requestAnimationFrame(drawBatch);
   }
 
   /* ══════════════════════════════════════
@@ -1092,7 +1219,7 @@ again.">Look<br>again.</h2>
      ══════════════════════════════════════ */
 
   function init() {
-    generateHeroHalftone();
+    initBayerDithering();
     initCardPatterns();
     initScrollReveal();
     initMarbleFlip();
@@ -1110,12 +1237,11 @@ again.">Look<br>again.</h2>
     init();
   }
 
-  // Re-render canvases on resize
+  // Re-render card canvases on resize (dithering handles its own resize)
   var resizeTimer;
   window.addEventListener('resize', function() {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(function() {
-      generateHeroHalftone();
       initCardPatterns();
     }, 250);
   });
