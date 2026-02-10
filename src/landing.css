@@ -337,6 +337,23 @@ a.link-underline:hover::after {
   align-items: end;
 }
 
+/* Project name — masthead at top-left */
+.hero-masthead {
+  grid-column: 1 / 6;
+  grid-row: 1;
+  align-self: start;
+  padding-top: 40px;
+}
+
+.masthead-name {
+  font-family: var(--font-display);
+  font-size: clamp(0.875rem, 1.2vw, 1.125rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-black);
+}
+
 .hero-meta {
   grid-column: 9 / -1;
   grid-row: 1;
@@ -1291,12 +1308,17 @@ a.link-underline:hover::after {
     min-height: 90vh;
   }
 
+  .hero-masthead {
+    grid-column: 1 / -1;
+    padding-top: 24px;
+  }
+
   .hero-meta {
     grid-column: 1 / -1;
     text-align: left;
     flex-direction: row;
     gap: 1rem;
-    padding-top: 24px;
+    padding-top: 8px;
     flex-wrap: wrap;
   }
 
