@@ -5,6 +5,7 @@
    ══════════════════════════════════════════════════════════════ */
 
 import { initDitherGlobe } from './dither-globe';
+import { initProjectionCards } from './projection-cards';
 
 /* ── Ink colors for card patterns ── */
 const INK_COLORS: Record<string, string> = {
@@ -194,6 +195,9 @@ function initScrollProgress(): void {
 function init(): void {
   // WebGL dither globe (async — loads geographic data)
   initDitherGlobe();
+
+  // Projection cards (async — loads geographic data)
+  initProjectionCards();
 
   // DOM interactions
   initCardPatterns();

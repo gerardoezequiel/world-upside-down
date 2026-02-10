@@ -1037,6 +1037,103 @@ section, .section-divider, .pull-quote, footer.colophon {
 }
 
 /* ══════════════════════════════════════
+   PROJECTIONS — Beyond Mercator cards
+   ══════════════════════════════════════ */
+
+.projections-section {
+  padding: 4rem 0;
+  position: relative;
+}
+
+.projections-section .section-header {
+  grid-column: 1 / 10;
+  margin-bottom: 1.5rem;
+}
+
+.projections-intro {
+  grid-column: 1 / 7;
+  margin-bottom: 3rem;
+}
+
+/* ── Tier label ── */
+.proj-tier-label {
+  grid-column: 1 / -1;
+  padding: 1.5rem 0 0.5rem;
+  border-bottom: 1px solid var(--gray-20);
+  color: var(--ink-light-gray);
+}
+
+/* ── Card grids ── */
+.proj-grid--essential {
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--gray-20);
+}
+
+.proj-grid--supporting {
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid var(--gray-20);
+}
+
+/* ── Projection card ── */
+.proj-card {
+  position: relative;
+  padding: 2rem;
+  border-right: 1px solid var(--gray-20);
+  border-bottom: 1px solid var(--gray-20);
+  overflow: hidden;
+  min-height: 220px;
+}
+
+.proj-grid--essential .proj-card:nth-child(3n) { border-right: none; }
+.proj-grid--supporting .proj-card:nth-child(3n) { border-right: none; }
+
+/* ── Canvas overlay ── */
+.proj-card-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.15;
+  transition: opacity 0.3s;
+}
+
+@keyframes projCardBreathe {
+  0%, 100% { transform: scale(1.0);   opacity: 0.15; }
+  50%      { transform: scale(1.015); opacity: 0.22; }
+}
+
+.proj-card-canvas.animating {
+  animation: projCardBreathe 5s ease-in-out infinite;
+}
+
+.proj-card:hover .proj-card-canvas {
+  opacity: 0.35;
+  animation: none;
+}
+
+/* ── Card text ── */
+.proj-card .heading-sm {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 4px;
+}
+
+.proj-card-meta {
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.proj-card .body {
+  position: relative;
+  z-index: 1;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+/* ══════════════════════════════════════
    TORRES GARCIA
    ══════════════════════════════════════ */
 
@@ -1853,6 +1950,12 @@ section, .section-divider, .pull-quote, footer.colophon {
   .colophon-block {
     grid-template-columns: 1fr 1fr;
   }
+
+  /* Projections */
+  .proj-grid--essential,
+  .proj-grid--supporting {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 /* ══════════════════════════════════════
@@ -2123,6 +2226,16 @@ section, .section-divider, .pull-quote, footer.colophon {
   .cta-button {
     grid-column: 1 / -1;
     text-align: center;
+  }
+
+  /* Projections */
+  .proj-grid--essential,
+  .proj-grid--supporting {
+    grid-template-columns: 1fr;
+  }
+
+  .proj-card {
+    min-height: 200px;
   }
 
   /* Colophon */
