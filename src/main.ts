@@ -7,47 +7,50 @@ import { initDymaxion } from "./dymaxion";
 const protocol = new Protocol();
 maplibregl.addProtocol("pmtiles", protocol.tile);
 
-/* ── Risograph palette (London-Flipped inspired) ──────────── */
+/* ── Color palette — "Deep Cartography" ───────────────────── */
+// Colorblind-safe: avoids red/green distinction. Uses blue-orange
+// contrast (safe for protanopia, deuteranopia, tritanopia).
+// At low zoom, the ocean-to-land transition matches the Dymaxion.
 const PALETTE = {
-  // Base tones
-  bg:        "#D6D1C9",   // ocean / background — warm grey
-  earth:     "#EDE8E0",   // land mass — cream paper
+  // Base tones (ocean & land)
+  bg:        "#2B3A4E",   // deep slate-blue ocean
+  earth:     "#E8E4DA",   // warm parchment land
   // Urban fabric
-  buildings: "#9EC4D4",   // light blue — the signature riso-blue
-  urban:     "#C7DCE6",   // urban area landcover tint
-  // Parks & green → coral/salmon (the "flip")
-  park:      "#E87461",   // coral — parks, forests, cemeteries
-  parkAlt:   "#F09E8C",   // lighter coral for secondary green
-  // Water → olive/tan (the "flip")
-  water:     "#9B8E7E",   // olive-tan river/lake fill
-  waterLine: "#8B7D6B",   // darker for stream/river lines
+  buildings: "#7BA7BC",   // muted teal — clear against parchment
+  urban:     "#D4DDE4",   // pale blue-grey urban tint
+  // Parks & nature → warm amber/ochre (colorblind-safe vs blue)
+  park:      "#D4944C",   // warm amber — distinct from blue
+  parkAlt:   "#DBA86A",   // lighter amber for secondary green
+  // Water → deep blue (continuous with ocean)
+  water:     "#2B3A4E",   // same as bg for seamless ocean
+  waterLine: "#3D5166",   // slightly lighter for rivers
   // Infrastructure
-  road:      "#1A1A2E",   // dark navy
-  roadMajor: "#2A2A3C",   // slightly lighter navy
-  roadMinor: "#6E6E80",   // mid grey for minor roads
-  roadCas:   "#CFCCC6",   // casing — warm light grey
-  rail:      "#1A1A2E",   // rail lines
+  road:      "#1C2030",   // very dark navy
+  roadMajor: "#2E3448",   // dark blue-grey
+  roadMinor: "#8890A0",   // cool mid-grey
+  roadCas:   "#D4D0C8",   // warm light grey casing
+  rail:      "#1C2030",   // rail lines
   // Boundaries
-  boundary:  "#C9A0A0",   // muted rose for borders
+  boundary:  "#B08070",   // warm terracotta for borders
   // Text
-  label:     "#1A1A2E",   // dark navy labels
-  labelHalo: "#EDE8E0",   // cream halo
-  // Landcover
-  grass:     "#DDE8D0",   // very muted sage (low-zoom landcover)
-  farmland:  "#E8E4D0",   // warm beige
-  scrub:     "#D8DEC8",   // light sage
-  barren:    "#E8E2D0",   // sandy
-  glacier:   "#F0F0F0",   // near white
+  label:     "#1C2030",   // dark navy labels
+  labelHalo: "#E8E4DA",   // parchment halo
+  // Landcover (low zoom — must match Dymaxion transition)
+  grass:     "#C8CEB4",   // sage-grey (safe vs blue)
+  farmland:  "#DDD8C6",   // warm wheat
+  scrub:     "#C4C8B4",   // grey-sage
+  barren:    "#D8D2C0",   // sandy grey
+  glacier:   "#EDF0F4",   // blue-white
   // Special
-  hospital:  "#F0D0D0",   // light rose
-  school:    "#D8D0E0",   // light lavender
-  industrial:"#D0D4D8",   // blue-grey
-  beach:     "#F0E8D0",   // sandy
-  zoo:       "#F0C8B0",   // warm peach
-  aerodrome: "#D0D0D0",   // neutral grey
-  pier:      "#D8D4CC",   // warm grey
-  pedestrian:"#E0DCD4",   // warm off-white
-  runway:    "#B8B4AC",   // medium grey
+  hospital:  "#E0C8B8",   // warm sand
+  school:    "#CCC8D8",   // light lavender
+  industrial:"#C8CCD4",   // cool grey
+  beach:     "#E4DCC4",   // sandy
+  zoo:       "#D8B888",   // warm gold
+  aerodrome: "#C8C8C8",   // neutral grey
+  pier:      "#CCC8C0",   // warm grey
+  pedestrian:"#DCD8D0",   // warm off-white
+  runway:    "#A8A8A4",   // medium grey
 };
 
 /* ── Color replacement map ────────────────────────────────── */
@@ -789,7 +792,7 @@ function setupGeocoder(map: maplibregl.Map): void {
 
 /* ── Dynamic Graticule ────────────────────────────────────── */
 function addGraticule(map: maplibregl.Map): void {
-  const GRAT_COLOR = 'rgba(107, 168, 189, 0.55)';
+  const GRAT_COLOR = 'rgba(123, 167, 188, 0.45)';
 
   function getInterval(zoom: number): number {
     if (zoom >= 10) return 1;

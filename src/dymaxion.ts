@@ -60,34 +60,34 @@ export async function initDymaxion(container: HTMLElement): Promise<DymaxionCont
     const w = container.clientWidth;
     const h = container.clientHeight;
 
-    // Background
-    ctx.fillStyle = '#1A1A2E';
+    // Background — matches MapLibre ocean (#2B3A4E)
+    ctx.fillStyle = '#2B3A4E';
     ctx.fillRect(0, 0, w, h);
 
-    // Graticule (under land for subtle grid)
+    // Graticule (under land)
     ctx.beginPath();
     path(graticule);
-    ctx.strokeStyle = 'rgba(107, 168, 189, 0.12)';
+    ctx.strokeStyle = 'rgba(123, 167, 188, 0.12)';
     ctx.lineWidth = 0.4;
     ctx.stroke();
 
-    // Land fill
+    // Land fill — parchment tinted to match low-zoom MapLibre earth
     ctx.beginPath();
     path(land);
-    ctx.fillStyle = '#2D2D42';
+    ctx.fillStyle = '#C8C0B0';
     ctx.fill();
 
-    // Country borders
+    // Country borders — warm terracotta (matches boundary color)
     ctx.beginPath();
     path(borders);
-    ctx.strokeStyle = 'rgba(250, 250, 246, 0.10)';
+    ctx.strokeStyle = 'rgba(176, 128, 112, 0.25)';
     ctx.lineWidth = 0.5;
     ctx.stroke();
 
-    // Icosahedron / sphere outline (the key visual)
+    // Icosahedron / sphere outline — amber accent (colorblind-safe)
     ctx.beginPath();
     path({ type: 'Sphere' });
-    ctx.strokeStyle = 'rgba(232, 116, 97, 0.30)';
+    ctx.strokeStyle = 'rgba(212, 148, 76, 0.40)';
     ctx.lineWidth = 1.2;
     ctx.stroke();
 
