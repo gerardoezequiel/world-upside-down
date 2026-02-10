@@ -341,18 +341,44 @@ body {
   opacity: 1;
 }
 
-/* Typewriter cursor blink on manifesto text */
-#manifesto p::after {
-  content: '|';
-  font-weight: 300;
-  animation: cursorBlink 0.7s step-end infinite;
-  margin-left: 1px;
-  color: var(--ink);
-}
-
 @keyframes cursorBlink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
+}
+
+/* ── Typewriter search hint (in map frame) ── */
+#search-typewriter {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 12;
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 22px;
+  color: var(--dark);
+  background: rgba(250, 250, 246, 0.92);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 10px 24px;
+  border: 1px solid rgba(232, 116, 97, 0.2);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  white-space: nowrap;
+  text-align: center;
+}
+
+#search-typewriter.visible {
+  opacity: 1;
+}
+
+#typewriter-text::after {
+  content: '|';
+  font-weight: 300;
+  color: var(--ink);
+  animation: cursorBlink 0.7s step-end infinite;
+  margin-left: 1px;
 }
 
 /* Title pulse to draw attention to geocoder */
@@ -693,6 +719,13 @@ body {
     max-width: 80vw;
   }
 
+  #search-typewriter {
+    font-size: 18px;
+    padding: 8px 18px;
+    max-width: 85vw;
+    white-space: normal;
+  }
+
   /* Hide keyboard hint, show touch controls */
   #flip-hint { display: none !important; }
   .touch-controls { display: flex; }
@@ -747,6 +780,11 @@ body {
     font-size: 16px;
     padding: 8px 16px;
     max-width: 85vw;
+  }
+
+  #search-typewriter {
+    font-size: 15px;
+    padding: 7px 14px;
   }
 
   .touch-controls {

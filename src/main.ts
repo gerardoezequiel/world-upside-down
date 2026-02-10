@@ -972,7 +972,6 @@ async function init() {
 
     // Show manifesto in top band with a gentle fade-in
     const manifestoEl = document.getElementById('manifesto');
-    const manifestoP = manifestoEl?.querySelector('p');
     setTimeout(() => {
       manifestoEl?.classList.add('visible');
     }, 1200);
@@ -985,10 +984,15 @@ async function init() {
     map.on('movestart', hideManifesto);
 
     // ── Typewriter search hint (after 20s) ──
+    const twEl = document.getElementById('search-typewriter');
+    const twText = document.getElementById('typewriter-text');
     let searchHintCancelled = false;
 
     // Cancel if user already found the geocoder
-    const cancelHint = () => { searchHintCancelled = true; };
+    const cancelHint = () => {
+      searchHintCancelled = true;
+      twEl?.classList.remove('visible');
+    };
     document.getElementById('city-title')?.addEventListener('click', cancelHint, { once: true });
 
     async function typewrite(el: HTMLElement, text: string, speed = 55): Promise<void> {
@@ -1001,26 +1005,21 @@ async function init() {
     }
 
     setTimeout(async () => {
-      if (searchHintCancelled || !manifestoEl || !manifestoP) return;
+      if (searchHintCancelled || !twEl || !twText) return;
 
       const messages = [
         { text: 'Did you get lost?', pause: 1800 },
-        { text: "That's normal.", pause: 1800 },
-        { text: 'Click the title to search.', pause: 3000 },
+        { text: "That's normal.", pause: 1600 },
+        { text: 'Tap the title to search.', pause: 3000 },
       ];
-
-      manifestoP.style.fontFamily = "'Space Mono', monospace";
-      manifestoP.style.fontSize = '8px';
-      manifestoP.style.letterSpacing = '0.06em';
-      manifestoP.style.opacity = '1';
 
       for (const msg of messages) {
         if (searchHintCancelled) return;
-        manifestoEl.classList.add('visible');
-        await typewrite(manifestoP, msg.text);
+        twEl.classList.add('visible');
+        await typewrite(twText, msg.text);
         await new Promise(r => setTimeout(r, msg.pause));
         if (searchHintCancelled) return;
-        manifestoEl.classList.remove('visible');
+        twEl.classList.remove('visible');
         await new Promise(r => setTimeout(r, 400));
       }
 
@@ -1030,7 +1029,7 @@ async function init() {
         titleEl.classList.add('hint-pulse');
         setTimeout(() => titleEl.classList.remove('hint-pulse'), 2000);
       }
-    }, 20000);
+    }, 12000);
   });
 
   // Live updates on zoom/move
