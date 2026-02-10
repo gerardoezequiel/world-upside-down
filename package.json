@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.6.1",
     "maplibre-gl": "^4.7.1",
     "pmtiles": "^4.4.0"
   },

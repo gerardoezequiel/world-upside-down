@@ -1,5 +1,6 @@
 import maplibregl from "maplibre-gl";
 import { Protocol } from "pmtiles";
+import "./analytics";
 
 /* ── PMTiles protocol ─────────────────────────────────────── */
 const protocol = new Protocol();
