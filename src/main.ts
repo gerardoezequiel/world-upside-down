@@ -971,9 +971,66 @@ async function init() {
     addGraticule(map);
 
     // Show manifesto in top band with a gentle fade-in
+    const manifestoEl = document.getElementById('manifesto');
+    const manifestoP = manifestoEl?.querySelector('p');
     setTimeout(() => {
-      document.getElementById('manifesto')?.classList.add('visible');
+      manifestoEl?.classList.add('visible');
     }, 1200);
+
+    // Fade out manifesto when user starts interacting
+    const hideManifesto = () => {
+      manifestoEl?.classList.remove('visible');
+      map.off('movestart', hideManifesto);
+    };
+    map.on('movestart', hideManifesto);
+
+    // ── Typewriter search hint (after 20s) ──
+    let searchHintCancelled = false;
+
+    // Cancel if user already found the geocoder
+    const cancelHint = () => { searchHintCancelled = true; };
+    document.getElementById('city-title')?.addEventListener('click', cancelHint, { once: true });
+
+    async function typewrite(el: HTMLElement, text: string, speed = 55): Promise<void> {
+      el.textContent = '';
+      for (let i = 0; i < text.length; i++) {
+        if (searchHintCancelled) return;
+        el.textContent += text[i];
+        await new Promise(r => setTimeout(r, speed));
+      }
+    }
+
+    setTimeout(async () => {
+      if (searchHintCancelled || !manifestoEl || !manifestoP) return;
+
+      const messages = [
+        { text: 'Did you get lost?', pause: 1800 },
+        { text: "That's normal.", pause: 1800 },
+        { text: 'Click the title to search.', pause: 3000 },
+      ];
+
+      manifestoP.style.fontFamily = "'Space Mono', monospace";
+      manifestoP.style.fontSize = '8px';
+      manifestoP.style.letterSpacing = '0.06em';
+      manifestoP.style.opacity = '1';
+
+      for (const msg of messages) {
+        if (searchHintCancelled) return;
+        manifestoEl.classList.add('visible');
+        await typewrite(manifestoP, msg.text);
+        await new Promise(r => setTimeout(r, msg.pause));
+        if (searchHintCancelled) return;
+        manifestoEl.classList.remove('visible');
+        await new Promise(r => setTimeout(r, 400));
+      }
+
+      // Brief pulse on title to draw attention
+      const titleEl = document.getElementById('city-title');
+      if (titleEl && !searchHintCancelled) {
+        titleEl.classList.add('hint-pulse');
+        setTimeout(() => titleEl.classList.remove('hint-pulse'), 2000);
+      }
+    }, 20000);
   });
 
   // Live updates on zoom/move

@@ -341,6 +341,30 @@ body {
   opacity: 1;
 }
 
+/* Typewriter cursor blink on manifesto text */
+#manifesto p::after {
+  content: '|';
+  font-weight: 300;
+  animation: cursorBlink 0.7s step-end infinite;
+  margin-left: 1px;
+  color: var(--ink);
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Title pulse to draw attention to geocoder */
+#city-title.hint-pulse {
+  animation: titlePulse 1s ease 2;
+}
+
+@keyframes titlePulse {
+  0%, 100% { color: var(--dark); }
+  50% { color: var(--ink); }
+}
+
 /* ── FLIP TOAST ── */
 #flip-toast {
   position: absolute;
