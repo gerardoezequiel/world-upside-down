@@ -1220,55 +1220,6 @@ async function init() {
     map.on('movestart', hideScreenprint);
     map.on('zoomstart', hideScreenprint);
 
-    // ── Periodic ambient toasts ──
-    const ambientMessages = [
-      "Your compass has trust issues now",
-      "Geography is just organised disagreement",
-      "The Equator doesn't care which way you hold the map",
-      "Fun fact: medieval maps put east on top",
-      "Australia has entered the chat",
-      "Buckminster Fuller would approve",
-      "This is what the Blue Marble actually showed",
-      "Perspective is everything",
-      "The Southern Hemisphere thanks you",
-      "Maps lie. All of them. Even this one.",
-      "Your mental map just filed a complaint",
-      "No GPS was harmed in the making of this map",
-      "Plot twist: there is no correct orientation",
-      "South is just north with confidence",
-      "Ancient Egyptians oriented south. Just saying.",
-      "Your school atlas owes you an apology",
-      "The Earth is a sphere. It has no top.",
-      "Try scrolling to the edge of the world",
-      "North was a marketing decision",
-      "Copernicus would have loved this",
-    ];
-
-    const ambientLocationMessages = [
-      "The residents of {city} have questions",
-      "{city}: now 100% more disorienting",
-      "If you're in {city}, look out the window",
-      "Somewhere in {city}, a compass is crying",
-      "{city} didn't sign up for this",
-    ];
-
-    let ambientIdx = Math.floor(Math.random() * ambientMessages.length);
-
-    function showAmbientToast() {
-      // ~30% chance of location-aware ambient toast
-      if (currentCityName && Math.random() < 0.3) {
-        const template = ambientLocationMessages[Math.floor(Math.random() * ambientLocationMessages.length)];
-        showFlipToast(template.replace('{city}', currentCityName));
-      } else {
-        showFlipToast(ambientMessages[ambientIdx]);
-        ambientIdx = (ambientIdx + 1) % ambientMessages.length;
-      }
-      // Next toast in 25-40s
-      setTimeout(showAmbientToast, 25000 + Math.random() * 15000);
-    }
-
-    // First ambient toast after 15s
-    setTimeout(showAmbientToast, 15000);
   });
 
   // ── Dymaxion projection crossfade on zoom out ──
