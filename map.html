@@ -19,7 +19,7 @@
   <meta name="twitter:description" content="The first photo of Earth had south on top. NASA flipped it. This map flips it back." />
   <meta name="twitter:image" content="/og-image.png" />
 
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:wght@400;500;700&family=Instrument+Serif:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:wght@400;500;700&family=Instrument+Serif:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Abril+Fatface&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/src/style.css" />
 </head>
 <body>
@@ -53,6 +53,13 @@
         <div class="tb-dropdown-menu ink-panel" id="ink-panel">
           <div class="ink-presets" id="ink-presets"></div>
           <div class="ink-custom" id="ink-custom"></div>
+        </div>
+      </div>
+      <div class="tb-dropdown" id="font-dropdown">
+        <button class="tb-btn" data-tool="font" id="tool-font" aria-label="Font">A</button>
+        <div class="tb-dropdown-menu font-panel" id="font-panel">
+          <div class="font-pairings" id="font-pairings"></div>
+          <div class="font-mix" id="font-mix"></div>
         </div>
       </div>
       <div class="tb-dropdown" id="download-dropdown">
@@ -174,6 +181,11 @@
         </div>
       </div>
       <button class="export-close" id="export-close" aria-label="Close">&times;</button>
+    </div>
+
+    <!-- ── Ticker — scrolling reverse-geocoded phrase ── -->
+    <div class="ticker-track" id="ticker-track">
+      <span class="ticker" id="ticker"></span>
     </div>
 
     <!-- ── Touch controls — two flip buttons ── -->

@@ -534,7 +534,8 @@ body {
 }
 
 .screenprint-line {
-  font-family: 'Anton', sans-serif;
+  font-family: var(--hero-font-family, 'Anton', sans-serif);
+  font-variation-settings: var(--hero-font-variation, normal);
   font-size: 14vw;
   font-weight: 400;
   text-transform: uppercase;
@@ -543,7 +544,7 @@ body {
   color: var(--sp-color);
   text-shadow: var(--sp-shadow-x) var(--sp-shadow-y) 0 var(--sp-shadow);
   filter: url(#riso-rough);
-  transition: color 0.4s ease, text-shadow 0.4s ease, transform 0.3s ease;
+  transition: color 0.4s ease, text-shadow 0.4s ease, transform 0.3s ease, font-family 0.3s ease;
 }
 
 /* Editable state */
@@ -1369,6 +1370,13 @@ body {
     flex-direction: column;
     gap: 10px;
   }
+
+  .ticker-track { bottom: 2px; height: 24px; }
+  .ticker { font-size: clamp(12px, 3vw, 16px); }
+
+  .font-panel { min-width: 220px; max-height: 360px; }
+  .font-pairing-hero { font-size: 15px; }
+  .font-pairing-ticker { font-size: 11px; }
 }
 
 /* ══════════════════════════════════════
@@ -1461,6 +1469,265 @@ body {
   #flip-toast { font-size: 13px; padding: 6px 12px; }
   .flip-btn { width: 36px; height: 36px; }
   .flip-btn-arrow { font-size: 16px; }
+}
+
+/* ══════════════════════════════════════
+   FONT PANEL
+   ══════════════════════════════════════ */
+.font-panel {
+  min-width: 260px;
+  max-width: 320px;
+  max-height: 440px;
+  overflow-y: auto;
+  padding: 6px 0;
+}
+
+.font-pairings,
+.font-mix {
+  padding: 4px 0;
+}
+
+.font-mix {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  display: none;
+}
+
+.font-mix.open {
+  display: block;
+}
+
+/* ── Pairing cards ── */
+.font-pairing-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  border-left: 2px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.font-pairing-card:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.font-pairing-card.active {
+  border-left-color: var(--ink);
+}
+
+.font-pairing-hero {
+  font-size: 18px;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  color: var(--dark);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.font-pairing-ticker {
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--mid);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.font-pairing-ticker .ticker-place {
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.font-pairing-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.font-pairing-name {
+  font-family: 'Space Mono', monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mid);
+}
+
+.font-pairing-card.active .font-pairing-name {
+  color: var(--ink);
+}
+
+.font-pairing-char {
+  font-family: 'Space Mono', monospace;
+  font-size: 7px;
+  color: var(--light);
+  letter-spacing: 0.02em;
+}
+
+/* ── Mix mode toggle ── */
+.font-mix-toggle {
+  display: block;
+  width: 100%;
+  padding: 6px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 10px;
+  color: var(--light);
+  text-align: left;
+  letter-spacing: 0.02em;
+  transition: color 0.15s;
+}
+
+.font-mix-toggle:hover {
+  color: var(--ink);
+}
+
+/* ── Font category rows (mix mode) ── */
+.font-category {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.font-category-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  cursor: pointer;
+  font-family: 'Space Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mid);
+  transition: background 0.15s;
+}
+
+.font-category-header:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.font-category-current {
+  font-size: 8px;
+  font-weight: 400;
+  color: var(--light);
+  margin-left: auto;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.font-category-body {
+  display: none;
+  padding: 4px 12px 8px;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.font-category.open .font-category-body {
+  display: flex;
+}
+
+.font-option {
+  display: block;
+  padding: 4px 8px;
+  background: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  color: var(--mid);
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: border-color 0.15s, color 0.15s;
+  line-height: 1.3;
+}
+
+.font-option:hover {
+  border-color: var(--light);
+  color: var(--ink);
+}
+
+.font-option.active {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.font-option-name {
+  font-family: 'Space Mono', monospace;
+  font-size: 7px;
+  display: block;
+  margin-top: 1px;
+  opacity: 0.6;
+}
+
+.font-option-sample {
+  font-size: 15px;
+  display: block;
+}
+
+/* ══════════════════════════════════════
+   TICKER
+   ══════════════════════════════════════ */
+.ticker-track {
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  overflow: hidden;
+  pointer-events: none;
+  height: 28px;
+  display: flex;
+  align-items: center;
+}
+
+.ticker {
+  white-space: nowrap;
+  font-family: var(--ticker-font-family, 'Caveat', cursive);
+  font-size: clamp(14px, 3vw, 20px);
+  color: var(--mid);
+  opacity: 0;
+  pointer-events: none;
+  animation-timing-function: linear;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+  transition: opacity 0.3s ease;
+}
+
+.ticker.visible {
+  opacity: 0.7;
+}
+
+.ticker .ticker-place-name {
+  font-family: var(--hero-font-family, 'Abril Fatface', serif);
+  font-variation-settings: var(--hero-font-variation, normal);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+@keyframes ticker-east {
+  from { transform: translateX(100vw); }
+  to   { transform: translateX(-100%); }
+}
+
+@keyframes ticker-west {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100vw); }
+}
+
+.ticker--east { animation-name: ticker-east; }
+.ticker--west { animation-name: ticker-west; }
+
+/* ── Hero font CSS custom properties ── */
+:root {
+  --hero-font-family: 'Anton', sans-serif;
+  --hero-font-variation: normal;
+  --ticker-font-family: 'Caveat', cursive;
 }
 
 /* ── Print ── */

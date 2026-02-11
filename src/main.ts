@@ -7,6 +7,14 @@ import {
   buildDerivedPalette, applyMapPalette, buildTextPairings, darken,
   type MapPalette, type DerivedPalette, type PresetPalette,
 } from "./ink-palette";
+import {
+  FONT_CATALOG, FONT_CATEGORIES, FONT_PAIRINGS, DEFAULT_PAIRING_ID,
+  TICKER_COMPANIONS, TICKER_PHRASES,
+  getFont, getFontsByCategory, generateTickerPhrase,
+  createFontState, applyPairing, applyHeroFont, applyTickerFont,
+  loadFontById, preloadAllFonts, persistFontState, restoreFontState,
+  type FontDefinition, type FontPairing, type FontState, type FontCategory,
+} from "./font-system";
 
 /* ── 5-Colour Risograph — Official Riso Kagaku Inks ─────────── */
 let PALETTE: Record<string, string> = {
@@ -45,6 +53,9 @@ let PALETTE: Record<string, string> = {
 /* ── Ink palette state ─────────────────────────────────────── */
 let currentPaletteId = DEFAULT_PALETTE_ID;
 let currentMapPalette: MapPalette = { ...PALETTES[0].palette };
+
+/* ── Font state ───────────────────────────────────────────── */
+const fontState: FontState = createFontState();
 
 /* ── Color replacement map ────────────────────────────────── */
 const COLOR_MAP: Record<string, string> = {
@@ -1030,6 +1041,7 @@ function setupTools(map: maplibregl.Map): void {
   setupToolLocate(map);
   setupToolTitle(map);
   setupToolInk(map);
+  setupToolFont(map);
   setupToolDownload(map);
   setupToolShare(map);
 }
@@ -1545,6 +1557,317 @@ function restorePalette(map: maplibregl.Map): void {
 }
 
 /* ══════════════════════════════════════════════════════════════
+   TOOL: A FONT
+   ══════════════════════════════════════════════════════════════ */
+function setupToolFont(map: maplibregl.Map): void {
+  const btn = document.getElementById('tool-font');
+  const panel = document.getElementById('font-panel');
+  const pairingsContainer = document.getElementById('font-pairings');
+  const mixContainer = document.getElementById('font-mix');
+  if (!btn || !panel || !pairingsContainer || !mixContainer) return;
+
+  let fontsPreloading = false;
+
+  // Toggle dropdown
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = panel.classList.contains('open');
+    closeAllDropdowns();
+    if (!isOpen) {
+      panel.classList.add('open');
+      // Preload all fonts in background on first open
+      if (!fontsPreloading) {
+        fontsPreloading = true;
+        preloadAllFonts(fontState);
+      }
+    }
+  });
+
+  // Build pairing cards
+  const placeName = currentCityName || 'London';
+  for (const pairing of FONT_PAIRINGS) {
+    const heroFont = getFont(pairing.hero);
+    const tickerFont = getFont(pairing.ticker);
+    if (!heroFont || !tickerFont) continue;
+
+    const card = document.createElement('div');
+    card.className = 'font-pairing-card' + (pairing.id === fontState.activePairing ? ' active' : '');
+    card.dataset.pairingId = pairing.id;
+
+    // Hero sample
+    const heroSample = document.createElement('div');
+    heroSample.className = 'font-pairing-hero';
+    heroSample.style.fontFamily = heroFont.family;
+    if (heroFont.isVariable && heroFont.variableAxes?.WONK) {
+      heroSample.style.fontVariationSettings = "'WONK' 1, 'opsz' 144";
+    }
+    heroSample.textContent = heroFont.sampleText;
+    card.appendChild(heroSample);
+
+    // Ticker sample
+    const tickerSample = document.createElement('div');
+    tickerSample.className = 'font-pairing-ticker';
+    tickerSample.style.fontFamily = tickerFont.family;
+    tickerSample.innerHTML = `lost in <span class="ticker-place" style="font-family:${heroFont.family}">${placeName}</span>`;
+    card.appendChild(tickerSample);
+
+    // Meta row
+    const meta = document.createElement('div');
+    meta.className = 'font-pairing-meta';
+    const nameEl = document.createElement('span');
+    nameEl.className = 'font-pairing-name';
+    nameEl.textContent = pairing.name;
+    meta.appendChild(nameEl);
+    const charEl = document.createElement('span');
+    charEl.className = 'font-pairing-char';
+    charEl.textContent = pairing.character;
+    meta.appendChild(charEl);
+    card.appendChild(meta);
+
+    card.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectFontPairing(pairing);
+    });
+
+    pairingsContainer.appendChild(card);
+  }
+
+  // Mix toggle
+  const mixToggle = document.createElement('button');
+  mixToggle.className = 'font-mix-toggle';
+  mixToggle.textContent = 'mix your own...';
+  mixToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    mixContainer.classList.toggle('open');
+    mixToggle.textContent = mixContainer.classList.contains('open') ? 'back to pairings' : 'mix your own...';
+  });
+  pairingsContainer.appendChild(mixToggle);
+
+  // Build mix mode (hero font categories)
+  buildFontMixer(mixContainer);
+
+  // Restore persisted font state
+  restoreFontPairing();
+}
+
+async function selectFontPairing(pairing: FontPairing): Promise<void> {
+  await applyPairing(pairing.id, fontState);
+  updateFontUI();
+  persistFontState(fontState);
+  updateShareableHash();
+}
+
+function buildFontMixer(container: HTMLElement): void {
+  const title = document.createElement('div');
+  title.className = 'ink-section-title';
+  title.textContent = 'Hero font';
+  container.appendChild(title);
+
+  const byCategory = getFontsByCategory();
+  const categories: FontCategory[] = ['slab', 'fatface', 'blade', 'hand', 'wire', 'scrawl'];
+
+  for (const catId of categories) {
+    const catMeta = FONT_CATEGORIES[catId];
+    const fonts = byCategory[catId];
+    if (!fonts.length) continue;
+
+    const cat = document.createElement('div');
+    cat.className = 'font-category';
+    cat.dataset.category = catId;
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'font-category-header';
+    header.textContent = catMeta.label;
+
+    const current = document.createElement('span');
+    current.className = 'font-category-current';
+    const activeFont = fonts.find(f => f.id === fontState.activeHero);
+    current.textContent = activeFont ? activeFont.name : '';
+    header.appendChild(current);
+
+    header.addEventListener('click', (e) => {
+      e.stopPropagation();
+      cat.classList.toggle('open');
+    });
+    cat.appendChild(header);
+
+    // Body
+    const body = document.createElement('div');
+    body.className = 'font-category-body';
+
+    for (const font of fonts) {
+      const opt = document.createElement('button');
+      opt.className = 'font-option' + (fontState.activeHero === font.id ? ' active' : '');
+      opt.dataset.fontId = font.id;
+
+      const sample = document.createElement('span');
+      sample.className = 'font-option-sample';
+      sample.style.fontFamily = font.family;
+      if (font.isVariable && font.variableAxes?.WONK) {
+        sample.style.fontVariationSettings = "'WONK' 1, 'opsz' 144";
+      }
+      sample.textContent = font.sampleText;
+      opt.appendChild(sample);
+
+      const name = document.createElement('span');
+      name.className = 'font-option-name';
+      name.textContent = font.name;
+      opt.appendChild(name);
+
+      opt.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        await applyHeroFont(font.id, fontState);
+        fontState.activePairing = 'custom';
+        updateFontUI();
+        persistFontState(fontState);
+        updateShareableHash();
+      });
+
+      body.appendChild(opt);
+    }
+
+    cat.appendChild(body);
+    container.appendChild(cat);
+  }
+}
+
+function updateFontUI(): void {
+  // Pairing cards
+  document.querySelectorAll('.font-pairing-card').forEach(card => {
+    const el = card as HTMLElement;
+    card.classList.toggle('active', el.dataset.pairingId === fontState.activePairing);
+  });
+
+  // Mix mode: font options active state + category current
+  document.querySelectorAll('.font-category').forEach(cat => {
+    const el = cat as HTMLElement;
+    const catId = el.dataset.category;
+    if (!catId) return;
+
+    // Update active option
+    cat.querySelectorAll('.font-option').forEach(opt => {
+      const optEl = opt as HTMLElement;
+      opt.classList.toggle('active', optEl.dataset.fontId === fontState.activeHero);
+    });
+
+    // Update header current name
+    const cur = cat.querySelector('.font-category-current');
+    const byCategory = getFontsByCategory();
+    const fonts = byCategory[catId as FontCategory] || [];
+    const activeFont = fonts.find(f => f.id === fontState.activeHero);
+    if (cur) cur.textContent = activeFont ? activeFont.name : '';
+  });
+}
+
+async function restoreFontPairing(): Promise<void> {
+  // URL hash priority
+  const hash = window.location.hash.replace('#', '');
+  const parts = hash.split('/');
+  for (const part of parts) {
+    if (part.startsWith('f:')) {
+      const fVal = part.slice(2);
+      if (fVal.startsWith('custom:')) {
+        const [heroId, tickerId] = fVal.slice(7).split('-');
+        if (getFont(heroId) && getFont(tickerId)) {
+          await applyHeroFont(heroId, fontState);
+          await applyTickerFont(tickerId, fontState);
+          fontState.activePairing = 'custom';
+          updateFontUI();
+          return;
+        }
+      } else {
+        const pairing = FONT_PAIRINGS.find(p => p.id === fVal);
+        if (pairing) {
+          await applyPairing(pairing.id, fontState);
+          updateFontUI();
+          return;
+        }
+      }
+    }
+  }
+
+  // Fallback: sessionStorage
+  const stored = restoreFontState(fontState);
+  if (stored) {
+    if (stored.pairing !== 'custom') {
+      const pairing = FONT_PAIRINGS.find(p => p.id === stored.pairing);
+      if (pairing) {
+        await applyPairing(pairing.id, fontState);
+        updateFontUI();
+        return;
+      }
+    }
+    await applyHeroFont(stored.hero, fontState);
+    await applyTickerFont(stored.ticker, fontState);
+    fontState.activePairing = stored.pairing;
+    updateFontUI();
+    return;
+  }
+
+  // Default: apply poster pairing (Abril Fatface + Caveat)
+  await applyPairing(DEFAULT_PAIRING_ID, fontState);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TICKER SYSTEM
+   ══════════════════════════════════════════════════════════════ */
+let tickerTimeout: ReturnType<typeof setTimeout> | null = null;
+let tickerIdleTimeout: ReturnType<typeof setTimeout> | null = null;
+
+function setupTicker(map: maplibregl.Map): void {
+  const tickerEl = document.getElementById('ticker');
+  if (!tickerEl) return;
+  const el = tickerEl; // non-null alias for closures
+
+  function updateTicker() {
+    const place = currentCityName;
+    if (!place) return;
+
+    const phrase = generateTickerPhrase(place, fontState);
+    if (!phrase) return;
+
+    // Build HTML: phrase with place name emphasized in hero font
+    const template = fontState.tickerPhrase;
+    const parts = template.split('[place]');
+    el.innerHTML = parts[0] + `<span class="ticker-place-name">${place}</span>` + (parts[1] || '');
+
+    // Direction
+    el.classList.remove('ticker--east', 'ticker--west', 'visible');
+    // Force reflow
+    void el.offsetWidth;
+
+    const dir = fontState.tickerDirection;
+    const charCount = phrase.length;
+    const duration = Math.max(8, Math.min(20, charCount * 0.5));
+    el.style.animationDuration = `${duration}s`;
+    el.classList.add(`ticker--${dir}`, 'visible');
+
+    // Remove after animation
+    el.addEventListener('animationend', () => {
+      el.classList.remove('visible');
+    }, { once: true });
+  }
+
+  // On map moveend — debounced
+  map.on('moveend', () => {
+    if (tickerTimeout) clearTimeout(tickerTimeout);
+    tickerTimeout = setTimeout(() => {
+      // Only show in explore mode
+      if (currentMode !== 'explore') return;
+      updateTicker();
+    }, 1500);
+
+    // Reset idle timeout
+    if (tickerIdleTimeout) clearTimeout(tickerIdleTimeout);
+    tickerIdleTimeout = setTimeout(() => {
+      fontState.tickerPaused = true;
+    }, 30000);
+    fontState.tickerPaused = false;
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
    TOOL: ↓ DOWNLOAD
    ══════════════════════════════════════════════════════════════ */
 function closeAllDropdowns() {
@@ -1660,7 +1983,9 @@ async function captureAndExport(map: maplibregl.Map, format: string, action: 'do
     const l2 = document.getElementById('screenprint-l2')?.textContent || '';
 
     const fontSize = res.w * 0.14;
-    ctx.font = `400 ${fontSize}px Anton`;
+    const heroFont = getFont(fontState.activeHero);
+    const heroFamily = heroFont ? heroFont.family.replace(/'/g, '') : 'Anton, sans-serif';
+    ctx.font = `400 ${fontSize}px ${heroFamily}`;
     ctx.textAlign = 'center';
     ctx.globalCompositeOperation = 'multiply';
 
@@ -1736,7 +2061,8 @@ async function captureAndExport(map: maplibregl.Map, format: string, action: 'do
 async function exportCanvas(canvas: HTMLCanvasElement, format: string, action: 'download' | 'copy', _subtitle: string): Promise<void> {
   const citySlug = (currentCityName || 'world').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
   const paletteSuffix = currentPaletteId !== 'classic' ? `-${currentPaletteId}` : '';
-  const filename = `upside-down-${format}-${citySlug}${paletteSuffix}.png`;
+  const fontSuffix = fontState.activePairing !== DEFAULT_PAIRING_ID ? `-${fontState.activeHero}` : '';
+  const filename = `upside-down-${format}-${citySlug}${paletteSuffix}${fontSuffix}.png`;
 
   if (action === 'download') {
     const link = document.createElement('a');
@@ -1861,6 +2187,15 @@ function updateShareableHash(): void {
       newHash += `/p:custom:${base}-${water}-${built}-${green}-${ink}`;
     } else {
       newHash += `/p:${currentPaletteId}`;
+    }
+  }
+
+  // Font pairing param
+  if (fontState.activePairing !== DEFAULT_PAIRING_ID) {
+    if (fontState.activePairing === 'custom') {
+      newHash += `/f:custom:${fontState.activeHero}-${fontState.activeTicker}`;
+    } else {
+      newHash += `/f:${fontState.activePairing}`;
     }
   }
 
@@ -2008,6 +2343,7 @@ async function init() {
     addGraticule(map);
     applyRisoMisregistration(map);
     setupTools(map);
+    setupTicker(map);
 
     // Apply shareable URL params
     applyShareableParams();
