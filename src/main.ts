@@ -2,9 +2,14 @@ import maplibregl from "maplibre-gl";
 import "./analytics";
 import { initDymaxion } from "./dymaxion";
 import { RISO_INKS, PAPER, generateMisregistration, getSessionSeed } from "./riso";
+import {
+  INK_CATALOG, PALETTES, CATEGORY_INKS, DEFAULT_PALETTE_ID,
+  buildDerivedPalette, applyMapPalette, darken,
+  type MapPalette, type DerivedPalette, type PresetPalette,
+} from "./ink-palette";
 
 /* ── 5-Colour Risograph — Official Riso Kagaku Inks ─────────── */
-const PALETTE = {
+let PALETTE: Record<string, string> = {
   bg:        PAPER,
   earth:     "#F5F5F5",
   water:     RISO_INKS.teal.hex,
@@ -36,6 +41,10 @@ const PALETTE = {
   pedestrian:"#E0DCD4",
   runway:    "#B8B4AC",
 };
+
+/* ── Ink palette state ─────────────────────────────────────── */
+let currentPaletteId = DEFAULT_PALETTE_ID;
+let currentMapPalette: MapPalette = { ...PALETTES[0].palette };
 
 /* ── Color replacement map ────────────────────────────────── */
 const COLOR_MAP: Record<string, string> = {
@@ -1020,6 +1029,7 @@ function closeAllPanels() {
 function setupTools(map: maplibregl.Map): void {
   setupToolLocate(map);
   setupToolTitle(map);
+  setupToolInk(map);
   setupToolDownload(map);
   setupToolShare(map);
 }
@@ -1227,6 +1237,283 @@ function setupToolTitle(map: maplibregl.Map): void {
 }
 
 /* ══════════════════════════════════════════════════════════════
+   TOOL: ◉ INK PALETTE
+   ══════════════════════════════════════════════════════════════ */
+function setupToolInk(map: maplibregl.Map): void {
+  const btn = document.getElementById('tool-ink');
+  const panel = document.getElementById('ink-panel');
+  const presetsContainer = document.getElementById('ink-presets');
+  const customContainer = document.getElementById('ink-custom');
+  if (!btn || !panel || !presetsContainer || !customContainer) return;
+
+  // Toggle dropdown
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = panel.classList.contains('open');
+    closeAllDropdowns();
+    if (!isOpen) panel.classList.add('open');
+  });
+
+  // Build preset rows
+  for (const preset of PALETTES) {
+    const row = document.createElement('div');
+    row.className = 'ink-preset-row' + (preset.id === currentPaletteId ? ' active' : '');
+    row.dataset.presetId = preset.id;
+
+    const dots = document.createElement('div');
+    dots.className = 'ink-preset-dots';
+    for (const role of ['base', 'water', 'built', 'green', 'ink'] as (keyof MapPalette)[]) {
+      const dot = document.createElement('span');
+      dot.className = 'ink-dot';
+      dot.style.background = INK_CATALOG[preset.palette[role]].hex;
+      dots.appendChild(dot);
+    }
+    row.appendChild(dots);
+
+    const name = document.createElement('span');
+    name.className = 'ink-preset-name';
+    name.textContent = preset.name;
+    row.appendChild(name);
+
+    row.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectPreset(map, preset);
+    });
+
+    presetsContainer.appendChild(row);
+  }
+
+  // Build customizer
+  buildCustomizer(map, customContainer);
+
+  // Restore persisted palette
+  restorePalette(map);
+}
+
+function selectPreset(map: maplibregl.Map, preset: PresetPalette): void {
+  currentPaletteId = preset.id;
+  currentMapPalette = { ...preset.palette };
+
+  const derived = buildDerivedPalette(currentMapPalette);
+  applyMapPalette(map, derived, currentMapPalette);
+  updatePALETTEFromDerived(derived);
+  updateLegendColors(derived);
+  updateInkUI();
+  persistPalette();
+  updateShareableHash();
+}
+
+function buildCustomizer(map: maplibregl.Map, container: HTMLElement): void {
+  const title = document.createElement('div');
+  title.className = 'ink-section-title';
+  title.textContent = 'Custom mix';
+  container.appendChild(title);
+
+  const roles: { key: keyof MapPalette; label: string }[] = [
+    { key: 'base',  label: 'Base' },
+    { key: 'water', label: 'Water' },
+    { key: 'built', label: 'Built' },
+    { key: 'green', label: 'Green' },
+    { key: 'ink',   label: 'Ink' },
+  ];
+
+  for (const { key, label } of roles) {
+    const cat = document.createElement('div');
+    cat.className = 'ink-category';
+    cat.dataset.role = key;
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'ink-category-header';
+
+    const dot = document.createElement('span');
+    dot.className = 'ink-dot ink-category-dot';
+    dot.style.background = INK_CATALOG[currentMapPalette[key]].hex;
+    header.appendChild(dot);
+
+    const labelEl = document.createElement('span');
+    labelEl.className = 'ink-category-label';
+    labelEl.textContent = label;
+    header.appendChild(labelEl);
+
+    const current = document.createElement('span');
+    current.className = 'ink-category-current';
+    current.textContent = INK_CATALOG[currentMapPalette[key]].name;
+    header.appendChild(current);
+
+    header.addEventListener('click', (e) => {
+      e.stopPropagation();
+      cat.classList.toggle('open');
+    });
+    cat.appendChild(header);
+
+    // Body — ink options
+    const body = document.createElement('div');
+    body.className = 'ink-category-body';
+
+    for (const inkId of CATEGORY_INKS[key]) {
+      const ink = INK_CATALOG[inkId];
+      const opt = document.createElement('button');
+      opt.className = 'ink-option' + (currentMapPalette[key] === inkId ? ' active' : '');
+      opt.dataset.inkId = inkId;
+
+      const optDot = document.createElement('span');
+      optDot.className = 'ink-dot';
+      optDot.style.background = ink.hex;
+      opt.appendChild(optDot);
+
+      const optName = document.createElement('span');
+      optName.textContent = ink.name;
+      opt.appendChild(optName);
+
+      opt.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectCategoryInk(map, key, inkId);
+      });
+
+      body.appendChild(opt);
+    }
+
+    cat.appendChild(body);
+    container.appendChild(cat);
+  }
+}
+
+function selectCategoryInk(map: maplibregl.Map, role: keyof MapPalette, inkId: string): void {
+  currentMapPalette[role] = inkId;
+  currentPaletteId = 'custom';
+
+  const derived = buildDerivedPalette(currentMapPalette);
+  applyMapPalette(map, derived, currentMapPalette);
+  updatePALETTEFromDerived(derived);
+  updateLegendColors(derived);
+  updateInkUI();
+  persistPalette();
+  updateShareableHash();
+}
+
+function updatePALETTEFromDerived(d: DerivedPalette): void {
+  // Keep the global PALETTE in sync for export and other reads
+  PALETTE = { ...d } as unknown as Record<string, string>;
+}
+
+function updateLegendColors(d: DerivedPalette): void {
+  const rows = document.querySelectorAll('.leg-item');
+  const colorMap: Record<string, string> = {
+    'Land': d.earth,
+    'Water': d.water,
+    'Buildings': d.buildings,
+    'Parks': d.park,
+  };
+
+  rows.forEach(row => {
+    const label = row.querySelector('span')?.textContent?.trim();
+    if (label && colorMap[label]) {
+      const rect = row.querySelector('rect');
+      if (rect) {
+        rect.setAttribute('fill', colorMap[label]);
+        rect.setAttribute('stroke', darken(colorMap[label], 0.15));
+      }
+    }
+  });
+}
+
+function updateInkUI(): void {
+  // Update preset rows active state
+  document.querySelectorAll('.ink-preset-row').forEach(row => {
+    const el = row as HTMLElement;
+    row.classList.toggle('active', el.dataset.presetId === currentPaletteId);
+  });
+
+  // Update category headers and option active states
+  document.querySelectorAll('.ink-category').forEach(cat => {
+    const el = cat as HTMLElement;
+    const role = el.dataset.role as keyof MapPalette;
+    if (!role) return;
+
+    const inkId = currentMapPalette[role];
+    const ink = INK_CATALOG[inkId];
+
+    // Update header dot + current name
+    const dot = cat.querySelector('.ink-category-dot') as HTMLElement | null;
+    if (dot) dot.style.background = ink.hex;
+    const cur = cat.querySelector('.ink-category-current');
+    if (cur) cur.textContent = ink.name;
+
+    // Update option active states
+    cat.querySelectorAll('.ink-option').forEach(opt => {
+      const optEl = opt as HTMLElement;
+      opt.classList.toggle('active', optEl.dataset.inkId === inkId);
+    });
+  });
+}
+
+/* ── Palette persistence ─────────────────────────────────── */
+function persistPalette(): void {
+  sessionStorage.setItem('wud-palette', JSON.stringify({
+    id: currentPaletteId,
+    palette: currentMapPalette,
+  }));
+}
+
+function restorePalette(map: maplibregl.Map): void {
+  // URL hash takes priority
+  const hash = window.location.hash.replace('#', '');
+  const parts = hash.split('/');
+  for (const part of parts) {
+    if (part.startsWith('p:')) {
+      const pVal = part.slice(2);
+      if (pVal.startsWith('custom:')) {
+        const inks = pVal.slice(7).split('-');
+        if (inks.length === 5) {
+          const [base, water, built, green, ink] = inks;
+          if (INK_CATALOG[base] && INK_CATALOG[water] && INK_CATALOG[built] && INK_CATALOG[green] && INK_CATALOG[ink]) {
+            currentMapPalette = { base, water, built, green, ink };
+            currentPaletteId = 'custom';
+            const derived = buildDerivedPalette(currentMapPalette);
+            applyMapPalette(map, derived, currentMapPalette);
+            updatePALETTEFromDerived(derived);
+            updateLegendColors(derived);
+            updateInkUI();
+            return;
+          }
+        }
+      } else {
+        const preset = PALETTES.find(p => p.id === pVal);
+        if (preset) {
+          selectPreset(map, preset);
+          return;
+        }
+      }
+    }
+  }
+
+  // Fallback: sessionStorage
+  const stored = sessionStorage.getItem('wud-palette');
+  if (stored) {
+    try {
+      const { id, palette } = JSON.parse(stored);
+      if (id && palette && palette.base && palette.water && palette.built && palette.green && palette.ink) {
+        // Validate all ink IDs exist
+        const allValid = [palette.base, palette.water, palette.built, palette.green, palette.ink]
+          .every((inkId: string) => INK_CATALOG[inkId]);
+        if (allValid) {
+          currentMapPalette = palette;
+          currentPaletteId = id;
+          const derived = buildDerivedPalette(currentMapPalette);
+          applyMapPalette(map, derived, currentMapPalette);
+          updatePALETTEFromDerived(derived);
+          updateLegendColors(derived);
+          updateInkUI();
+        }
+      }
+    } catch {
+      // Ignore
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
    TOOL: ↓ DOWNLOAD
    ══════════════════════════════════════════════════════════════ */
 function closeAllDropdowns() {
@@ -1417,7 +1704,8 @@ async function captureAndExport(map: maplibregl.Map, format: string, action: 'do
 
 async function exportCanvas(canvas: HTMLCanvasElement, format: string, action: 'download' | 'copy', _subtitle: string): Promise<void> {
   const citySlug = (currentCityName || 'world').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-  const filename = `upside-down-${format}-${citySlug}.png`;
+  const paletteSuffix = currentPaletteId !== 'classic' ? `-${currentPaletteId}` : '';
+  const filename = `upside-down-${format}-${citySlug}${paletteSuffix}.png`;
 
   if (action === 'download') {
     const link = document.createElement('a');
@@ -1537,6 +1825,16 @@ function updateShareableHash(): void {
   const colorName = getColorNameFromHex(currentColor);
   if (colorName && colorName !== 'yellow') {
     newHash += `/c:${colorName}`;
+  }
+
+  // Palette param
+  if (currentPaletteId !== 'classic') {
+    if (currentPaletteId === 'custom') {
+      const { base, water, built, green, ink } = currentMapPalette;
+      newHash += `/p:custom:${base}-${water}-${built}-${green}-${ink}`;
+    } else {
+      newHash += `/p:${currentPaletteId}`;
+    }
   }
 
   history.replaceState(null, '', newHash);
