@@ -4,7 +4,7 @@ import { initDymaxion } from "./dymaxion";
 import { RISO_INKS, PAPER, generateMisregistration, getSessionSeed } from "./riso";
 import {
   INK_CATALOG, PALETTES, CATEGORY_INKS, DEFAULT_PALETTE_ID,
-  buildDerivedPalette, applyMapPalette, darken,
+  buildDerivedPalette, applyMapPalette, buildTextPairings, darken,
   type MapPalette, type DerivedPalette, type PresetPalette,
 } from "./ink-palette";
 
@@ -1215,25 +1215,7 @@ function setupToolTitle(map: maplibregl.Map): void {
     setTimeout(() => document.addEventListener('click', handleClickOutside), 100);
   });
 
-  // Color dot clicks
-  colorStrip.querySelectorAll('.color-dot').forEach(dot => {
-    dot.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const el = dot as HTMLElement;
-      const color = el.dataset.color!;
-      const shadow = el.dataset.shadow!;
-
-      // Update active state
-      colorStrip.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
-      el.classList.add('active');
-
-      // Update CSS custom properties
-      root.style.setProperty('--sp-color', color);
-      root.style.setProperty('--sp-shadow', shadow);
-
-      updateShareableHash();
-    });
-  });
+  // Color dot clicks are handled by updateColorStrip() which rebuilds dots dynamically
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1286,7 +1268,10 @@ function setupToolInk(map: maplibregl.Map): void {
   // Build customizer
   buildCustomizer(map, customContainer);
 
-  // Restore persisted palette
+  // Initialize color strip from default palette
+  updateColorStrip(currentMapPalette);
+
+  // Restore persisted palette (may update color strip again)
   restorePalette(map);
 }
 
@@ -1298,6 +1283,7 @@ function selectPreset(map: maplibregl.Map, preset: PresetPalette): void {
   applyMapPalette(map, derived, currentMapPalette);
   updatePALETTEFromDerived(derived);
   updateLegendColors(derived);
+  updateColorStrip(currentMapPalette);
   updateInkUI();
   persistPalette();
   updateShareableHash();
@@ -1387,6 +1373,7 @@ function selectCategoryInk(map: maplibregl.Map, role: keyof MapPalette, inkId: s
   applyMapPalette(map, derived, currentMapPalette);
   updatePALETTEFromDerived(derived);
   updateLegendColors(derived);
+  updateColorStrip(currentMapPalette);
   updateInkUI();
   persistPalette();
   updateShareableHash();
@@ -1416,6 +1403,48 @@ function updateLegendColors(d: DerivedPalette): void {
       }
     }
   });
+}
+
+function updateColorStrip(mp: MapPalette): void {
+  const strip = document.getElementById('color-strip');
+  if (!strip) return;
+
+  const pairings = buildTextPairings(mp);
+  strip.innerHTML = '';
+
+  pairings.forEach((p, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'color-dot' + (i === 0 ? ' active' : '');
+    btn.dataset.color = p.color;
+    btn.dataset.shadow = p.shadow;
+    btn.setAttribute('aria-label', p.name);
+
+    const span = document.createElement('span');
+    span.style.background = p.color;
+    btn.appendChild(span);
+
+    if (p.recommended) {
+      btn.classList.add('recommended');
+    }
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      strip.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+      btn.classList.add('active');
+      root.style.setProperty('--sp-color', p.color);
+      root.style.setProperty('--sp-shadow', p.shadow);
+      updateShareableHash();
+    });
+
+    strip.appendChild(btn);
+  });
+
+  // Auto-apply recommended (first) pairing
+  const first = pairings[0];
+  if (first) {
+    root.style.setProperty('--sp-color', first.color);
+    root.style.setProperty('--sp-shadow', first.shadow);
+  }
 }
 
 function updateInkUI(): void {
@@ -1474,6 +1503,7 @@ function restorePalette(map: maplibregl.Map): void {
             applyMapPalette(map, derived, currentMapPalette);
             updatePALETTEFromDerived(derived);
             updateLegendColors(derived);
+            updateColorStrip(currentMapPalette);
             updateInkUI();
             return;
           }
@@ -1504,6 +1534,7 @@ function restorePalette(map: maplibregl.Map): void {
           applyMapPalette(map, derived, currentMapPalette);
           updatePALETTEFromDerived(derived);
           updateLegendColors(derived);
+          updateColorStrip(currentMapPalette);
           updateInkUI();
         }
       }
@@ -1793,13 +1824,6 @@ const COLOR_NAMES: Record<string, { color: string; shadow: string }> = {
   black:  { color: '#000000', shadow: '#333333' },
 };
 
-function getColorNameFromHex(hex: string): string | null {
-  for (const [name, val] of Object.entries(COLOR_NAMES)) {
-    if (val.color.toLowerCase() === hex.toLowerCase()) return name;
-  }
-  return null;
-}
-
 function updateShareableHash(): void {
   const hash = window.location.hash;
   // MapLibre hash format: #zoom/lat/lng
@@ -1821,10 +1845,13 @@ function updateShareableHash(): void {
     }
   }
 
+  // Text color — store as hex (without #) for dynamic palette pairings
   const currentColor = getComputedStyle(root).getPropertyValue('--sp-color').trim();
-  const colorName = getColorNameFromHex(currentColor);
-  if (colorName && colorName !== 'yellow') {
-    newHash += `/c:${colorName}`;
+  const defaultPairings = buildTextPairings(currentMapPalette);
+  const isDefault = defaultPairings.length > 0 && defaultPairings[0].color.toLowerCase() === currentColor.toLowerCase();
+  if (!isDefault && currentColor) {
+    const currentShadow = getComputedStyle(root).getPropertyValue('--sp-shadow').trim();
+    newHash += `/c:${currentColor.slice(1)}.${currentShadow.slice(1)}`;
   }
 
   // Palette param
@@ -1867,16 +1894,32 @@ function applyShareableParams(): void {
     hasCustomTitle = true;
   }
 
-  if (colorName && COLOR_NAMES[colorName]) {
-    const { color, shadow } = COLOR_NAMES[colorName];
-    root.style.setProperty('--sp-color', color);
-    root.style.setProperty('--sp-shadow', shadow);
+  if (colorName) {
+    let color: string | undefined;
+    let shadow: string | undefined;
 
-    // Update color strip active state
-    document.querySelectorAll('#color-strip .color-dot').forEach(dot => {
-      const el = dot as HTMLElement;
-      dot.classList.toggle('active', el.dataset.color === color);
-    });
+    // New format: hex.hex (e.g. "FF48B0.C4305C")
+    if (colorName.includes('.')) {
+      const [c, s] = colorName.split('.');
+      color = `#${c}`;
+      shadow = `#${s}`;
+    }
+    // Legacy format: named color
+    else if (COLOR_NAMES[colorName]) {
+      color = COLOR_NAMES[colorName].color;
+      shadow = COLOR_NAMES[colorName].shadow;
+    }
+
+    if (color && shadow) {
+      root.style.setProperty('--sp-color', color);
+      root.style.setProperty('--sp-shadow', shadow);
+
+      // Update color strip active state
+      document.querySelectorAll('#color-strip .color-dot').forEach(dot => {
+        const el = dot as HTMLElement;
+        dot.classList.toggle('active', el.dataset.color?.toLowerCase() === color!.toLowerCase());
+      });
+    }
   }
 
   // Restore session title if no URL title

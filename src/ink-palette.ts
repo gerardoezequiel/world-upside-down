@@ -104,6 +104,49 @@ export function darken(hex: string, amount: number): string {
   return rgbToHex(r * (1 - amount), g * (1 - amount), b * (1 - amount));
 }
 
+/* ── Text color pairings — derived from active palette inks ── */
+export interface TextPairing {
+  color: string;    // text fill
+  shadow: string;   // misregistration shadow
+  name: string;     // ink name for aria-label
+  recommended?: boolean;
+}
+
+function luminance(hex: string): number {
+  const [r, g, b] = hexToRgb(hex);
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+}
+
+export function buildTextPairings(mp: MapPalette): TextPairing[] {
+  // Order: green (recommended), water, built, ink, base
+  const roles: (keyof MapPalette)[] = ['green', 'water', 'built', 'ink', 'base'];
+  const seen = new Set<string>();
+  const pairings: TextPairing[] = [];
+
+  for (const role of roles) {
+    const inkId = mp[role];
+    if (seen.has(inkId)) continue; // skip duplicates (e.g. mono palette)
+    seen.add(inkId);
+
+    const ink = INK_CATALOG[inkId];
+    const lum = luminance(ink.hex);
+
+    // For dark inks, shadow is lighter; for light inks, shadow is darker
+    const shadow = lum < 0.35
+      ? lighten(ink.hex, 0.35)
+      : darken(ink.hex, 0.35);
+
+    pairings.push({
+      color: ink.hex,
+      shadow,
+      name: ink.name,
+      recommended: role === 'green',
+    });
+  }
+
+  return pairings;
+}
+
 /* ── Derived palette — full ~30 entries from 5 inks ────────── */
 export interface DerivedPalette {
   bg: string;
