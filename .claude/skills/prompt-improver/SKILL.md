@@ -51,6 +51,12 @@ Synthesise the research and answers into a structured execution prompt:
 ## Approach
 [The chosen technical approach with rationale]
 
+## Recommended Workflow
+[Which skill to invoke: /engineering-workflow, /writing-workflow, /design-workflow, /git-workflow, /full-cycle]
+
+## Key Agents
+[Which 2-4 agents are most relevant: technologist, frontend-dev, designer, etc.]
+
 ## Files to Modify
 [List of files with what changes in each]
 
@@ -64,6 +70,23 @@ Synthesise the research and answers into a structured execution prompt:
 ```
 
 Then ask the user: "This is the refined prompt. Should I proceed with execution, or adjust anything?"
+
+## Skill Selection Guide
+
+Match task type to workflow:
+
+| Task Type | Recommended Skill | Key Agents |
+|-----------|-------------------|------------|
+| New feature (code) | `/engineering-workflow` | technologist, frontend-dev or geo-frontend-dev, qa-engineer |
+| Bug fix | `/engineering-workflow` | technologist, qa-engineer |
+| Visual/UI change | `/design-workflow` | creative-director, designer, visual-qa |
+| Content/copy | `/writing-workflow` | copywriter, writer, philosopher |
+| Map accuracy issue | `/domain-review` | cartographer, geo-frontend-dev |
+| Multi-phase project | `/full-cycle` | (orchestrates all teams) |
+| Git branch work | `/git-workflow` | git-ops, technologist |
+| Research needed | Start with researcher or ux-ui-researcher | - |
+
+If the task spans multiple domains (e.g., "add a new map projection with explanatory text"), recommend `/full-cycle`.
 
 ## When NOT to Use This Skill
 

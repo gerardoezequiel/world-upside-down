@@ -18,39 +18,33 @@ Use this workflow when designing new features, refining visual identity, or audi
 
 ## Workflow Steps
 
-### Step 1: User Research
-Spawn the **ux-researcher** agent with:
+### Step 1: UX/UI Research
+Spawn the **ux-ui-researcher** agent with:
 - The feature or design context
-- Request: user needs analysis, accessibility requirements, interaction patterns
+- Request: user needs analysis, accessibility requirements, interaction patterns, AND best-in-class pattern analysis, responsive strategy
 
-Wait for UX brief.
+This consolidated agent handles both behavioural research and interface benchmarking. Wait for combined UX/UI brief.
 
-### Step 2: Pattern Benchmarking
-Spawn the **ui-researcher** agent with:
-- The feature type (map tool, overlay, panel, etc.)
-- Request: best-in-class pattern analysis, responsive strategy
-
-Wait for UI patterns report.
-
-### Step 3: Visual Execution
+### Step 2: Visual Execution
 Spawn the **designer** agent with:
-- The UX brief from Step 1
-- The UI patterns from Step 2
+- The UX/UI brief from Step 1
 - Request: visual specs, layout, typography, colour application
 
 Wait for design specs.
 
-### Step 4: Art Direction Review
+### Step 3: Art Direction Review
 Spawn the **creative-director** agent with:
-- The design specs from Step 3
+- The design specs from Step 2
 - Request: review for visual identity coherence, riso aesthetic, brand alignment
 
 Wait for art direction feedback. If changes needed, re-spawn designer.
 
-### Step 5: Visual QA
+### Step 4: Visual QA (after implementation)
 Spawn the **visual-qa** agent with:
-- The implemented design (or design specs)
+- The implemented design
 - Request: screenshot testing, responsive verification, visual regression check
+
+Note: Step 4 runs after engineering has implemented the design, not during the design phase.
 
 ## After Completion
 

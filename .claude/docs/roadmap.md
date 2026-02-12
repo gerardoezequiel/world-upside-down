@@ -9,13 +9,14 @@ World Upside Down: an interactive cartographic art tool that challenges the conv
 - 6 style presets, 19 fonts, 34 riso inks
 - Export to PNG, URL sharing, geocoding
 - Story page (editorial scroll)
-- 23-agent swarm with 11 workflow Skills
+- 22-agent swarm with 11 workflow Skills (consolidated from 24)
 - Modular codebase (16 extracted modules from main.ts)
+- OpenClaw integration: MCP bridge configured, cross-machine cooperation enabled
 
 ## Active Work
-- OpenClaw MCP bridge: installed, awaiting remote Gateway URL configuration
 - Foundry-inspired self-improvement: workflow observation hook active, collecting data
 - Image generation integration research (fal.ai FLUX.2 Pro, Ideogram)
+- Agent metrics tracking: measuring spawn counts, success rates, utilisation
 
 ## Next
 - Story page content production (editorial writing about map orientation)
@@ -43,3 +44,9 @@ World Upside Down: an interactive cartographic art tool that challenges the conv
 - Agent swarm improvements: prompt sharpening, quality hooks, memory seeding
 - Prompt improvement pipeline: UserPromptSubmit hook + /prompt-improver skill
 - OpenClaw research and integration documentation
+- OpenClaw MCP bridge configuration and cross-machine cooperation
+- Agent consolidation: ux-researcher + ui-researcher → ux-ui-researcher (24 → 22 agents)
+- Director failure handling protocol (4-level escalation)
+- Cross-team handoff patterns for tightly coupled work
+- Prompt-improver auto-skill suggestion
+- Agent metrics tracking system
