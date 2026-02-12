@@ -1443,7 +1443,7 @@ body {
   }
 
   #top-band {
-    height: 38px;
+    height: 44px;
     padding: 0 12px;
   }
 
@@ -1459,12 +1459,143 @@ body {
     width: 200px;
   }
 
-  .geocoder-results { width: 280px; }
+  .geocoder-results {
+    position: fixed;
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-height: 50vh;
+    border: none;
+    border-top: 2px solid var(--rule);
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.12);
+    z-index: 200;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .geocoder-result {
+    padding: 12px 16px;
+    min-height: 48px;
+  }
+
+  .geocoder-result-name { font-size: 15px; }
+  .geocoder-result-detail { font-size: 12px; }
+
+  /* Toolbar: 44px touch targets */
+  .tb-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 16px;
+  }
+
+  #toolbar { gap: 0; margin-right: 0; }
 
   #coords { font-size: 7px; gap: 4px; }
 
+  /* Dropdown panels → bottom sheets */
+  .tb-dropdown-menu {
+    position: fixed;
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin-top: 0;
+    min-width: 0;
+    width: 100%;
+    max-height: 70vh;
+    overflow-y: auto;
+    border: none;
+    border-top: 2px solid var(--rule);
+    border-radius: 0;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.12);
+    transform: translateY(100%);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    -webkit-overflow-scrolling: touch;
+    z-index: 200;
+    padding-top: 12px;
+  }
+
+  .tb-dropdown-menu.open {
+    transform: translateY(0);
+  }
+
+  /* Drag handle on bottom sheets */
+  .tb-dropdown-menu::before {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 4px;
+    background: var(--light);
+    border-radius: 2px;
+    margin: 0 auto 8px;
+    opacity: 0.5;
+  }
+
+  .tb-dropdown-item {
+    padding: 14px 20px;
+    font-size: 13px;
+    min-height: 48px;
+  }
+
+  .tb-dropdown-item small {
+    font-size: 11px;
+  }
+
+  /* Style panel bottom sheet */
+  .style-panel {
+    min-width: 0;
+    max-width: 100%;
+    max-height: 70vh;
+    padding: 8px 0 env(safe-area-inset-bottom, 16px);
+  }
+
+  .style-preset-hero { font-size: 14px; }
+
+  /* Ink option touch targets */
+  .ink-option {
+    padding: 8px 10px 8px 6px;
+    font-size: 11px;
+    min-height: 40px;
+  }
+
+  .ink-category-header {
+    padding: 10px 16px;
+    min-height: 44px;
+  }
+
+  .ink-preset-row {
+    padding: 10px 16px;
+    min-height: 44px;
+  }
+
+  /* Font panel bottom sheet */
+  .font-panel {
+    min-width: 0;
+    max-width: 100%;
+    max-height: 70vh;
+  }
+
+  .font-pairing-card {
+    padding: 12px 16px;
+    min-height: 48px;
+  }
+
+  .font-pairing-hero { font-size: 15px; }
+  .font-pairing-ticker { font-size: 11px; }
+
+  .font-category-header {
+    padding: 10px 16px;
+    min-height: 44px;
+  }
+
+  .font-option {
+    padding: 8px 12px;
+    min-height: 44px;
+  }
+
   #bot-band {
-    height: 44px;
+    height: 48px;
     padding: 0 12px;
     gap: 12px;
   }
@@ -1502,14 +1633,68 @@ body {
     gap: 10px;
   }
 
+  .color-dot span {
+    width: 28px;
+    height: 28px;
+  }
+
   .ticker-track { bottom: 2px; height: 24px; }
   .ticker { font-size: clamp(12px, 3vw, 16px); }
 
-  .style-panel { min-width: 240px; max-height: 380px; }
-  .style-preset-hero { font-size: 14px; }
-  .font-panel { min-width: 220px; max-height: 360px; }
-  .font-pairing-hero { font-size: 15px; }
-  .font-pairing-ticker { font-size: 11px; }
+  /* Export preview: full width */
+  .export-canvas {
+    max-width: 90%;
+    max-height: 50%;
+  }
+
+  .export-btn {
+    padding: 12px 24px;
+    font-size: 11px;
+    min-height: 44px;
+  }
+
+  .export-close {
+    top: env(safe-area-inset-top, 8px);
+    right: 8px;
+    font-size: 28px;
+    padding: 8px 12px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .export-toggle {
+    font-size: 10px;
+    padding: 4px;
+    min-height: 36px;
+  }
+
+  .export-toggle input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+  }
+
+  .export-subtitle {
+    font-size: 14px;
+    padding: 8px 0;
+  }
+
+  /* Style preset cards: bigger touch targets */
+  .style-preset-card {
+    padding: 12px 16px;
+    min-height: 48px;
+  }
+
+  .style-customize-toggle {
+    padding: 12px 16px;
+    font-size: 12px;
+    min-height: 44px;
+  }
+
+  .font-mix-toggle {
+    padding: 12px 16px;
+    font-size: 12px;
+    min-height: 44px;
+  }
 }
 
 /* ══════════════════════════════════════
@@ -1524,30 +1709,51 @@ body {
   }
 
   #top-band {
-    height: 36px;
-    padding: 0 10px;
+    height: 44px;
+    padding: 0 8px;
     padding-top: env(safe-area-inset-top, 0px);
+    gap: 4px;
   }
 
   #city-title { font-size: 15px; }
 
   #geocoder-input {
-    font-size: 14px;
-    width: 160px;
+    font-size: 16px; /* prevents iOS zoom on focus */
+    width: 140px;
   }
 
-  .geocoder-results { width: 240px; }
+  /* Geocoder already a bottom sheet from 768px breakpoint — just increase height */
+  .geocoder-results {
+    max-height: 60vh;
+  }
 
-  #coords { font-size: 6.5px; }
-  .coord-sep { display: none; }
-  #coords { gap: 3px; flex-wrap: wrap; }
+  /* Hide coords on phone — they're in the way */
+  #coords { display: none; }
+
+  /* Toolbar: maintain 44px targets, tighter spacing */
+  .tb-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+
+  #toolbar { gap: 0; margin-right: 0; }
+
+  /* Bottom sheet: taller on phone */
+  .tb-dropdown-menu {
+    max-height: 80vh;
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+  }
 
   #bot-band {
-    height: 40px;
+    height: 44px;
     padding: 0 10px;
     padding-bottom: env(safe-area-inset-bottom, 0px);
     gap: 8px;
   }
+
+  /* Hide legend on phone, too cramped */
+  .legend-block { display: none; }
 
   .north-arrow svg { width: 24px; height: 24px; }
   .scale-block { gap: 6px; }
@@ -1570,38 +1776,77 @@ body {
   }
 
   .flip-btn {
-    width: 42px;
-    height: 42px;
+    width: 48px;
+    height: 48px;
   }
 
-  .flip-btn-arrow { font-size: 18px; }
+  .flip-btn-arrow { font-size: 20px; }
 
   .reg-mark {
     bottom: 10px;
     right: 10px;
   }
 
-
-  .tb-btn {
-    width: 26px;
-    height: 26px;
-    font-size: 12px;
+  /* Export: full-screen overlay on phone */
+  .export-preview {
+    gap: 12px;
+    padding: 16px;
+    padding-top: calc(16px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   }
+
+  .export-canvas {
+    max-width: 95%;
+    max-height: 45%;
+  }
+
+  .export-controls {
+    max-width: 100%;
+    gap: 10px;
+  }
+
+  .export-actions {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .export-btn {
+    flex: 1;
+    padding: 14px 16px;
+    font-size: 11px;
+    min-height: 48px;
+    text-align: center;
+  }
+
+  .export-options-row {
+    gap: 12px;
+  }
+
+  /* Screenprint overlay: slightly larger on phone */
+  .screenprint-line { font-size: 18vw; }
 }
 
 /* ── Very small phones ── */
 @media (max-width: 374px) {
-  #top-band { padding: 0 8px; }
+  #top-band { padding: 0 6px; gap: 2px; }
   #city-title { font-size: 13px; }
-  #geocoder-input { font-size: 13px; width: 120px; }
-  .geocoder-results { width: 200px; }
-  #coords { font-size: 6px; }
-  #bot-band { padding: 0 8px; gap: 6px; }
+  #geocoder-input { font-size: 16px; width: 100px; } /* keep 16px to prevent iOS zoom */
+  #bot-band { padding: 0 8px; gap: 4px; }
   .north-arrow svg { width: 20px; height: 20px; }
+  .scale-ratio { display: none; }
   .bot-author { font-size: 6px; }
   #flip-toast { font-size: 13px; padding: 6px 12px; }
-  .flip-btn { width: 36px; height: 36px; }
+  .flip-btn { width: 44px; height: 44px; } /* keep 44px minimum */
   .flip-btn-arrow { font-size: 16px; }
+
+  /* Toolbar: hide less-used buttons on very small screens */
+  #tool-globe { display: none; }
+
+  .tb-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 13px;
+  }
 }
 
 /* ══════════════════════════════════════
@@ -1861,6 +2106,24 @@ body {
   --hero-font-family: 'Anton', sans-serif;
   --hero-font-variation: normal;
   --ticker-font-family: 'Caveat', cursive;
+}
+
+/* ══════════════════════════════════════
+   RESPONSIVE — Landscape phone
+   ══════════════════════════════════════ */
+@media (max-height: 500px) and (orientation: landscape) {
+  #top-band { height: 36px; }
+  #bot-band { height: 36px; }
+
+  .screenprint-line { font-size: 12vh; }
+
+  .tb-dropdown-menu {
+    max-height: 90vh;
+  }
+
+  .touch-controls { bottom: 6px; right: 12px; }
+  .flip-btn { width: 40px; height: 40px; }
+  .touch-prompt { display: none; }
 }
 
 /* ── Print ── */
