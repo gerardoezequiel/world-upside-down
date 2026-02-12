@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:bench": "vitest bench"
   },
   "dependencies": {
     "@vercel/analytics": "^1.6.1",
@@ -22,7 +25,9 @@
     "@types/d3-geo": "^3.1.0",
     "@types/topojson-client": "^3.1.5",
     "@types/topojson-specification": "^1.0.5",
+    "happy-dom": "^20.6.1",
     "typescript": "^5.7.0",
-    "vite": "^6.1.0"
+    "vite": "^6.1.0",
+    "vitest": "^4.0.18"
   }
 }
