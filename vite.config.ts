@@ -1,4 +1,3 @@
-/// <reference types="vitest" />
 import { defineConfig } from "vite";
 import { resolve } from "path";
 
@@ -12,9 +11,5 @@ export default defineConfig({
         story: resolve(__dirname, "story.html"),
       },
     },
-  },
-  test: {
-    environment: "happy-dom",
-    include: ["src/__tests__/**/*.test.ts"],
   },
 });
