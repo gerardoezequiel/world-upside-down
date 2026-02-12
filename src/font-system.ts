@@ -226,6 +226,27 @@ export const FONT_PAIRINGS: FontPairing[] = [
 
 export const DEFAULT_PAIRING_ID = 'poster';
 
+/* ── Unified style presets — ink + font + text in one click ─ */
+export interface StylePreset {
+  id: string;
+  name: string;
+  inkPalette: string;    // PALETTES id
+  fontPairing: string;   // FONT_PAIRINGS id
+  textInk: string;       // ink id from INK_CATALOG for screenprint text color
+  character: string;
+}
+
+export const STYLE_PRESETS: StylePreset[] = [
+  { id: 'poster',    name: 'Poster',    inkPalette: 'classic',   fontPairing: 'poster',      textInk: 'fluorPink',  character: 'Fat face on riso paper. The gallery opening.' },
+  { id: 'protest',   name: 'Protest',   inkPalette: 'protest',   fontPairing: 'rally',       textInk: 'yellow',     character: 'Condensed type, loud ink. The march.' },
+  { id: 'blueprint', name: 'Blueprint', inkPalette: 'blueprint', fontPairing: 'dispatch',    textInk: 'teal',       character: 'All blue, sharp gothic. The architect\'s proof.' },
+  { id: 'botanical', name: 'Botanical', inkPalette: 'botanical', fontPairing: 'letterpress', textInk: 'green',      character: 'Soft green, hand-carved serif. The nature print.' },
+  { id: 'neon',      name: 'Neon',      inkPalette: 'neon',      fontPairing: 'zine',        textInk: 'fluorPink',  character: 'Marker scrawl, fluorescent ink. The zine cover.' },
+  { id: 'mono',      name: 'Mono',      inkPalette: 'mono',      fontPairing: 'broadsheet',  textInk: 'blue',       character: 'One colour, slab serif. The serious map.' },
+];
+
+export const DEFAULT_STYLE_ID = 'poster';
+
 /* ── Ticker companion lookup ──────────────────────────────── */
 export const TICKER_COMPANIONS: Record<FontCategory, string[]> = {
   slab:    ['caveat', 'syne', 'space-mono'],

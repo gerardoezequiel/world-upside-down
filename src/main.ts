@@ -5,15 +5,15 @@ import { RISO_INKS, PAPER, generateMisregistration, getSessionSeed } from "./ris
 import {
   INK_CATALOG, PALETTES, CATEGORY_INKS, DEFAULT_PALETTE_ID,
   buildDerivedPalette, applyMapPalette, buildTextPairings, darken,
-  type MapPalette, type DerivedPalette, type PresetPalette,
+  type MapPalette, type DerivedPalette,
 } from "./ink-palette";
 import {
-  FONT_CATALOG, FONT_CATEGORIES, FONT_PAIRINGS, DEFAULT_PAIRING_ID,
-  TICKER_COMPANIONS, TICKER_PHRASES,
+  FONT_CATEGORIES, FONT_PAIRINGS, DEFAULT_PAIRING_ID,
+  STYLE_PRESETS, DEFAULT_STYLE_ID,
   getFont, getFontsByCategory, generateTickerPhrase,
   createFontState, applyPairing, applyHeroFont, applyTickerFont,
-  loadFontById, preloadAllFonts, persistFontState, restoreFontState,
-  type FontDefinition, type FontPairing, type FontState, type FontCategory,
+  preloadAllFonts, persistFontState,
+  type FontState, type FontCategory, type StylePreset,
 } from "./font-system";
 
 /* ── 5-Colour Risograph — Official Riso Kagaku Inks ─────────── */
@@ -56,6 +56,9 @@ let currentMapPalette: MapPalette = { ...PALETTES[0].palette };
 
 /* ── Font state ───────────────────────────────────────────── */
 const fontState: FontState = createFontState();
+
+/* ── Unified style state ──────────────────────────────────── */
+let currentStyleId = DEFAULT_STYLE_ID;
 
 /* ── Color replacement map ────────────────────────────────── */
 const COLOR_MAP: Record<string, string> = {
@@ -1040,8 +1043,8 @@ function closeAllPanels() {
 function setupTools(map: maplibregl.Map): void {
   setupToolLocate(map);
   setupToolTitle(map);
-  setupToolInk(map);
-  setupToolFont(map);
+  setupToolStyle(map);
+  setupToolGlobe(map);
   setupToolDownload(map);
   setupToolShare(map);
 }
@@ -1231,81 +1234,162 @@ function setupToolTitle(map: maplibregl.Map): void {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   TOOL: ◉ INK PALETTE
+   TOOL: ◉ UNIFIED STYLE (ink + font + text in one panel)
    ══════════════════════════════════════════════════════════════ */
-function setupToolInk(map: maplibregl.Map): void {
-  const btn = document.getElementById('tool-ink');
-  const panel = document.getElementById('ink-panel');
-  const presetsContainer = document.getElementById('ink-presets');
-  const customContainer = document.getElementById('ink-custom');
+function setupToolStyle(map: maplibregl.Map): void {
+  const btn = document.getElementById('tool-style');
+  const panel = document.getElementById('style-panel');
+  const presetsContainer = document.getElementById('style-presets');
+  const customContainer = document.getElementById('style-customize');
   if (!btn || !panel || !presetsContainer || !customContainer) return;
+
+  let fontsPreloading = false;
 
   // Toggle dropdown
   btn.addEventListener('click', (e) => {
     e.stopPropagation();
     const isOpen = panel.classList.contains('open');
     closeAllDropdowns();
-    if (!isOpen) panel.classList.add('open');
+    if (!isOpen) {
+      panel.classList.add('open');
+      if (!fontsPreloading) {
+        fontsPreloading = true;
+        preloadAllFonts(fontState);
+      }
+    }
   });
 
-  // Build preset rows
-  for (const preset of PALETTES) {
-    const row = document.createElement('div');
-    row.className = 'ink-preset-row' + (preset.id === currentPaletteId ? ' active' : '');
-    row.dataset.presetId = preset.id;
+  // Build style preset cards
+  const placeName = currentCityName || 'London';
 
-    const dots = document.createElement('div');
-    dots.className = 'ink-preset-dots';
+  for (const style of STYLE_PRESETS) {
+    const inkPreset = PALETTES.find(p => p.id === style.inkPalette);
+    const fontPairing = FONT_PAIRINGS.find(p => p.id === style.fontPairing);
+    if (!inkPreset || !fontPairing) continue;
+
+    const heroFont = getFont(fontPairing.hero);
+    const tickerFont = getFont(fontPairing.ticker);
+    if (!heroFont || !tickerFont) continue;
+
+    const card = document.createElement('div');
+    card.className = 'style-preset-card' + (style.id === currentStyleId ? ' active' : '');
+    card.dataset.styleId = style.id;
+
+    // Top row: ink dots
+    const dotsRow = document.createElement('div');
+    dotsRow.className = 'style-preset-dots';
     for (const role of ['base', 'water', 'built', 'green', 'ink'] as (keyof MapPalette)[]) {
       const dot = document.createElement('span');
       dot.className = 'ink-dot';
-      dot.style.background = INK_CATALOG[preset.palette[role]].hex;
-      dots.appendChild(dot);
+      dot.style.background = INK_CATALOG[inkPreset.palette[role]].hex;
+      dotsRow.appendChild(dot);
     }
-    row.appendChild(dots);
+    // Text color dot
+    const textDot = document.createElement('span');
+    textDot.className = 'ink-dot style-text-dot';
+    const textInk = INK_CATALOG[style.textInk];
+    if (textInk) textDot.style.background = textInk.hex;
+    dotsRow.appendChild(textDot);
+    card.appendChild(dotsRow);
 
-    const name = document.createElement('span');
-    name.className = 'ink-preset-name';
-    name.textContent = preset.name;
-    row.appendChild(name);
+    // Hero sample
+    const heroSample = document.createElement('div');
+    heroSample.className = 'style-preset-hero';
+    heroSample.style.fontFamily = heroFont.family;
+    if (heroFont.isVariable && heroFont.variableAxes?.WONK) {
+      heroSample.style.fontVariationSettings = "'WONK' 1, 'opsz' 144";
+    }
+    if (textInk) heroSample.style.color = textInk.hex;
+    heroSample.textContent = heroFont.sampleText;
+    card.appendChild(heroSample);
 
-    row.addEventListener('click', (e) => {
+    // Ticker sample
+    const tickerSample = document.createElement('div');
+    tickerSample.className = 'style-preset-ticker';
+    tickerSample.style.fontFamily = tickerFont.family;
+    tickerSample.innerHTML = `lost in <span style="font-family:${heroFont.family};text-transform:uppercase;font-weight:700">${placeName}</span>`;
+    card.appendChild(tickerSample);
+
+    // Meta row
+    const meta = document.createElement('div');
+    meta.className = 'style-preset-meta';
+    const nameEl = document.createElement('span');
+    nameEl.className = 'style-preset-name';
+    nameEl.textContent = style.name;
+    meta.appendChild(nameEl);
+    const charEl = document.createElement('span');
+    charEl.className = 'style-preset-char';
+    charEl.textContent = style.character;
+    meta.appendChild(charEl);
+    card.appendChild(meta);
+
+    card.addEventListener('click', (e) => {
       e.stopPropagation();
-      selectPreset(map, preset);
+      applyStylePreset(map, style);
     });
 
-    presetsContainer.appendChild(row);
+    presetsContainer.appendChild(card);
   }
 
-  // Build customizer
-  buildCustomizer(map, customContainer);
+  // "customize..." toggle
+  const customToggle = document.createElement('button');
+  customToggle.className = 'style-customize-toggle';
+  customToggle.textContent = 'customize...';
+  customToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    customContainer.classList.toggle('open');
+    customToggle.textContent = customContainer.classList.contains('open') ? 'back to presets' : 'customize...';
+  });
+  presetsContainer.appendChild(customToggle);
 
-  // Initialize color strip from default palette
+  // Build customizer: ink section + font section
+  buildInkCustomizer(map, customContainer);
+  buildFontCustomizer(customContainer);
+
+  // Initialize color strip + restore persisted state
   updateColorStrip(currentMapPalette);
-
-  // Restore persisted palette (may update color strip again)
-  restorePalette(map);
+  restoreStyle(map);
 }
 
-function selectPreset(map: maplibregl.Map, preset: PresetPalette): void {
-  currentPaletteId = preset.id;
-  currentMapPalette = { ...preset.palette };
+async function applyStylePreset(map: maplibregl.Map, style: StylePreset): Promise<void> {
+  currentStyleId = style.id;
 
-  const derived = buildDerivedPalette(currentMapPalette);
-  applyMapPalette(map, derived, currentMapPalette);
-  updatePALETTEFromDerived(derived);
-  updateLegendColors(derived);
-  updateColorStrip(currentMapPalette);
-  updateInkUI();
-  persistPalette();
+  // 1. Apply ink palette
+  const inkPreset = PALETTES.find(p => p.id === style.inkPalette);
+  if (inkPreset) {
+    currentPaletteId = inkPreset.id;
+    currentMapPalette = { ...inkPreset.palette };
+    const derived = buildDerivedPalette(currentMapPalette);
+    applyMapPalette(map, derived, currentMapPalette);
+    updatePALETTEFromDerived(derived);
+    updateLegendColors(derived);
+    updateColorStrip(currentMapPalette);
+  }
+
+  // 2. Apply font pairing
+  await applyPairing(style.fontPairing, fontState);
+
+  // 3. Apply text color from style's textInk
+  const textInk = INK_CATALOG[style.textInk];
+  if (textInk) {
+    root.style.setProperty('--sp-color', textInk.hex);
+    root.style.setProperty('--sp-shadow', darken(textInk.hex, 0.35));
+  }
+
+  // 4. Update all UI
+  updateStyleUI();
+  persistStyle();
   updateShareableHash();
 }
 
-function buildCustomizer(map: maplibregl.Map, container: HTMLElement): void {
+function buildInkCustomizer(map: maplibregl.Map, container: HTMLElement): void {
+  const section = document.createElement('div');
+  section.className = 'style-custom-section';
+
   const title = document.createElement('div');
   title.className = 'ink-section-title';
-  title.textContent = 'Custom mix';
-  container.appendChild(title);
+  title.textContent = 'Ink drums';
+  section.appendChild(title);
 
   const roles: { key: keyof MapPalette; label: string }[] = [
     { key: 'base',  label: 'Base' },
@@ -1320,7 +1404,6 @@ function buildCustomizer(map: maplibregl.Map, container: HTMLElement): void {
     cat.className = 'ink-category';
     cat.dataset.role = key;
 
-    // Header
     const header = document.createElement('div');
     header.className = 'ink-category-header';
 
@@ -1345,7 +1428,6 @@ function buildCustomizer(map: maplibregl.Map, container: HTMLElement): void {
     });
     cat.appendChild(header);
 
-    // Body — ink options
     const body = document.createElement('div');
     body.className = 'ink-category-body';
 
@@ -1373,21 +1455,103 @@ function buildCustomizer(map: maplibregl.Map, container: HTMLElement): void {
     }
 
     cat.appendChild(body);
-    container.appendChild(cat);
+    section.appendChild(cat);
   }
+
+  container.appendChild(section);
+}
+
+function buildFontCustomizer(container: HTMLElement): void {
+  const section = document.createElement('div');
+  section.className = 'style-custom-section';
+
+  const title = document.createElement('div');
+  title.className = 'ink-section-title';
+  title.textContent = 'Hero font';
+  section.appendChild(title);
+
+  const byCategory = getFontsByCategory();
+  const categories: FontCategory[] = ['slab', 'fatface', 'blade', 'hand', 'wire', 'scrawl'];
+
+  for (const catId of categories) {
+    const catMeta = FONT_CATEGORIES[catId];
+    const fonts = byCategory[catId];
+    if (!fonts.length) continue;
+
+    const cat = document.createElement('div');
+    cat.className = 'font-category';
+    cat.dataset.category = catId;
+
+    const header = document.createElement('div');
+    header.className = 'font-category-header';
+    header.textContent = catMeta.label;
+
+    const current = document.createElement('span');
+    current.className = 'font-category-current';
+    const activeFont = fonts.find(f => f.id === fontState.activeHero);
+    current.textContent = activeFont ? activeFont.name : '';
+    header.appendChild(current);
+
+    header.addEventListener('click', (e) => {
+      e.stopPropagation();
+      cat.classList.toggle('open');
+    });
+    cat.appendChild(header);
+
+    const body = document.createElement('div');
+    body.className = 'font-category-body';
+
+    for (const font of fonts) {
+      const opt = document.createElement('button');
+      opt.className = 'font-option' + (fontState.activeHero === font.id ? ' active' : '');
+      opt.dataset.fontId = font.id;
+
+      const sample = document.createElement('span');
+      sample.className = 'font-option-sample';
+      sample.style.fontFamily = font.family;
+      if (font.isVariable && font.variableAxes?.WONK) {
+        sample.style.fontVariationSettings = "'WONK' 1, 'opsz' 144";
+      }
+      sample.textContent = font.sampleText;
+      opt.appendChild(sample);
+
+      const name = document.createElement('span');
+      name.className = 'font-option-name';
+      name.textContent = font.name;
+      opt.appendChild(name);
+
+      opt.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        await applyHeroFont(font.id, fontState);
+        fontState.activePairing = 'custom';
+        currentStyleId = 'custom';
+        updateStyleUI();
+        persistStyle();
+        updateShareableHash();
+      });
+
+      body.appendChild(opt);
+    }
+
+    cat.appendChild(body);
+    section.appendChild(cat);
+  }
+
+  container.appendChild(section);
 }
 
 function selectCategoryInk(map: maplibregl.Map, role: keyof MapPalette, inkId: string): void {
   currentMapPalette[role] = inkId;
   currentPaletteId = 'custom';
+  currentStyleId = 'custom';
 
   const derived = buildDerivedPalette(currentMapPalette);
   applyMapPalette(map, derived, currentMapPalette);
   updatePALETTEFromDerived(derived);
   updateLegendColors(derived);
   updateColorStrip(currentMapPalette);
-  updateInkUI();
-  persistPalette();
+  updateStyleUI();
+  persistStyle();
   updateShareableHash();
 }
 
@@ -1459,14 +1623,15 @@ function updateColorStrip(mp: MapPalette): void {
   }
 }
 
-function updateInkUI(): void {
-  // Update preset rows active state
-  document.querySelectorAll('.ink-preset-row').forEach(row => {
-    const el = row as HTMLElement;
-    row.classList.toggle('active', el.dataset.presetId === currentPaletteId);
+/* ── Unified style UI update ─────────────────────────────── */
+function updateStyleUI(): void {
+  // Style preset cards
+  document.querySelectorAll('.style-preset-card').forEach(card => {
+    const el = card as HTMLElement;
+    card.classList.toggle('active', el.dataset.styleId === currentStyleId);
   });
 
-  // Update category headers and option active states
+  // Ink category headers and option active states
   document.querySelectorAll('.ink-category').forEach(cat => {
     const el = cat as HTMLElement;
     const role = el.dataset.role as keyof MapPalette;
@@ -1475,33 +1640,69 @@ function updateInkUI(): void {
     const inkId = currentMapPalette[role];
     const ink = INK_CATALOG[inkId];
 
-    // Update header dot + current name
     const dot = cat.querySelector('.ink-category-dot') as HTMLElement | null;
     if (dot) dot.style.background = ink.hex;
     const cur = cat.querySelector('.ink-category-current');
     if (cur) cur.textContent = ink.name;
 
-    // Update option active states
     cat.querySelectorAll('.ink-option').forEach(opt => {
       const optEl = opt as HTMLElement;
       opt.classList.toggle('active', optEl.dataset.inkId === inkId);
     });
   });
+
+  // Font options active state + category current
+  document.querySelectorAll('.font-category').forEach(cat => {
+    const el = cat as HTMLElement;
+    const catId = el.dataset.category;
+    if (!catId) return;
+
+    cat.querySelectorAll('.font-option').forEach(opt => {
+      const optEl = opt as HTMLElement;
+      opt.classList.toggle('active', optEl.dataset.fontId === fontState.activeHero);
+    });
+
+    const cur = cat.querySelector('.font-category-current');
+    const byCategory = getFontsByCategory();
+    const fonts = byCategory[catId as FontCategory] || [];
+    const activeFont = fonts.find(f => f.id === fontState.activeHero);
+    if (cur) cur.textContent = activeFont ? activeFont.name : '';
+  });
 }
 
-/* ── Palette persistence ─────────────────────────────────── */
-function persistPalette(): void {
-  sessionStorage.setItem('wud-palette', JSON.stringify({
-    id: currentPaletteId,
+/* ── Unified persistence ─────────────────────────────────── */
+function persistStyle(): void {
+  sessionStorage.setItem('wud-style', JSON.stringify({
+    styleId: currentStyleId,
+    paletteId: currentPaletteId,
     palette: currentMapPalette,
+    fontPairing: fontState.activePairing,
+    hero: fontState.activeHero,
+    ticker: fontState.activeTicker,
   }));
+  persistFontState(fontState);
 }
 
-function restorePalette(map: maplibregl.Map): void {
-  // URL hash takes priority
+async function restoreStyle(map: maplibregl.Map): Promise<void> {
+  // URL hash: check for s: (unified style) or p:/f: (individual)
   const hash = window.location.hash.replace('#', '');
   const parts = hash.split('/');
+
+  let restoredInk = false;
+  let restoredFont = false;
+
   for (const part of parts) {
+    // Unified style param
+    if (part.startsWith('s:')) {
+      const sVal = part.slice(2);
+      const style = STYLE_PRESETS.find(s => s.id === sVal);
+      if (style) {
+        await applyStylePreset(map, style);
+        return;
+      }
+    }
+
+    // Individual ink palette param
     if (part.startsWith('p:')) {
       const pVal = part.slice(2);
       if (pVal.startsWith('custom:')) {
@@ -1511,260 +1712,31 @@ function restorePalette(map: maplibregl.Map): void {
           if (INK_CATALOG[base] && INK_CATALOG[water] && INK_CATALOG[built] && INK_CATALOG[green] && INK_CATALOG[ink]) {
             currentMapPalette = { base, water, built, green, ink };
             currentPaletteId = 'custom';
+            currentStyleId = 'custom';
             const derived = buildDerivedPalette(currentMapPalette);
             applyMapPalette(map, derived, currentMapPalette);
             updatePALETTEFromDerived(derived);
             updateLegendColors(derived);
             updateColorStrip(currentMapPalette);
-            updateInkUI();
-            return;
+            restoredInk = true;
           }
         }
       } else {
         const preset = PALETTES.find(p => p.id === pVal);
         if (preset) {
-          selectPreset(map, preset);
-          return;
-        }
-      }
-    }
-  }
-
-  // Fallback: sessionStorage
-  const stored = sessionStorage.getItem('wud-palette');
-  if (stored) {
-    try {
-      const { id, palette } = JSON.parse(stored);
-      if (id && palette && palette.base && palette.water && palette.built && palette.green && palette.ink) {
-        // Validate all ink IDs exist
-        const allValid = [palette.base, palette.water, palette.built, palette.green, palette.ink]
-          .every((inkId: string) => INK_CATALOG[inkId]);
-        if (allValid) {
-          currentMapPalette = palette;
-          currentPaletteId = id;
+          currentPaletteId = preset.id;
+          currentMapPalette = { ...preset.palette };
           const derived = buildDerivedPalette(currentMapPalette);
           applyMapPalette(map, derived, currentMapPalette);
           updatePALETTEFromDerived(derived);
           updateLegendColors(derived);
           updateColorStrip(currentMapPalette);
-          updateInkUI();
+          restoredInk = true;
         }
       }
-    } catch {
-      // Ignore
-    }
-  }
-}
-
-/* ══════════════════════════════════════════════════════════════
-   TOOL: A FONT
-   ══════════════════════════════════════════════════════════════ */
-function setupToolFont(map: maplibregl.Map): void {
-  const btn = document.getElementById('tool-font');
-  const panel = document.getElementById('font-panel');
-  const pairingsContainer = document.getElementById('font-pairings');
-  const mixContainer = document.getElementById('font-mix');
-  if (!btn || !panel || !pairingsContainer || !mixContainer) return;
-
-  let fontsPreloading = false;
-
-  // Toggle dropdown
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = panel.classList.contains('open');
-    closeAllDropdowns();
-    if (!isOpen) {
-      panel.classList.add('open');
-      // Preload all fonts in background on first open
-      if (!fontsPreloading) {
-        fontsPreloading = true;
-        preloadAllFonts(fontState);
-      }
-    }
-  });
-
-  // Build pairing cards
-  const placeName = currentCityName || 'London';
-  for (const pairing of FONT_PAIRINGS) {
-    const heroFont = getFont(pairing.hero);
-    const tickerFont = getFont(pairing.ticker);
-    if (!heroFont || !tickerFont) continue;
-
-    const card = document.createElement('div');
-    card.className = 'font-pairing-card' + (pairing.id === fontState.activePairing ? ' active' : '');
-    card.dataset.pairingId = pairing.id;
-
-    // Hero sample
-    const heroSample = document.createElement('div');
-    heroSample.className = 'font-pairing-hero';
-    heroSample.style.fontFamily = heroFont.family;
-    if (heroFont.isVariable && heroFont.variableAxes?.WONK) {
-      heroSample.style.fontVariationSettings = "'WONK' 1, 'opsz' 144";
-    }
-    heroSample.textContent = heroFont.sampleText;
-    card.appendChild(heroSample);
-
-    // Ticker sample
-    const tickerSample = document.createElement('div');
-    tickerSample.className = 'font-pairing-ticker';
-    tickerSample.style.fontFamily = tickerFont.family;
-    tickerSample.innerHTML = `lost in <span class="ticker-place" style="font-family:${heroFont.family}">${placeName}</span>`;
-    card.appendChild(tickerSample);
-
-    // Meta row
-    const meta = document.createElement('div');
-    meta.className = 'font-pairing-meta';
-    const nameEl = document.createElement('span');
-    nameEl.className = 'font-pairing-name';
-    nameEl.textContent = pairing.name;
-    meta.appendChild(nameEl);
-    const charEl = document.createElement('span');
-    charEl.className = 'font-pairing-char';
-    charEl.textContent = pairing.character;
-    meta.appendChild(charEl);
-    card.appendChild(meta);
-
-    card.addEventListener('click', (e) => {
-      e.stopPropagation();
-      selectFontPairing(pairing);
-    });
-
-    pairingsContainer.appendChild(card);
-  }
-
-  // Mix toggle
-  const mixToggle = document.createElement('button');
-  mixToggle.className = 'font-mix-toggle';
-  mixToggle.textContent = 'mix your own...';
-  mixToggle.addEventListener('click', (e) => {
-    e.stopPropagation();
-    mixContainer.classList.toggle('open');
-    mixToggle.textContent = mixContainer.classList.contains('open') ? 'back to pairings' : 'mix your own...';
-  });
-  pairingsContainer.appendChild(mixToggle);
-
-  // Build mix mode (hero font categories)
-  buildFontMixer(mixContainer);
-
-  // Restore persisted font state
-  restoreFontPairing();
-}
-
-async function selectFontPairing(pairing: FontPairing): Promise<void> {
-  await applyPairing(pairing.id, fontState);
-  updateFontUI();
-  persistFontState(fontState);
-  updateShareableHash();
-}
-
-function buildFontMixer(container: HTMLElement): void {
-  const title = document.createElement('div');
-  title.className = 'ink-section-title';
-  title.textContent = 'Hero font';
-  container.appendChild(title);
-
-  const byCategory = getFontsByCategory();
-  const categories: FontCategory[] = ['slab', 'fatface', 'blade', 'hand', 'wire', 'scrawl'];
-
-  for (const catId of categories) {
-    const catMeta = FONT_CATEGORIES[catId];
-    const fonts = byCategory[catId];
-    if (!fonts.length) continue;
-
-    const cat = document.createElement('div');
-    cat.className = 'font-category';
-    cat.dataset.category = catId;
-
-    // Header
-    const header = document.createElement('div');
-    header.className = 'font-category-header';
-    header.textContent = catMeta.label;
-
-    const current = document.createElement('span');
-    current.className = 'font-category-current';
-    const activeFont = fonts.find(f => f.id === fontState.activeHero);
-    current.textContent = activeFont ? activeFont.name : '';
-    header.appendChild(current);
-
-    header.addEventListener('click', (e) => {
-      e.stopPropagation();
-      cat.classList.toggle('open');
-    });
-    cat.appendChild(header);
-
-    // Body
-    const body = document.createElement('div');
-    body.className = 'font-category-body';
-
-    for (const font of fonts) {
-      const opt = document.createElement('button');
-      opt.className = 'font-option' + (fontState.activeHero === font.id ? ' active' : '');
-      opt.dataset.fontId = font.id;
-
-      const sample = document.createElement('span');
-      sample.className = 'font-option-sample';
-      sample.style.fontFamily = font.family;
-      if (font.isVariable && font.variableAxes?.WONK) {
-        sample.style.fontVariationSettings = "'WONK' 1, 'opsz' 144";
-      }
-      sample.textContent = font.sampleText;
-      opt.appendChild(sample);
-
-      const name = document.createElement('span');
-      name.className = 'font-option-name';
-      name.textContent = font.name;
-      opt.appendChild(name);
-
-      opt.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        await applyHeroFont(font.id, fontState);
-        fontState.activePairing = 'custom';
-        updateFontUI();
-        persistFontState(fontState);
-        updateShareableHash();
-      });
-
-      body.appendChild(opt);
     }
 
-    cat.appendChild(body);
-    container.appendChild(cat);
-  }
-}
-
-function updateFontUI(): void {
-  // Pairing cards
-  document.querySelectorAll('.font-pairing-card').forEach(card => {
-    const el = card as HTMLElement;
-    card.classList.toggle('active', el.dataset.pairingId === fontState.activePairing);
-  });
-
-  // Mix mode: font options active state + category current
-  document.querySelectorAll('.font-category').forEach(cat => {
-    const el = cat as HTMLElement;
-    const catId = el.dataset.category;
-    if (!catId) return;
-
-    // Update active option
-    cat.querySelectorAll('.font-option').forEach(opt => {
-      const optEl = opt as HTMLElement;
-      opt.classList.toggle('active', optEl.dataset.fontId === fontState.activeHero);
-    });
-
-    // Update header current name
-    const cur = cat.querySelector('.font-category-current');
-    const byCategory = getFontsByCategory();
-    const fonts = byCategory[catId as FontCategory] || [];
-    const activeFont = fonts.find(f => f.id === fontState.activeHero);
-    if (cur) cur.textContent = activeFont ? activeFont.name : '';
-  });
-}
-
-async function restoreFontPairing(): Promise<void> {
-  // URL hash priority
-  const hash = window.location.hash.replace('#', '');
-  const parts = hash.split('/');
-  for (const part of parts) {
+    // Individual font param
     if (part.startsWith('f:')) {
       const fVal = part.slice(2);
       if (fVal.startsWith('custom:')) {
@@ -1773,40 +1745,82 @@ async function restoreFontPairing(): Promise<void> {
           await applyHeroFont(heroId, fontState);
           await applyTickerFont(tickerId, fontState);
           fontState.activePairing = 'custom';
-          updateFontUI();
-          return;
+          restoredFont = true;
         }
       } else {
         const pairing = FONT_PAIRINGS.find(p => p.id === fVal);
         if (pairing) {
           await applyPairing(pairing.id, fontState);
-          updateFontUI();
-          return;
+          restoredFont = true;
         }
       }
     }
   }
 
-  // Fallback: sessionStorage
-  const stored = restoreFontState(fontState);
-  if (stored) {
-    if (stored.pairing !== 'custom') {
-      const pairing = FONT_PAIRINGS.find(p => p.id === stored.pairing);
-      if (pairing) {
-        await applyPairing(pairing.id, fontState);
-        updateFontUI();
-        return;
+  if (restoredInk || restoredFont) {
+    if (restoredInk && !restoredFont) {
+      // Match font to ink preset style if possible
+      const matchingStyle = STYLE_PRESETS.find(s => s.inkPalette === currentPaletteId);
+      if (matchingStyle) {
+        await applyPairing(matchingStyle.fontPairing, fontState);
+        currentStyleId = matchingStyle.id;
+      } else {
+        currentStyleId = 'custom';
+        await applyPairing(DEFAULT_PAIRING_ID, fontState);
       }
+    } else {
+      currentStyleId = 'custom';
     }
-    await applyHeroFont(stored.hero, fontState);
-    await applyTickerFont(stored.ticker, fontState);
-    fontState.activePairing = stored.pairing;
-    updateFontUI();
+    updateStyleUI();
     return;
   }
 
-  // Default: apply poster pairing (Abril Fatface + Caveat)
-  await applyPairing(DEFAULT_PAIRING_ID, fontState);
+  // Fallback: sessionStorage
+  const stored = sessionStorage.getItem('wud-style');
+  if (stored) {
+    try {
+      const data = JSON.parse(stored);
+      if (data.styleId && data.styleId !== 'custom') {
+        const style = STYLE_PRESETS.find(s => s.id === data.styleId);
+        if (style) {
+          await applyStylePreset(map, style);
+          return;
+        }
+      }
+      // Custom state
+      if (data.palette && data.palette.base) {
+        const allValid = [data.palette.base, data.palette.water, data.palette.built, data.palette.green, data.palette.ink]
+          .every((inkId: string) => INK_CATALOG[inkId]);
+        if (allValid) {
+          currentMapPalette = data.palette;
+          currentPaletteId = data.paletteId || 'custom';
+          currentStyleId = 'custom';
+          const derived = buildDerivedPalette(currentMapPalette);
+          applyMapPalette(map, derived, currentMapPalette);
+          updatePALETTEFromDerived(derived);
+          updateLegendColors(derived);
+          updateColorStrip(currentMapPalette);
+        }
+      }
+      if (data.hero && getFont(data.hero)) {
+        await applyHeroFont(data.hero, fontState);
+        if (data.ticker && getFont(data.ticker)) {
+          await applyTickerFont(data.ticker, fontState);
+        }
+        fontState.activePairing = data.fontPairing || 'custom';
+      }
+      updateStyleUI();
+      return;
+    } catch {
+      // Ignore
+    }
+  }
+
+  // Default: apply poster style
+  const defaultStyle = STYLE_PRESETS.find(s => s.id === DEFAULT_STYLE_ID);
+  if (defaultStyle) {
+    await applyStylePreset(map, defaultStyle);
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -1864,6 +1878,27 @@ function setupTicker(map: maplibregl.Map): void {
       fontState.tickerPaused = true;
     }, 30000);
     fontState.tickerPaused = false;
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TOOL: ○ GLOBE / MERCATOR TOGGLE
+   ══════════════════════════════════════════════════════════════ */
+let isGlobe = false;
+
+function setupToolGlobe(map: maplibregl.Map): void {
+  const btn = document.getElementById('tool-globe');
+  if (!btn) return;
+
+  btn.addEventListener('click', () => {
+    closeAllPanels();
+    isGlobe = !isGlobe;
+
+    map.setProjection({ type: isGlobe ? 'globe' : 'mercator' });
+    btn.innerHTML = isGlobe ? '&#x25CF;' : '&#x25CB;';
+    btn.classList.toggle('active', isGlobe);
+
+    showFlipToast(isGlobe ? 'No edges. Just Earth.' : 'Back to Mercator');
   });
 }
 
@@ -2060,9 +2095,8 @@ async function captureAndExport(map: maplibregl.Map, format: string, action: 'do
 
 async function exportCanvas(canvas: HTMLCanvasElement, format: string, action: 'download' | 'copy', _subtitle: string): Promise<void> {
   const citySlug = (currentCityName || 'world').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-  const paletteSuffix = currentPaletteId !== 'classic' ? `-${currentPaletteId}` : '';
-  const fontSuffix = fontState.activePairing !== DEFAULT_PAIRING_ID ? `-${fontState.activeHero}` : '';
-  const filename = `upside-down-${format}-${citySlug}${paletteSuffix}${fontSuffix}.png`;
+  const styleSuffix = currentStyleId !== DEFAULT_STYLE_ID ? `-${currentStyleId}` : '';
+  const filename = `upside-down-${format}-${citySlug}${styleSuffix}.png`;
 
   if (action === 'download') {
     const link = document.createElement('a');
@@ -2180,22 +2214,26 @@ function updateShareableHash(): void {
     newHash += `/c:${currentColor.slice(1)}.${currentShadow.slice(1)}`;
   }
 
-  // Palette param
-  if (currentPaletteId !== 'classic') {
-    if (currentPaletteId === 'custom') {
-      const { base, water, built, green, ink } = currentMapPalette;
-      newHash += `/p:custom:${base}-${water}-${built}-${green}-${ink}`;
-    } else {
-      newHash += `/p:${currentPaletteId}`;
+  // Style param — unified s: for known presets, or p: + f: for custom
+  if (currentStyleId !== 'custom' && currentStyleId !== DEFAULT_STYLE_ID) {
+    newHash += `/s:${currentStyleId}`;
+  } else if (currentStyleId === 'custom') {
+    // Palette param
+    if (currentPaletteId !== 'classic') {
+      if (currentPaletteId === 'custom') {
+        const { base, water, built, green, ink } = currentMapPalette;
+        newHash += `/p:custom:${base}-${water}-${built}-${green}-${ink}`;
+      } else {
+        newHash += `/p:${currentPaletteId}`;
+      }
     }
-  }
-
-  // Font pairing param
-  if (fontState.activePairing !== DEFAULT_PAIRING_ID) {
-    if (fontState.activePairing === 'custom') {
-      newHash += `/f:custom:${fontState.activeHero}-${fontState.activeTicker}`;
-    } else {
-      newHash += `/f:${fontState.activePairing}`;
+    // Font pairing param
+    if (fontState.activePairing !== DEFAULT_PAIRING_ID) {
+      if (fontState.activePairing === 'custom') {
+        newHash += `/f:custom:${fontState.activeHero}-${fontState.activeTicker}`;
+      } else {
+        newHash += `/f:${fontState.activePairing}`;
+      }
     }
   }
 
@@ -2297,7 +2335,7 @@ async function init() {
     maxTileCacheSize: 200,
     attributionControl: {},
     hash: true,
-    preserveDrawingBuffer: true, // needed for canvas export
+    canvasContextAttributes: { preserveDrawingBuffer: true }, // needed for canvas export
   });
 
   map.dragRotate.disable();

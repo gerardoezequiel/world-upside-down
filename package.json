@@ -13,7 +13,7 @@
     "d3-geo": "^3.1.1",
     "d3-geo-polygon": "^2.0.1",
     "html2canvas": "^1.4.1",
-    "maplibre-gl": "^4.7.1",
+    "maplibre-gl": "^5.18.0",
     "pmtiles": "^4.4.0",
     "qrcode-generator": "^2.0.4",
     "topojson-client": "^3.1.0"
