@@ -19,18 +19,29 @@ export async function initDymaxion(container: HTMLElement): Promise<DymaxionCont
   }
   const ctx = canvas.getContext('2d')!;
 
-  // Load TopoJSON
-  const [landTopo, countriesTopo] = await Promise.all([
-    fetch('/land-110m.json').then(r => r.json()) as Promise<Topology>,
-    fetch('/countries-110m.json').then(r => r.json()) as Promise<Topology>,
-  ]);
+  // Lazy-load: defer TopoJSON fetch until actually needed (show() called with t > 0)
+  let land: any = null;
+  let borders: any = null;
+  let dataLoaded = false;
+  let dataLoading = false;
 
-  const land = topojson.feature(landTopo, landTopo.objects.land);
-  const borders = topojson.mesh(
-    countriesTopo,
-    countriesTopo.objects.countries as any,
-    (a, b) => a !== b
-  );
+  async function loadData() {
+    if (dataLoaded || dataLoading) return;
+    dataLoading = true;
+    const [landTopo, countriesTopo] = await Promise.all([
+      fetch('/land-110m.json').then(r => r.json()) as Promise<Topology>,
+      fetch('/countries-110m.json').then(r => r.json()) as Promise<Topology>,
+    ]);
+    land = topojson.feature(landTopo, landTopo.objects.land);
+    borders = topojson.mesh(
+      countriesTopo,
+      countriesTopo.objects.countries as any,
+      (a, b) => a !== b
+    );
+    dataLoaded = true;
+    dataLoading = false;
+  }
+
   const graticule = geoGraticule10();
 
   let projection = geoAirocean();
@@ -60,7 +71,7 @@ export async function initDymaxion(container: HTMLElement): Promise<DymaxionCont
   }
 
   function render() {
-    if (!compositor) return;
+    if (!compositor || !dataLoaded) return;
     const w = canvas.width;
     const h = canvas.height;
 
@@ -143,7 +154,7 @@ export async function initDymaxion(container: HTMLElement): Promise<DymaxionCont
     rendered = true;
   }
 
-  function show(t: number) {
+  async function show(t: number) {
     currentT = t;
     if (t <= 0) {
       canvas.style.opacity = '0';
@@ -153,6 +164,7 @@ export async function initDymaxion(container: HTMLElement): Promise<DymaxionCont
     canvas.style.display = 'block';
     canvas.style.opacity = String(t);
     if (!rendered) {
+      await loadData();
       sizeCanvas();
       render();
     }
@@ -160,7 +172,7 @@ export async function initDymaxion(container: HTMLElement): Promise<DymaxionCont
 
   function resize() {
     sizeCanvas();
-    if (currentT > 0) render();
+    if (currentT > 0 && dataLoaded) render();
   }
 
   function destroy() {

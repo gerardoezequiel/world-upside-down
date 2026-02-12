@@ -554,6 +554,68 @@ body {
   cursor: text;
 }
 
+/* ── POSTER CTA (mobile onboarding) ── */
+.poster-cta {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--dark);
+  opacity: 0.7;
+  margin-top: 12px;
+  letter-spacing: 0.02em;
+  animation: ctaPulse 2.5s ease-in-out infinite;
+  transition: opacity 0.6s ease;
+}
+
+.poster-cta.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes ctaPulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 0.35; }
+}
+
+@media (min-width: 769px) {
+  .poster-cta { display: none; }
+}
+
+/* ── FLIP FAB (mobile) ── */
+.flip-fab {
+  display: none;
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 6;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 2px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+  transition: background 0.3s, transform 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.flip-fab:active {
+  transform: scale(0.9);
+}
+
+.flip-fab-arrow {
+  font-size: 24px;
+  line-height: 1;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.flip-fab.flipped .flip-fab-arrow {
+  transform: rotate(180deg);
+}
+
 /* ── FLIP TOAST ── */
 #flip-toast {
   position: absolute;
@@ -1620,7 +1682,8 @@ body {
   }
 
   #flip-hint { display: none !important; }
-  .touch-controls { display: flex; }
+  .touch-controls { display: none !important; }
+  .flip-fab { display: flex; }
 
   /* Color strip: vertical on right edge for mobile */
   .color-strip {
@@ -1730,6 +1793,9 @@ body {
   /* Hide coords on phone — they're in the way */
   #coords { display: none; }
 
+  /* Hide title editor button — power-user feature */
+  #tool-title { display: none; }
+
   /* Toolbar: maintain 44px targets, tighter spacing */
   .tb-btn {
     width: 40px;
@@ -1765,22 +1831,14 @@ body {
     max-width: 85vw;
   }
 
-  .touch-controls {
+  .flip-fab {
     bottom: 10px;
-    right: 56px;
-  }
-
-  .touch-prompt {
-    font-size: 11px;
-    padding: 3px 10px;
-  }
-
-  .flip-btn {
+    left: 10px;
     width: 48px;
     height: 48px;
   }
 
-  .flip-btn-arrow { font-size: 20px; }
+  .flip-fab-arrow { font-size: 20px; }
 
   .reg-mark {
     bottom: 10px;
@@ -1836,8 +1894,8 @@ body {
   .scale-ratio { display: none; }
   .bot-author { font-size: 6px; }
   #flip-toast { font-size: 13px; padding: 6px 12px; }
-  .flip-btn { width: 44px; height: 44px; } /* keep 44px minimum */
-  .flip-btn-arrow { font-size: 16px; }
+  .flip-fab { width: 44px; height: 44px; } /* keep 44px minimum */
+  .flip-fab-arrow { font-size: 16px; }
 
   /* Toolbar: hide less-used buttons on very small screens */
   #tool-globe { display: none; }
@@ -2121,9 +2179,8 @@ body {
     max-height: 90vh;
   }
 
-  .touch-controls { bottom: 6px; right: 12px; }
-  .flip-btn { width: 40px; height: 40px; }
-  .touch-prompt { display: none; }
+  .flip-fab { bottom: 6px; left: 12px; width: 40px; height: 40px; }
+  .flip-fab-arrow { font-size: 18px; }
 }
 
 /* ── Print ── */

@@ -216,4 +216,22 @@ export function setupFlip(state: AppState): void {
   });
 
   updateFlipButtons();
+
+  // ── Flip FAB (mobile) ──
+  const flipFab = document.getElementById('flip-fab');
+  if (flipFab) {
+    function updateFabState() {
+      flipFab!.classList.toggle('flipped', state.orientation === 'normal' || state.orientation === 'mirrored');
+    }
+
+    flipFab.addEventListener('click', () => {
+      const target = state.orientation === 'upside-down' ? 'normal' : 'upside-down';
+      applyOrientation(state, target);
+      updateFabState();
+      updateFlipButtons();
+      touchPrompt?.classList.add('hidden');
+    });
+
+    updateFabState();
+  }
 }

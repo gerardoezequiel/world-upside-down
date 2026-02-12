@@ -46,6 +46,7 @@ async function init() {
   const state = createAppState(map);
 
   map.dragRotate.disable();
+  map.touchZoomRotate.disableRotation();
 
   map.on('moveend', () => {
     if (!state.bearingLocked) return;

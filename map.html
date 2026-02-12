@@ -19,6 +19,8 @@
   <meta name="twitter:description" content="The first photo of Earth had south on top. NASA flipped it. This map flips it back." />
   <meta name="twitter:image" content="/og-image.png" />
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:wght@400;500;700&family=Instrument+Serif:ital@0;1&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Abril+Fatface&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/src/style.css" />
 </head>
@@ -76,6 +78,7 @@
       <div class="tb-dropdown" id="share-dropdown">
         <button class="tb-btn" data-tool="share" id="tool-share" aria-label="Share">&nearr;</button>
         <div class="tb-dropdown-menu" id="share-menu">
+          <button class="tb-dropdown-item" data-share="native" id="share-native">Share...</button>
           <button class="tb-dropdown-item" data-share="linkedin">LinkedIn</button>
           <button class="tb-dropdown-item" data-share="x">X / Twitter</button>
           <button class="tb-dropdown-item" data-share="copy">Copy link</button>
@@ -111,7 +114,13 @@
     <div id="screenprint-overlay">
       <span class="screenprint-line" id="screenprint-l1">UPSIDE</span>
       <span class="screenprint-line" id="screenprint-l2">DOWN</span>
+      <span class="poster-cta" id="poster-cta">tap to explore the upside-down world</span>
     </div>
+
+    <!-- ── Flip FAB (mobile) ── -->
+    <button class="flip-fab" id="flip-fab" aria-label="Flip orientation">
+      <span class="flip-fab-arrow">&#8595;</span>
+    </button>
 
     <!-- ── Flip toast ── -->
     <div id="flip-toast"></div>

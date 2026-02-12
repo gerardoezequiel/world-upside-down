@@ -1,6 +1,6 @@
 import type { AppState } from "./map-state";
 
-const IDLE_TIMEOUT = 45000;
+const IDLE_TIMEOUT = 120000;
 const root = document.documentElement;
 
 export function setOverlayOpacity(val: number, transition?: string) {
@@ -23,6 +23,7 @@ export function setMode(state: AppState, mode: AppState['currentMode']) {
     overlay?.classList.add('poster-mode');
     touchControls?.classList.remove('visible');
     flipHint?.classList.remove('visible');
+    document.getElementById('poster-cta')?.classList.remove('hidden');
     clearIdleTimer(state);
   }
 
@@ -31,7 +32,10 @@ export function setMode(state: AppState, mode: AppState['currentMode']) {
     setOverlayOpacity(0);
     overlay?.classList.remove('poster-mode');
 
-    setTimeout(() => touchControls?.classList.add('visible'), 150);
+    // Hide poster CTA
+    document.getElementById('poster-cta')?.classList.add('hidden');
+
+    touchControls?.classList.add('visible');
     setTimeout(() => {
       if (flipHint && !localStorage.getItem('wud-explored')) {
         flipHint.classList.add('visible');
