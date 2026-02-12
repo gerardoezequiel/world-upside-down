@@ -15,7 +15,13 @@ export function setupTicker(state: AppState): void {
 
     const template = state.fontState.tickerPhrase;
     const parts = template.split('[place]');
-    el.innerHTML = parts[0] + `<span class="ticker-place-name">${place}</span>` + (parts[1] || '');
+    el.textContent = '';
+    if (parts[0]) el.appendChild(document.createTextNode(parts[0]));
+    const placeSpan = document.createElement('span');
+    placeSpan.className = 'ticker-place-name';
+    placeSpan.textContent = place;
+    el.appendChild(placeSpan);
+    if (parts[1]) el.appendChild(document.createTextNode(parts[1]));
 
     el.classList.remove('ticker--east', 'ticker--west', 'visible');
     void el.offsetWidth;

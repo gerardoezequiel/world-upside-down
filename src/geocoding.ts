@@ -104,10 +104,14 @@ export function setupGeocoder(state: AppState): void {
           const name = parts[0];
           const detail = parts.slice(1).join(', ');
 
-          item.innerHTML = `
-            <span class="geocoder-result-name">${name}</span>
-            <span class="geocoder-result-detail">${detail}</span>
-          `;
+          const nameSpan = document.createElement('span');
+          nameSpan.className = 'geocoder-result-name';
+          nameSpan.textContent = name;
+          const detailSpan = document.createElement('span');
+          detailSpan.className = 'geocoder-result-detail';
+          detailSpan.textContent = detail;
+          item.appendChild(nameSpan);
+          item.appendChild(detailSpan);
 
           item.addEventListener('click', () => {
             const lat = parseFloat(r.lat);
