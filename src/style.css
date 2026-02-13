@@ -609,6 +609,7 @@ body {
   outline: none;
   caret-color: var(--sp-color);
   cursor: text;
+  pointer-events: auto;
 }
 
 /* ── POSTER CTA (mobile onboarding) ── */

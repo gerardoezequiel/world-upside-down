@@ -45,6 +45,12 @@ export function setupToolGlobe(state: AppState): void {
         const toasts = globeToasts;
         showFlipToast(state, toasts[Math.floor(Math.random() * toasts.length)]);
       }, 2800);
+    } else if (!state.isGlobe && state.map.getZoom() < 3.5) {
+      // Zoom back in past the dymaxion crossfade threshold (zoom 3)
+      // so the dymaxion map doesn't appear when exiting globe
+      state.map.easeTo({ zoom: 4, duration: 800 });
+      const toasts = mercatorToasts;
+      showFlipToast(state, toasts[Math.floor(Math.random() * toasts.length)]);
     } else {
       const toasts = state.isGlobe ? globeToasts : mercatorToasts;
       showFlipToast(state, toasts[Math.floor(Math.random() * toasts.length)]);

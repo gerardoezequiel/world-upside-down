@@ -16,7 +16,6 @@ import { setupToolTitle } from "./tools/title";
 import { setupToolGlobe } from "./tools/globe";
 import { setupToolDownload } from "./tools/download";
 import { setupToolShare } from "./tools/share";
-import { setupToolPitch } from "./tools/pitch";
 import { setupTissot } from "./tissot";
 import { setupPins } from "./pins";
 import { applyShareableParams } from "./shareable-urls";
@@ -176,8 +175,6 @@ async function init() {
     setupTissot(state);
     setupPins(state);
     setupLayers(state);
-    setupToolPitch(state);
-
     setupTicker(state);
     setupOnboarding(state);
     applyShareableParams(state);
