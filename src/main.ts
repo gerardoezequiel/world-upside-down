@@ -116,6 +116,14 @@ async function init() {
 
   initDymaxion(mapFrame).then(dymaxion => {
     function updateDymaxionTransition() {
+      // Suppress Dymaxion when globe projection is active
+      if (state.isGlobe) {
+        dymaxion.show(0);
+        mapEl.style.opacity = '1';
+        if (gratLabels) gratLabels.style.opacity = '1';
+        if (dymaxionLabel) dymaxionLabel.classList.remove('visible');
+        return;
+      }
       const zoom = map.getZoom();
       const t = Math.max(0, Math.min(1, 3 - zoom));
       dymaxion.show(t);
@@ -123,6 +131,7 @@ async function init() {
       if (gratLabels) gratLabels.style.opacity = String(1 - t);
       if (dymaxionLabel) dymaxionLabel.classList.toggle('visible', t > 0.9);
     }
+    state.onGlobeChange = updateDymaxionTransition;
     map.on('zoom', updateDymaxionTransition);
     window.addEventListener('resize', () => dymaxion.resize());
   });

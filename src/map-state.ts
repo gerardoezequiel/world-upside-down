@@ -37,6 +37,7 @@ export interface AppState {
 
   /* Globe */
   isGlobe: boolean;
+  onGlobeChange?: () => void;
 
   /* Download */
   formatsOpen: boolean;

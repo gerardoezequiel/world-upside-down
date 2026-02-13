@@ -1798,8 +1798,9 @@ body {
   /* Hide coords on phone — they're in the way */
   #coords { display: none; }
 
-  /* Hide title editor button — power-user feature */
+  /* Hide power-user buttons on phone */
   #tool-title { display: none; }
+  #tool-style { display: none; }
 
   /* Toolbar: maintain 44px targets, tighter spacing */
   .tb-btn {
@@ -1908,6 +1909,7 @@ body {
 
   /* Toolbar: hide less-used buttons on very small screens */
   #tool-globe { display: none; }
+  #tool-style { display: none; }
 
   .tb-btn {
     width: 36px;
