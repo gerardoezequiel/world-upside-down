@@ -11,7 +11,7 @@
   <meta property="og:title" content="Upside Down | You've Been Holding the Map Wrong" />
   <meta property="og:description" content="The first photo of Earth had south on top. NASA flipped it. This map flips it back." />
   <meta property="og:image" content="/og-image.png" />
-  <meta property="og:url" content="https://world-upside-down.vercel.app/map" />
+  <meta property="og:url" content="https://upsidedown.earth/map" />
 
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
@@ -58,6 +58,10 @@
         </div>
       </div>
       <button class="tb-btn" data-tool="tissot" id="tool-tissot" aria-label="Tissot's indicatrix" title="Show projection distortion">&#x25CE;</button>
+      <div class="tb-dropdown" id="pin-dropdown">
+        <button class="tb-btn" data-tool="pin" id="tool-pin" aria-label="Drop a pin" title="Drop an emotion pin">&#x2764;</button>
+        <div class="tb-dropdown-menu pin-picker" id="pin-picker"></div>
+      </div>
       <button class="tb-btn" data-tool="globe" id="tool-globe" aria-label="Globe">&#x25CB;</button>
       <div class="tb-dropdown" id="download-dropdown">
         <button class="tb-btn" data-tool="download" id="tool-download" aria-label="Download">&darr;</button>
@@ -80,6 +84,7 @@
         <button class="tb-btn" data-tool="share" id="tool-share" aria-label="Share">&nearr;</button>
         <div class="tb-dropdown-menu" id="share-menu">
           <button class="tb-dropdown-item" data-share="native" id="share-native">Share...</button>
+          <button class="tb-dropdown-item" data-share="image" id="share-image">Share as image</button>
           <button class="tb-dropdown-item" data-share="linkedin">LinkedIn</button>
           <button class="tb-dropdown-item" data-share="x">X / Twitter</button>
           <button class="tb-dropdown-item" data-share="copy">Copy link</button>
@@ -99,6 +104,9 @@
 
   <!-- ── MAP FRAME ── -->
   <div id="map-frame">
+    <div id="map-loading" class="map-loading">
+      <span class="loading-text">Warming up the riso drums...</span>
+    </div>
     <div id="map"></div>
     <canvas id="dymaxion-canvas"></canvas>
     <div id="dymaxion-label">No north. No south. Just Earth.</div>

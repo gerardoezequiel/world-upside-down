@@ -142,7 +142,7 @@ async function captureAndExport(state: AppState, format: string, action: 'downlo
     ctx.fillStyle = '#88898A';
     ctx.globalAlpha = 0.5;
     ctx.textAlign = 'right';
-    ctx.fillText('Gerardo Ezequiel · upside-down.vercel.app', res.w - 20, res.h - 20);
+    ctx.fillText('upsidedown.earth', res.w - 20, res.h - 20);
     ctx.globalAlpha = 1;
 
     const toggles = document.getElementById('export-toggles');
@@ -166,7 +166,7 @@ async function captureAndExport(state: AppState, format: string, action: 'downlo
         ctx.fillStyle = '#88898A';
         ctx.globalAlpha = 0.5;
         ctx.textAlign = 'center';
-        ctx.fillText('upside-down.vercel.app', res.w / 2, res.h - 20);
+        ctx.fillText('upsidedown.earth', res.w / 2, res.h - 20);
         ctx.globalAlpha = 1;
       }
     }

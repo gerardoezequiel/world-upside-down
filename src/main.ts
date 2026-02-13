@@ -19,6 +19,7 @@ import { setupToolShare } from "./tools/share";
 import { setupTissot } from "./tissot";
 import { applyShareableParams } from "./shareable-urls";
 import { startSubtitleAnimation } from "./subtitle";
+import { setupPins } from "./pins";
 
 const root = document.documentElement;
 
@@ -79,7 +80,25 @@ async function init() {
     if (state.currentMode === 'poster') setMode(state, 'explore');
   });
 
+  /* Loading state with rotating copy */
+  const loadingEl = document.getElementById('map-loading');
+  const loadingTexts = [
+    'Warming up the riso drums...',
+    'Rotating 180 degrees...',
+    'Unlearning north...',
+    'Inverting 500 years of habit...',
+    'Flipping the world...',
+  ];
+  const loadingText = loadingEl?.querySelector('.loading-text');
+  if (loadingText) {
+    loadingText.textContent = loadingTexts[Math.floor(Math.random() * loadingTexts.length)];
+  }
+
   map.on('load', () => {
+    /* Dismiss loading state */
+    loadingEl?.classList.add('hidden');
+    setTimeout(() => loadingEl?.remove(), 1000);
+
     updateScaleBar(state);
     updateCoords(state);
     updateCityTitle(state);
@@ -96,6 +115,7 @@ async function init() {
     setupToolDownload(state);
     setupToolShare(state);
     setupTissot(state);
+    setupPins(state);
 
     setupTicker(state);
     applyShareableParams(state);

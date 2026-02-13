@@ -420,6 +420,61 @@ body {
   transform: scaleX(-1);
 }
 
+/* ── MAP LOADING STATE ── */
+.map-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper);
+  transition: opacity 0.8s ease;
+}
+
+.map-loading.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loading-text {
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--mid);
+  letter-spacing: 0.02em;
+  animation: loadingPulse 2s ease-in-out infinite;
+}
+
+@keyframes loadingPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* ── PIN MARKERS ── */
+.pin-marker {
+  font-size: 24px;
+  cursor: pointer;
+  filter: drop-shadow(1px 2px 2px rgba(0,0,0,0.2));
+  transition: transform 0.2s ease;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.pin-marker:hover {
+  transform: scale(1.2);
+}
+
+.pin-emotion-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pin-emotion-emoji {
+  font-size: 18px;
+}
+
 /* ── TRIM MARKS ── */
 .trim-marks {
   position: absolute;
@@ -1802,6 +1857,7 @@ body {
   #tool-title { display: none; }
   #tool-style { display: none; }
   #tool-tissot { display: none; }
+  #pin-dropdown { display: none; }
 
   /* Toolbar: maintain 44px targets, tighter spacing */
   .tb-btn {

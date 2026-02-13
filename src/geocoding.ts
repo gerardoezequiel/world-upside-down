@@ -27,6 +27,7 @@ export function updateCityTitle(state: AppState): void {
       if (name) {
         titleEl.textContent = name;
         state.currentCityName = name;
+        document.title = `Lost in ${name} | Upside Down`;
       }
     } catch {
       // Silently fail

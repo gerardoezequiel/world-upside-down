@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lost? Good. | Upside Down</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@1&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Space Mono', monospace;
+    background: #F5F5F5;
+    color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    text-align: center;
+    padding: 24px;
+  }
+  .container { max-width: 480px; }
+  h1 {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(48px, 12vw, 96px);
+    line-height: 0.95;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: #FF48B0;
+    margin-bottom: 24px;
+  }
+  .subtitle {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: #88898A;
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+  .body-text {
+    font-size: 12px;
+    color: #88898A;
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+  .links {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  a {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #000;
+    text-decoration: none;
+    border: 1.5px solid #000;
+    padding: 10px 20px;
+    transition: background 0.2s, color 0.2s;
+  }
+  a:hover {
+    background: #000;
+    color: #F5F5F5;
+  }
+  .reg-mark {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    font-size: 10px;
+    color: #C4BAA8;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Lost?<br>Good.</h1>
+  <p class="subtitle">That's the whole point.</p>
+  <p class="body-text">But this page genuinely doesn't exist. The map does, though.</p>
+  <div class="links">
+    <a href="/map">Find the map</a>
+    <a href="/">Start over</a>
+  </div>
+</div>
+<span class="reg-mark">upsidedown.earth</span>
+</body>
+</html>
