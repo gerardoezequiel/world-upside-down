@@ -1,4 +1,5 @@
 import type { AppState } from "./map-state";
+import { trackEvent } from "./analytics";
 
 export function updateCityTitle(state: AppState): void {
   if (state.geocodeTimeout) clearTimeout(state.geocodeTimeout);
@@ -135,6 +136,7 @@ export function setupGeocoder(state: AppState): void {
 
             titleEl.textContent = name;
             state.currentCityName = name;
+            trackEvent('search', { city: name });
             closeGeocoder();
           });
 

@@ -1,6 +1,7 @@
 import type { AppState } from "../map-state";
 import { showFlipToast } from "../orientation";
 import { closeAllDropdowns } from "../style-system";
+import { trackEvent } from "../analytics";
 
 const shareTemplates = [
   "I flipped {city} upside down. Turns out NASA did it first.",
@@ -72,6 +73,8 @@ export function setupToolShare(state: AppState): void {
       const url = encodeURIComponent(window.location.href);
       const text = encodeURIComponent(getShareText(state));
       const title = encodeURIComponent("Upside Down \u2014 You've Been Holding the Map Wrong");
+
+      trackEvent('share', { platform: platform || 'unknown', city: state.currentCityName || 'unknown' });
 
       if (platform === 'native') {
         await triggerNativeShare(state);

@@ -1,6 +1,7 @@
 import type { AppState, Orientation } from "./map-state";
 import { setMode, setOverlayOpacity } from "./mode-system";
 import { closeAllPanels } from "./style-system";
+import { trackEvent } from "./analytics";
 
 const toastMessages: Record<Orientation, string[]> = {
   'normal': [
@@ -222,6 +223,7 @@ export function applyOrientation(state: AppState, target: Orientation): void {
   }
 
   showFlipToast(state, getOrientationToast(state, target));
+  trackEvent('flip', { orientation: target, city: state.currentCityName || 'unknown' });
 
   if (state.currentMode === 'poster') {
     setMode(state, 'explore');

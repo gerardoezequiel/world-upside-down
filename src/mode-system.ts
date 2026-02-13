@@ -1,4 +1,5 @@
 import type { AppState } from "./map-state";
+import { trackEvent } from "./analytics";
 
 const IDLE_TIMEOUT = 120000;
 const root = document.documentElement;
@@ -21,6 +22,8 @@ export function setMode(state: AppState, mode: AppState['currentMode']) {
   if (mode === state.currentMode) return;
   const prev = state.currentMode;
   state.currentMode = mode;
+  trackEvent('mode', { from: prev, to: mode });
+  trackEvent('mode', { from: prev, to: mode });
 
   const overlay = document.getElementById('screenprint-overlay');
   const touchControls = document.getElementById('touch-controls');

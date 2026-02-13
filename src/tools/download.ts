@@ -4,6 +4,7 @@ import { showFlipToast } from "../orientation";
 import { closeAllDropdowns } from "../style-system";
 import { getFont } from "../font-system";
 import { DEFAULT_STYLE_ID } from "../font-system";
+import { trackEvent } from "../analytics";
 
 const root = document.documentElement;
 
@@ -24,6 +25,7 @@ export function setupToolDownload(state: AppState): void {
       e.stopPropagation();
       const format = (item as HTMLElement).dataset.format!;
       closeAllDropdowns();
+      trackEvent('download', { format, city: state.currentCityName || 'unknown' });
       captureAndExport(state, format, 'download');
     });
   });
@@ -179,6 +181,7 @@ async function exportCanvas(state: AppState, canvas: HTMLCanvasElement, format: 
   const citySlug = (state.currentCityName || 'world').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
   const styleSuffix = state.currentStyleId !== DEFAULT_STYLE_ID ? `-${state.currentStyleId}` : '';
   const filename = `upside-down-${format}-${citySlug}${styleSuffix}.png`;
+  trackEvent('download', { format, action, city: state.currentCityName || 'unknown' });
 
   if (action === 'download') {
     const link = document.createElement('a');

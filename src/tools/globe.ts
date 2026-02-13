@@ -1,6 +1,7 @@
 import type { AppState } from "../map-state";
 import { showFlipToast } from "../orientation";
 import { closeAllPanels } from "../style-system";
+import { trackEvent } from "../analytics";
 
 const globeToasts = [
   'No edges. Just Earth.',
@@ -36,6 +37,7 @@ export function setupToolGlobe(state: AppState): void {
     // Notify dymaxion system to suppress
     state.onGlobeChange?.();
 
+    trackEvent('globe', { enabled: state.isGlobe });
     const toasts = state.isGlobe ? globeToasts : mercatorToasts;
     showFlipToast(state, toasts[Math.floor(Math.random() * toasts.length)]);
   });
