@@ -12,6 +12,11 @@ const shareTemplates = [
   "You've been looking at {city} wrong your whole life.",
   "I broke {city}. Or maybe the map was already broken.",
   "The world upside down, starting with {city}.",
+  "Lost in {city} \u2014 on purpose. upsidedown.earth",
+  "{city} upside down hits different.",
+  "I just rotated {city} 180\u00b0. Your atlas lied.",
+  "South-up {city}. You're welcome.",
+  "{city} but make it disorienting \ud83c\udf0d",
 ];
 
 function getShareText(state: AppState): string {
@@ -73,7 +78,7 @@ async function captureMapImage(state: AppState): Promise<Blob> {
   ctx.fillStyle = '#88898A';
   ctx.globalAlpha = 0.5;
   ctx.textAlign = 'right';
-  ctx.fillText('upside-down.vercel.app', size - 16, size - 16);
+  ctx.fillText('upsidedown.earth', size - 16, size - 16);
   ctx.globalAlpha = 1;
 
   return new Promise<Blob>((resolve) => {
@@ -191,6 +196,11 @@ export function setupToolShare(state: AppState): void {
         window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank', 'width=600,height=500');
       } else if (platform === 'x') {
         window.open(`https://x.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=600,height=400');
+      } else if (platform === 'whatsapp') {
+        window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
+      } else if (platform === 'instagram') {
+        // Instagram doesn't support URL sharing — generate image and trigger share/download
+        await shareAsImage(state);
       } else if (platform === 'copy') {
         const copyToasts = [
           'Link copied. Go spread the disorientation.',

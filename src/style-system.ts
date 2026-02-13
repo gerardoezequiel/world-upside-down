@@ -28,6 +28,11 @@ export function closeAllPanels(state: AppState) {
   colorStrip?.classList.remove('visible');
   exportPreview?.classList.remove('visible');
   state.formatsOpen = false;
+
+  // Close sidebar
+  const sidebar = document.getElementById('sidebar');
+  sidebar?.classList.remove('open');
+  document.getElementById('page')?.classList.remove('sidebar-open');
 }
 
 /* ── PALETTE sync helpers ────────────────────────────────── */
@@ -164,6 +169,21 @@ async function applyStylePreset(state: AppState, style: StylePreset): Promise<vo
   if (textInk) {
     root.style.setProperty('--sp-color', textInk.hex);
     root.style.setProperty('--sp-shadow', darken(textInk.hex, 0.35));
+  }
+
+  // Apply preset default text when user hasn't customized it
+  if (!state.hasCustomTitle && style.defaultText) {
+    const spL1 = document.getElementById('screenprint-l1');
+    const spL2 = document.getElementById('screenprint-l2');
+    if (spL1 && spL2) {
+      let [line1, line2] = style.defaultText;
+      // City-aware presets: substitute {CITY} with current city name
+      const city = state.currentCityName || 'LONDON';
+      line1 = line1.replace('{CITY}', city.toUpperCase());
+      line2 = line2.replace('{CITY}', city.toUpperCase());
+      spL1.textContent = line1;
+      spL2.textContent = line2;
+    }
   }
 
   updateStyleUI(state);
@@ -457,23 +477,21 @@ async function restoreStyle(state: AppState): Promise<void> {
 
 /* ── Main setup ──────────────────────────────────────────── */
 export function setupToolStyle(state: AppState): void {
-  const btn = document.getElementById('tool-style');
-  const panel = document.getElementById('style-panel');
   const presetsContainer = document.getElementById('style-presets');
   const customContainer = document.getElementById('style-customize');
-  if (!btn || !panel || !presetsContainer || !customContainer) return;
+  if (!presetsContainer || !customContainer) return;
 
+  // Preload fonts when sidebar style section first becomes visible
   let fontsPreloading = false;
-
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = panel.classList.contains('open');
-    closeAllDropdowns();
-    if (!isOpen) {
-      panel.classList.add('open');
-      if (!fontsPreloading) { fontsPreloading = true; preloadAllFonts(state.fontState); }
+  const observer = new MutationObserver(() => {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar?.classList.contains('open') && !fontsPreloading) {
+      fontsPreloading = true;
+      preloadAllFonts(state.fontState);
     }
   });
+  const sidebar = document.getElementById('sidebar');
+  if (sidebar) observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
 
   const placeName = state.currentCityName || 'London';
 

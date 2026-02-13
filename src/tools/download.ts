@@ -9,26 +9,40 @@ import { trackEvent } from "../analytics";
 const root = document.documentElement;
 
 export function setupToolDownload(state: AppState): void {
-  const btn = document.getElementById('tool-download');
-  const menu = document.getElementById('download-formats');
-  if (!btn || !menu) return;
-
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = menu.classList.contains('open');
-    closeAllDropdowns();
-    if (!isOpen) menu.classList.add('open');
-  });
-
-  menu.querySelectorAll('.tb-dropdown-item').forEach(item => {
-    item.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const format = (item as HTMLElement).dataset.format!;
-      closeAllDropdowns();
-      trackEvent('download', { format, city: state.currentCityName || 'unknown' });
-      captureAndExport(state, format, 'download');
+  // Bind export format buttons inside the sidebar export section
+  const exportSection = document.getElementById('sidebar-export');
+  if (exportSection) {
+    exportSection.querySelectorAll('.tb-dropdown-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const format = (item as HTMLElement).dataset.format!;
+        trackEvent('download', { format, city: state.currentCityName || 'unknown' });
+        captureAndExport(state, format, 'download');
+      });
     });
-  });
+  }
+
+  // Also support the legacy dropdown if it still exists
+  const menu = document.getElementById('download-formats');
+  if (menu) {
+    const btn = document.getElementById('tool-download');
+    btn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = menu.classList.contains('open');
+      closeAllDropdowns();
+      if (!isOpen) menu.classList.add('open');
+    });
+
+    menu.querySelectorAll('.tb-dropdown-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const format = (item as HTMLElement).dataset.format!;
+        closeAllDropdowns();
+        trackEvent('download', { format, city: state.currentCityName || 'unknown' });
+        captureAndExport(state, format, 'download');
+      });
+    });
+  }
 
   document.addEventListener('click', () => closeAllDropdowns());
 }
@@ -38,17 +52,30 @@ async function captureAndExport(state: AppState, format: string, action: 'downlo
     feed: { w: 1080, h: 1080 },
     reel: { w: 1080, h: 1920 },
     poster: { w: 3600, h: 4800 },
+    print: { w: 7200, h: 10800 },
   };
 
   const map = state.map;
   const res = resolutions[format] || resolutions.feed;
-  const exportSubtitle = document.getElementById('subtitle-text')?.textContent || '';
+  const customSubtitle = document.getElementById('subtitle-text')?.textContent || '';
+
+  // Default "Lost in {city}" subtitle for zine vibe if no custom text set
+  const zineCopy = [
+    'South is the new up',
+    'Your atlas lied',
+    'An exercise in unlearning north',
+    'The first photo had south on top',
+    'Every projection is a political act',
+    'There is no up in space',
+  ];
+  const exportSubtitle = customSubtitle
+    || (state.currentCityName ? `Lost in ${state.currentCityName}` : zineCopy[Math.floor(Math.random() * zineCopy.length)]);
 
   showFlipToast(state, 'Generating...');
 
   await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-  if (format === 'poster') {
+  if (format === 'poster' || format === 'print') {
     try {
       const html2canvas = (await import('html2canvas')).default;
       const page = document.getElementById('page')!;
@@ -66,7 +93,7 @@ async function captureAndExport(state: AppState, format: string, action: 'downlo
       await new Promise(r => setTimeout(r, 400));
 
       const canvas = await html2canvas(page, {
-        scale: 3,
+        scale: format === 'print' ? 5 : 3,
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#FFFFFF',
@@ -193,6 +220,7 @@ async function exportCanvas(state: AppState, canvas: HTMLCanvasElement, format: 
       feed: 'Ready for the grid',
       reel: 'Swipe up on that',
       poster: 'Print it. Frame it. Flip someone\'s world.',
+      print: '300 DPI. Gallery ready.',
     };
     setTimeout(() => showFlipToast(state, toasts[format] || 'Downloaded'), 500);
   }

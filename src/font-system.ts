@@ -234,15 +234,20 @@ export interface StylePreset {
   fontPairing: string;   // FONT_PAIRINGS id
   textInk: string;       // ink id from INK_CATALOG for screenprint text color
   character: string;
+  defaultText: [string, string];  // [line1, line2] for screenprint overlay
 }
 
 export const STYLE_PRESETS: StylePreset[] = [
-  { id: 'poster',    name: 'Poster',    inkPalette: 'classic',   fontPairing: 'poster',      textInk: 'fluorPink',  character: 'Fat face on riso paper. The gallery opening.' },
-  { id: 'protest',   name: 'Protest',   inkPalette: 'protest',   fontPairing: 'rally',       textInk: 'yellow',     character: 'Condensed type, loud ink. The march.' },
-  { id: 'blueprint', name: 'Blueprint', inkPalette: 'blueprint', fontPairing: 'dispatch',    textInk: 'teal',       character: 'All blue, sharp gothic. The architect\'s proof.' },
-  { id: 'botanical', name: 'Botanical', inkPalette: 'botanical', fontPairing: 'letterpress', textInk: 'green',      character: 'Soft green, hand-carved serif. The nature print.' },
-  { id: 'neon',      name: 'Neon',      inkPalette: 'neon',      fontPairing: 'zine',        textInk: 'fluorPink',  character: 'Marker scrawl, fluorescent ink. The zine cover.' },
-  { id: 'mono',      name: 'Mono',      inkPalette: 'mono',      fontPairing: 'broadsheet',  textInk: 'blue',       character: 'One colour, slab serif. The serious map.' },
+  { id: 'poster',    name: 'Poster',    inkPalette: 'classic',   fontPairing: 'poster',      textInk: 'fluorPink',  character: 'Fat face on riso paper. The gallery opening.',        defaultText: ['UPSIDE', 'DOWN'] },
+  { id: 'protest',   name: 'Protest',   inkPalette: 'protest',   fontPairing: 'rally',       textInk: 'yellow',     character: 'Condensed type, loud ink. The march.',               defaultText: ['SOUTH', 'IS UP'] },
+  { id: 'blueprint', name: 'Blueprint', inkPalette: 'blueprint', fontPairing: 'dispatch',    textInk: 'teal',       character: 'All blue, sharp gothic. The architect\'s proof.',     defaultText: ['NO', 'NORTH'] },
+  { id: 'botanical', name: 'Botanical', inkPalette: 'botanical', fontPairing: 'letterpress', textInk: 'green',      character: 'Soft green, hand-carved serif. The nature print.',    defaultText: ['WILD', 'EARTH'] },
+  { id: 'neon',      name: 'Neon',      inkPalette: 'neon',      fontPairing: 'zine',        textInk: 'fluorPink',  character: 'Marker scrawl, fluorescent ink. The zine cover.',     defaultText: ['YOUR ATLAS', 'LIED'] },
+  { id: 'mono',      name: 'Mono',      inkPalette: 'mono',      fontPairing: 'broadsheet',  textInk: 'blue',       character: 'One colour, slab serif. The serious map.',            defaultText: ['EVERY MAP', 'IS A LIE'] },
+  { id: 'darkroom',  name: 'Darkroom',  inkPalette: 'darkroom',  fontPairing: 'rally',       textInk: 'brightRed',  character: 'Red on black. The radical broadside.',                defaultText: ['DECOLONISE', 'YOUR ATLAS'] },
+  { id: 'sunset',    name: 'Sunset',    inkPalette: 'sunset',    fontPairing: 'poster',      textInk: 'orange',     character: 'Warm bisque, golden hour. The postcard.',             defaultText: ['LOST IN', '{CITY}'] },
+  { id: 'archive',   name: 'Archive',   inkPalette: 'archive',   fontPairing: 'letterpress', textInk: 'charcoal',   character: 'Muted stone, antique serif. The old map.',            defaultText: ['TERRA', 'INCOGNITA'] },
+  { id: 'riot',      name: 'Riot',      inkPalette: 'riot',      fontPairing: 'zine',        textInk: 'yellow',     character: 'Marker on grey. The anarchist pamphlet.',             defaultText: ['NO BORDERS', 'NO NATIONS'] },
 ];
 
 export const DEFAULT_STYLE_ID = 'poster';

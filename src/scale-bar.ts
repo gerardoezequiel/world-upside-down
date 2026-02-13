@@ -32,7 +32,8 @@ export function updateScaleBar(state: AppState): void {
   const y = (ctr.lat * Math.PI) / 180;
   const mpp = (156543.03392 * Math.cos(y)) / Math.pow(2, map.getZoom());
 
-  const targetM = mpp * 200;
+  const maxBarPx = window.innerWidth <= 480 ? 120 : 200;
+  const targetM = mpp * maxBarPx;
   let cfg = scaleConfigs[0];
   for (const c of scaleConfigs) {
     if (c.total <= targetM * 1.5) cfg = c;
@@ -40,16 +41,17 @@ export function updateScaleBar(state: AppState): void {
   }
 
   let totalPx = cfg.total / mpp;
-  if (totalPx < 80) {
+  if (totalPx < 60) {
     for (const c of scaleConfigs) {
       const px = c.total / mpp;
-      if (px >= 80 && px <= 300) { cfg = c; totalPx = px; break; }
+      if (px >= 60 && px <= maxBarPx * 1.5) { cfg = c; totalPx = px; break; }
     }
-    if (totalPx < 80) {
+    if (totalPx < 60) {
       cfg = scaleConfigs[scaleConfigs.length - 1];
       totalPx = cfg.total / mpp;
     }
   }
+  totalPx = Math.min(totalPx, maxBarPx * 1.5);
 
   const ink = '#000000';
   const svgH = 28;

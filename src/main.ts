@@ -1,5 +1,5 @@
 import maplibregl from "maplibre-gl";
-import "./analytics";
+import { trackVisitType, trackSessionSummary } from "./analytics";
 import { initDymaxion } from "./dymaxion";
 import { createAppState, DEFAULT_PALETTE } from "./map-state";
 import { recolorStyle } from "./recolor-style";
@@ -16,14 +16,21 @@ import { setupToolTitle } from "./tools/title";
 import { setupToolGlobe } from "./tools/globe";
 import { setupToolDownload } from "./tools/download";
 import { setupToolShare } from "./tools/share";
+import { setupToolPitch } from "./tools/pitch";
 import { setupTissot } from "./tissot";
 import { setupPins } from "./pins";
 import { applyShareableParams } from "./shareable-urls";
 import { startSubtitleAnimation } from "./subtitle";
+import { setupOnboarding } from "./onboarding";
+import { setupSplash } from "./splash";
+import { setupSidebar } from "./sidebar";
+import { setupLayers } from "./layers";
 
 const root = document.documentElement;
 
 async function init() {
+  // Show splash for first-time visitors before anything else
+  setupSplash();
   const res = await fetch("/style.json");
   const baseStyle = (await res.json()) as maplibregl.StyleSpecification;
 
@@ -46,6 +53,9 @@ async function init() {
 
   /* Real state with map reference */
   const state = createAppState(map);
+
+  trackVisitType();
+  trackSessionSummary(() => state);
 
   map.dragRotate.disable();
   // Note: we do NOT call touchZoomRotate.disableRotation() because in
@@ -84,6 +94,32 @@ async function init() {
     document.addEventListener(evt, () => resetIdleTimer(state), { passive: true });
   });
 
+  /* Landscape: auto-hide bot-band after 3s, show on tap */
+  const botBand = document.getElementById('bot-band');
+  let landscapeTimer: ReturnType<typeof setTimeout> | null = null;
+  const landscapeMQ = window.matchMedia('(max-height: 500px) and (orientation: landscape)');
+
+  function startLandscapeHide() {
+    if (!landscapeMQ.matches || !botBand) return;
+    if (landscapeTimer) clearTimeout(landscapeTimer);
+    botBand.classList.remove('landscape-hidden');
+    landscapeTimer = setTimeout(() => botBand.classList.add('landscape-hidden'), 3000);
+  }
+
+  function showBotBand() {
+    if (!botBand) return;
+    botBand.classList.remove('landscape-hidden');
+    startLandscapeHide();
+  }
+
+  landscapeMQ.addEventListener('change', () => {
+    if (landscapeMQ.matches) startLandscapeHide();
+    else { botBand?.classList.remove('landscape-hidden'); if (landscapeTimer) clearTimeout(landscapeTimer); }
+  });
+
+  if (landscapeMQ.matches) startLandscapeHide();
+  document.getElementById('map-frame')?.addEventListener('click', showBotBand, { passive: true });
+
   const spOverlay = document.getElementById('screenprint-overlay');
 
   // Tap anywhere on map → enter explore mode (overlay is pointer-events:none
@@ -100,6 +136,16 @@ async function init() {
     'Unlearning north...',
     'Inverting 500 years of habit...',
     'Flipping the world...',
+    'Decolonising your atlas...',
+    'Consulting Al-Idrisi...',
+    'Recalibrating south...',
+    'Questioning Mercator...',
+    'Spinning the blue marble...',
+    'Asking Antarctica for directions...',
+    'Loading the honest projection...',
+    'Reversing 500 years of propaganda...',
+    'Calibrating riso ink levels...',
+    'Preparing your disorientation...',
   ];
   const loadingText = loadingEl?.querySelector('.loading-text');
   if (loadingText) {
@@ -120,6 +166,7 @@ async function init() {
     applyRisoMisregistration(state);
 
     /* Tools */
+    setupSidebar(state);
     setupToolLocate(state);
     setupToolTitle(state);
     setupToolStyle(state);
@@ -128,15 +175,18 @@ async function init() {
     setupToolShare(state);
     setupTissot(state);
     setupPins(state);
+    setupLayers(state);
+    setupToolPitch(state);
 
     setupTicker(state);
+    setupOnboarding(state);
     applyShareableParams(state);
 
     /* Start in poster mode */
     setMode(state, 'explore'); // trick: set to explore first so setMode('poster') actually fires
     setMode(state, 'poster');
     state.currentMode = 'poster';
-    root.style.setProperty('--overlay-opacity', '0.90');
+    root.style.setProperty('--overlay-opacity', '0.75');
     spOverlay?.classList.add('poster-mode');
 
     startSubtitleAnimation();

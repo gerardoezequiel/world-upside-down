@@ -1,7 +1,7 @@
 import type { AppState, Orientation } from "./map-state";
 import { setMode, setOverlayOpacity } from "./mode-system";
 import { closeAllPanels } from "./style-system";
-import { trackEvent } from "./analytics";
+import { trackEvent, trackOrientationChange } from "./analytics";
 
 const toastMessages: Record<Orientation, string[]> = {
   'normal': [
@@ -26,6 +26,11 @@ const toastMessages: Record<Orientation, string[]> = {
     "Welcome back to the Matrix",
     "North is a social construct",
     "Plot twist: this is the weird one",
+    "The Wall Street Journal orientation",
+    "Risk-averse cartography",
+    "The safe word is 'north'",
+    "Conformist, but we still like you",
+    "The imperial default",
   ],
   'upside-down': [
     "Ah, the correct way",
@@ -58,6 +63,16 @@ const toastMessages: Record<Orientation, string[]> = {
     "Earth has no opinion on the matter",
     "Antarctica is on top now. Deal with it.",
     "Stuart McArthur sends his regards",
+    "Torres Garc\u00eda drew this first",
+    "The Mediterranean isn't the centre",
+    "Indonesia has entered the chat",
+    "New Zealand isn't at the edge anymore",
+    "The South Pole says thanks",
+    "Decolonise your atlas",
+    "The first globe had no north",
+    "Perspective is a political act",
+    "The Mercator distortion exposed",
+    "South-up since Apollo 17, 1972",
   ],
   'mirrored': [
     "Read this backwards",
@@ -71,6 +86,10 @@ const toastMessages: Record<Orientation, string[]> = {
     "Left turn means right turn",
     "The world as a palindrome",
     "Through the looking glass",
+    "Japan is now west of California",
+    "Good luck navigating",
+    "Pacific Ocean: now on the left",
+    "Your brain is re-routing",
   ],
 };
 
@@ -81,6 +100,11 @@ const locationToasts: Record<Orientation, string[]> = {
     "{city}: the postcard version",
     "The {city} your GPS expects",
     "{city} on autopilot again",
+    "{city} returns to factory settings",
+    "The guidebook version of {city}",
+    "{city} as your teacher showed you",
+    "Google Maps recognises {city} again",
+    "{city}: safe mode restored",
   ],
   'upside-down': [
     "{city} from the other side",
@@ -93,6 +117,14 @@ const locationToasts: Record<Orientation, string[]> = {
     "{city} looking brand new",
     "The locals in {city} approve",
     "{city} just got interesting",
+    "{city} would like a word",
+    "Show this {city} to a taxi driver",
+    "{city}, decolonised",
+    "The {city} nobody puts on a postcard",
+    "You just rotated {city}'s whole vibe",
+    "{city} hits different upside down",
+    "{city}: now 100% more honest",
+    "Somewhere in {city}, a cartographer is crying",
   ],
   'mirrored': [
     "{city}: mirror edition",
@@ -100,8 +132,77 @@ const locationToasts: Record<Orientation, string[]> = {
     "{city} through the looking glass",
     "Every turn in {city} is wrong now",
     "{city} in reverse",
+    "{city}: your GPS just quit",
+    "Good luck giving directions in {city}",
+    "Mirror {city} looks uncanny",
+    "{city}, but make it palindrome",
+    "{city}: left is the new right",
   ],
 };
+
+const cityJokes: Record<string, string[]> = {
+  'Tokyo':      ["Tokyo's subway map makes more sense upside down", "Shibuya crossing looks calm from here"],
+  'London':     ["The Thames flows uphill now", "Mind the gap — and the orientation"],
+  'New York':   ["Manhattan's grid still works. Barely.", "Uptown is downtown now. Classic NYC."],
+  'Paris':      ["The Eiffel Tower points down now", "Paris looks just as arrogant upside down"],
+  'Sydney':     ["Harbour Bridge finally right-side up", "Sydney was upside down all along"],
+  'Buenos Aires': ["Buenos Aires: always knew south was up", "Boca just moved to the penthouse"],
+  'Cairo':      ["The Nile flows in the right direction now", "Cairo finally feels like the centre"],
+  'Mumbai':     ["Mumbai from a different angle entirely", "The trains still run. Probably."],
+  'São Paulo':  ["São Paulo is even more chaotic this way", "Paulista Avenue looking brand new"],
+  'Cape Town':  ["Table Mountain sits on top. As it should.", "Cape Town was born for this view"],
+  'Mexico City': ["La Ciudad de México, al revés", "CDMX hits different from the south"],
+  'Berlin':     ["The wall fell in every direction", "Berlin doesn't care which way is up"],
+  'Istanbul':   ["Two continents. Still one city. Now flipped.", "The Bosphorus still divides, just vertically"],
+  'Lagos':      ["Lagos doesn't slow down. Even upside down.", "Third Mainland Bridge, new perspective"],
+  'Rio de Janeiro': ["Christ the Redeemer is still watching", "Copacabana from the other side"],
+  'Singapore':  ["Singapore is organised in every orientation", "The Lion City roars south-up"],
+  'Bangkok':    ["Bangkok traffic: chaotic in any direction", "Khao San Road still confuses you"],
+  'Nairobi':    ["Nairobi skyline hits different", "The Great Rift Valley, inverted"],
+  'Jakarta':    ["Jakarta just sprawls. In every direction.", "Java from the south side"],
+  'Seoul':      ["Gangnam is now below the river. Wait—", "Seoul's neon looks the same, flipped"],
+};
+
+function getTimeOfDayMessage(): string | null {
+  const h = new Date().getHours();
+  if (h >= 0 && h < 5) {
+    const msgs = [
+      "Late night cartography? Respect.",
+      "The world looks different at this hour",
+      "Insomniac cartography. We see you.",
+      "Maps hit different after midnight",
+    ];
+    return msgs[Math.floor(Math.random() * msgs.length)];
+  }
+  if (h >= 5 && h < 8) {
+    const msgs = [
+      "Early bird gets the disorientation",
+      "Coffee and cartography. Good combo.",
+      "Starting the day upside down. Bold.",
+    ];
+    return msgs[Math.floor(Math.random() * msgs.length)];
+  }
+  if (h >= 22) {
+    const msgs = [
+      "Night owl cartography",
+      "The stars don't know north either",
+      "Evening disorientation session",
+    ];
+    return msgs[Math.floor(Math.random() * msgs.length)];
+  }
+  return null;
+}
+
+function getAchievementMessage(flipCount: number): string | null {
+  switch (flipCount) {
+    case 5:  return "5 flips. You're getting the hang of this.";
+    case 10: return "10 flips. You're officially lost.";
+    case 25: return "25 flips. Cartography anarchist.";
+    case 50: return "50 flips. You should teach a class.";
+    case 100: return "100 flips. You've broken your atlas forever.";
+    default: return null;
+  }
+}
 
 const TOAST_COOLDOWN = 2000;
 const root = document.documentElement;
@@ -132,11 +233,30 @@ export function showFlipToast(state: AppState, text: string): void {
 }
 
 function getOrientationToast(state: AppState, target: Orientation): string {
+  // Achievement messages take priority
+  const achievement = getAchievementMessage(state.flipCount);
+  if (achievement) return achievement;
+
+  // Time-of-day messages (15% chance)
+  if (Math.random() < 0.15) {
+    const tod = getTimeOfDayMessage();
+    if (tod) return tod;
+  }
+
+  // City-specific jokes (20% chance when city matches)
+  if (state.currentCityName && target === 'upside-down' && Math.random() < 0.20) {
+    const jokes = cityJokes[state.currentCityName];
+    if (jokes) return jokes[Math.floor(Math.random() * jokes.length)];
+  }
+
+  // Location-aware messages (55% chance when city known)
   if (state.currentCityName && Math.random() < 0.55) {
     const locMsgs = locationToasts[target];
     const template = locMsgs[Math.floor(Math.random() * locMsgs.length)];
     return template.replace('{city}', state.currentCityName);
   }
+
+  // Default orientation messages
   const msgs = toastMessages[target];
   return msgs[Math.floor(Math.random() * msgs.length)];
 }
@@ -222,8 +342,10 @@ export function applyOrientation(state: AppState, target: Orientation): void {
     }
   }
 
+  state.flipCount++;
+  trackOrientationChange(target);
   showFlipToast(state, getOrientationToast(state, target));
-  trackEvent('flip', { orientation: target, city: state.currentCityName || 'unknown' });
+  trackEvent('flip', { orientation: target, city: state.currentCityName || 'unknown', flip_number: state.flipCount });
 
   // Share nudge: after first flip, suggest sharing (once per session)
   if (!sessionStorage.getItem('wud-share-nudged')) {

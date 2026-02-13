@@ -5,12 +5,14 @@ const IDLE_TIMEOUT = 120000;
 const root = document.documentElement;
 
 const posterCTAs = [
-  "tap to explore the upside-down world",
-  "tap to flip everything you know",
-  "the map is waiting. tap anywhere.",
-  "south is up. tap to see why.",
-  "ready to get lost? tap the map.",
-  "tap to unlearn north",
+  "drag to explore the upside-down world \u2193",
+  "pinch & drag the map \u2193",
+  "the map is alive. drag anywhere.",
+  "south is up. drag to see why. \u2193",
+  "ready to get lost? drag the map.",
+  "drag to unlearn north \u2193",
+  "touch the map to start exploring",
+  "swipe to discover what they hid",
 ];
 
 export function setOverlayOpacity(val: number, transition?: string) {
@@ -23,7 +25,6 @@ export function setMode(state: AppState, mode: AppState['currentMode']) {
   const prev = state.currentMode;
   state.currentMode = mode;
   trackEvent('mode', { from: prev, to: mode });
-  trackEvent('mode', { from: prev, to: mode });
 
   const overlay = document.getElementById('screenprint-overlay');
   const touchControls = document.getElementById('touch-controls');
@@ -31,7 +32,7 @@ export function setMode(state: AppState, mode: AppState['currentMode']) {
 
   if (mode === 'poster') {
     root.style.setProperty('--overlay-transition', '1.2s cubic-bezier(0.4, 0, 0.2, 1)');
-    setOverlayOpacity(0.90);
+    setOverlayOpacity(0.75);
     overlay?.classList.add('poster-mode');
     touchControls?.classList.remove('visible');
     flipHint?.classList.remove('visible');
@@ -82,7 +83,7 @@ export function startIdleTimer(state: AppState) {
   state.idleTimer = setTimeout(() => {
     if (state.currentMode === 'explore') {
       root.style.setProperty('--overlay-transition', '3s ease-in-out');
-      setOverlayOpacity(0.90);
+      setOverlayOpacity(0.75);
       setTimeout(() => {
         if (state.currentMode === 'explore') {
           state.currentMode = 'poster';

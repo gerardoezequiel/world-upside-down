@@ -30,7 +30,7 @@ export function recolorStyle(palette: Record<string, string>, style: maplibregl.
     }
     if (id.startsWith("landuse_park") && "paint" in layer) {
       (layer as any).paint["fill-color"] = P.park;
-      (layer as any).paint["fill-opacity"] = ["interpolate", ["linear"], ["zoom"], 6, 0.15, 10, 0.35, 14, 0.55];
+      (layer as any).paint["fill-opacity"] = ["interpolate", ["linear"], ["zoom"], 6, 0.1, 10, 0.25, 14, 0.45];
       continue;
     }
     if (id === "landuse_urban_green" && "paint" in layer) { (layer as any).paint["fill-color"] = P.parkAlt; continue; }
@@ -56,7 +56,7 @@ export function recolorStyle(palette: Record<string, string>, style: maplibregl.
     if (id.includes("_casing") && "paint" in layer) {
       const p = (layer as any).paint;
       if (p["line-color"]) p["line-color"] = P.roadCas;
-      p["line-opacity"] = ["interpolate", ["linear"], ["zoom"], 10, 0.3, 16, 0.6];
+      p["line-opacity"] = ["interpolate", ["linear"], ["zoom"], 10, 0.3, 16, 0.4];
       continue;
     }
 
@@ -67,15 +67,15 @@ export function recolorStyle(palette: Record<string, string>, style: maplibregl.
           p["line-color"] = P.roadMajor;
           // Thinner roads: reduce visual weight at mid-zooms for a cleaner riso look
           if (id.includes("highway") && !id.includes("casing")) {
-            p["line-width"] = ["interpolate", ["exponential", 1.6], ["zoom"], 3, 0, 6, 0.8, 12, 1.2, 15, 3.5, 18, 11];
+            p["line-width"] = ["interpolate", ["exponential", 1.6], ["zoom"], 3, 0, 6, 0, 12, 0.9, 15, 2.5, 18, 8];
           } else if (id.includes("major") && !id.includes("casing")) {
-            p["line-width"] = ["interpolate", ["exponential", 1.6], ["zoom"], 6, 0, 12, 1.2, 15, 2.2, 18, 10];
+            p["line-width"] = ["interpolate", ["exponential", 1.6], ["zoom"], 6, 0, 12, 0.9, 15, 1.8, 18, 7];
           }
         }
         else if (id.includes("minor") || id.includes("other") || id.includes("link")) {
           p["line-color"] = P.roadMinor;
           // Lighter minor roads
-          p["line-opacity"] = ["interpolate", ["linear"], ["zoom"], 12, 0.4, 16, 0.7];
+          p["line-opacity"] = ["interpolate", ["linear"], ["zoom"], 12, 0.4, 16, 0.55];
         }
         else if (id.includes("rail")) p["line-color"] = P.rail;
         else if (id.includes("pier")) p["line-color"] = P.pier;

@@ -51,6 +51,9 @@ export interface AppState {
 
   /* Geocoder search */
   searchTimeout: ReturnType<typeof setTimeout> | null;
+
+  /* Analytics */
+  flipCount: number;
 }
 
 export const DEFAULT_PALETTE: Record<string, string> = {
@@ -116,5 +119,6 @@ export function createAppState(map: maplibregl.Map): AppState {
     tickerTimeout: null,
     tickerIdleTimeout: null,
     searchTimeout: null,
+    flipCount: 0,
   };
 }

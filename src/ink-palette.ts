@@ -65,12 +65,16 @@ export interface PresetPalette {
 }
 
 export const PALETTES: PresetPalette[] = [
-  { id: 'classic',   name: 'Classic',   palette: { base: 'lightGray', water: 'teal',      built: 'blue',       green: 'fluorPink',  ink: 'black' } },
-  { id: 'protest',   name: 'Protest',   palette: { base: 'lightGray', water: 'blue',      built: 'fluorPink',  green: 'yellow',     ink: 'black' } },
-  { id: 'blueprint', name: 'Blueprint', palette: { base: 'cornflower', water: 'blue',     built: 'mediumBlue', green: 'teal',       ink: 'black' } },
-  { id: 'botanical', name: 'Botanical', palette: { base: 'mist',      water: 'teal',      built: 'lightGray',  green: 'green',      ink: 'black' } },
-  { id: 'neon',      name: 'Neon',      palette: { base: 'lightGray', water: 'blue',      built: 'fluorPink',  green: 'fluorGreen', ink: 'black' } },
-  { id: 'mono',      name: 'Mono',      palette: { base: 'lightGray', water: 'blue',      built: 'blue',       green: 'blue',       ink: 'black' } },
+  { id: 'classic',   name: 'Classic',   palette: { base: 'lightGray', water: 'teal',       built: 'blue',       green: 'fluorPink',   ink: 'black' } },
+  { id: 'protest',   name: 'Protest',   palette: { base: 'lightGray', water: 'blue',       built: 'fluorPink',  green: 'yellow',      ink: 'black' } },
+  { id: 'blueprint', name: 'Blueprint', palette: { base: 'cornflower', water: 'blue',      built: 'mediumBlue', green: 'teal',        ink: 'black' } },
+  { id: 'botanical', name: 'Botanical', palette: { base: 'mist',      water: 'teal',       built: 'lightGray',  green: 'green',       ink: 'black' } },
+  { id: 'neon',      name: 'Neon',      palette: { base: 'lightGray', water: 'blue',       built: 'fluorPink',  green: 'fluorGreen',  ink: 'black' } },
+  { id: 'mono',      name: 'Mono',      palette: { base: 'lightGray', water: 'blue',       built: 'blue',       green: 'blue',        ink: 'black' } },
+  { id: 'darkroom',  name: 'Darkroom',  palette: { base: 'charcoal',  water: 'midnight',   built: 'brightRed',  green: 'teal',        ink: 'black' } },
+  { id: 'sunset',    name: 'Sunset',    palette: { base: 'bisque',    water: 'seaBlue',    built: 'orange',     green: 'emerald',     ink: 'black' } },
+  { id: 'archive',   name: 'Archive',   palette: { base: 'granite',   water: 'lightTeal',  built: 'lightGray',  green: 'hunterGreen', ink: 'charcoal' } },
+  { id: 'riot',      name: 'Riot',      palette: { base: 'lightGray', water: 'mediumBlue', built: 'brightRed',  green: 'yellow',      ink: 'black' } },
 ];
 
 export const DEFAULT_PALETTE_ID = 'classic';

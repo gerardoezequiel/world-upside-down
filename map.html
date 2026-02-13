@@ -34,6 +34,18 @@
   </filter>
 </svg>
 
+<!-- ── SPLASH / INTRO SCREEN ── -->
+<div id="splash" class="splash">
+  <div class="splash-content">
+    <h1 class="splash-title">Upside Down</h1>
+    <p class="splash-subtitle">an exercise in unlearning north</p>
+    <p class="splash-body">The first photo of Earth had south on top.<br>NASA flipped it. This map flips it back.</p>
+    <button class="splash-cta" id="splash-enter">Enter the map</button>
+    <a href="/story" class="splash-link">Read the full story &rarr;</a>
+  </div>
+  <div class="splash-bg" aria-hidden="true"></div>
+</div>
+
 <div id="page">
 
   <!-- ── TOP BAND ── -->
@@ -48,24 +60,54 @@
     </div>
     <!-- ── Tool bar (always visible) ── -->
     <div id="toolbar">
-      <button class="tb-btn" data-tool="locate" id="tool-locate" aria-label="Find me">&#x2316;</button>
-      <button class="tb-btn" data-tool="title" id="tool-title" aria-label="Make it yours">T</button>
-      <div class="tb-dropdown" id="style-dropdown">
-        <button class="tb-btn" data-tool="style" id="tool-style" aria-label="Style">&#x25C9;</button>
-        <div class="tb-dropdown-menu style-panel" id="style-panel">
-          <div class="style-presets" id="style-presets"></div>
-          <div class="style-customize" id="style-customize"></div>
+      <button class="tb-btn" data-tool="locate" id="tool-locate" aria-label="Find me" title="Find my location">&#x2316;</button>
+      <button class="tb-btn" data-tool="title" id="tool-title" aria-label="Make it yours" title="Edit title">T</button>
+      <button class="tb-btn" data-tool="style" id="tool-style" aria-label="Style" title="Style">&#x25C9;</button>
+      <button class="tb-btn" data-tool="layers" id="tool-layers" aria-label="Layers" title="Layers">&#x25A4;</button>
+      <button class="tb-btn" data-tool="pitch" id="tool-pitch" aria-label="3D tilt" title="3D perspective">&#x25E2;</button>
+      <button class="tb-btn" data-tool="globe" id="tool-globe" aria-label="Globe">&#x25CB;</button>
+      <button class="tb-btn" data-tool="export" id="tool-export" aria-label="Export" title="Export image">&darr;</button>
+      <div class="tb-dropdown" id="share-dropdown">
+        <button class="tb-btn" data-tool="share" id="tool-share" aria-label="Share" title="Share">&nearr;</button>
+        <div class="tb-dropdown-menu" id="share-menu">
+          <button class="tb-dropdown-item" data-share="native" id="share-native">Share...</button>
+          <button class="tb-dropdown-item" data-share="image" id="share-image">Share as image</button>
+          <button class="tb-dropdown-item" data-share="linkedin">LinkedIn</button>
+          <button class="tb-dropdown-item" data-share="x">X / Twitter</button>
+          <button class="tb-dropdown-item" data-share="whatsapp">WhatsApp</button>
+          <button class="tb-dropdown-item" data-share="instagram" id="share-instagram">Instagram Story</button>
+          <button class="tb-dropdown-item" data-share="copy">Copy link</button>
         </div>
       </div>
-      <button class="tb-btn" data-tool="tissot" id="tool-tissot" aria-label="Tissot's indicatrix" title="Show projection distortion">&#x25CE;</button>
-      <div class="tb-dropdown" id="pin-dropdown">
-        <button class="tb-btn" data-tool="pin" id="tool-pin" aria-label="Drop a pin" title="Drop an emotion pin">&#x2764;</button>
-        <div class="tb-dropdown-menu pin-picker" id="pin-picker"></div>
+      <a href="/" class="tb-btn" aria-label="Home" title="Back to home">&larr;</a>
+    </div>
+
+    <div id="coords">
+      <span id="coords-lat">51.51° N</span>
+      <span class="coord-sep">/</span>
+      <span id="coords-lon">0.13° W</span>
+      <span class="coord-sep">/</span>
+      <span id="coords-zoom">z11.0</span>
+    </div>
+  </div>
+
+  <!-- ── SIDEBAR ── -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-title" id="sidebar-title">Style</span>
+      <button class="sidebar-close" id="sidebar-close">&times;</button>
+    </div>
+    <div class="sidebar-body" id="sidebar-body">
+      <!-- Style section -->
+      <div class="sidebar-section" id="sidebar-style" data-section="style">
+        <div class="style-presets" id="style-presets"></div>
+        <div class="style-customize" id="style-customize"></div>
       </div>
-      <button class="tb-btn" data-tool="globe" id="tool-globe" aria-label="Globe">&#x25CB;</button>
-      <div class="tb-dropdown" id="download-dropdown">
-        <button class="tb-btn" data-tool="download" id="tool-download" aria-label="Download">&darr;</button>
-        <div class="tb-dropdown-menu" id="download-formats">
+      <!-- Layers section -->
+      <div class="sidebar-section" id="sidebar-layers" data-section="layers" style="display:none"></div>
+      <!-- Export section -->
+      <div class="sidebar-section" id="sidebar-export" data-section="export" style="display:none">
+        <div class="sidebar-export-formats">
           <button class="tb-dropdown-item" data-format="feed">
             <span class="dl-ratio feed-ratio"></span>
             <span>Feed <small>1080&times;1080</small></span>
@@ -78,29 +120,29 @@
             <span class="dl-ratio poster-ratio"></span>
             <span>Poster <small>3600&times;4800</small></span>
           </button>
+          <button class="tb-dropdown-item" data-format="print">
+            <span class="dl-ratio print-ratio"></span>
+            <span>Print <small>7200&times;10800</small></span>
+          </button>
         </div>
       </div>
-      <div class="tb-dropdown" id="share-dropdown">
-        <button class="tb-btn" data-tool="share" id="tool-share" aria-label="Share">&nearr;</button>
-        <div class="tb-dropdown-menu" id="share-menu">
-          <button class="tb-dropdown-item" data-share="native" id="share-native">Share...</button>
-          <button class="tb-dropdown-item" data-share="image" id="share-image">Share as image</button>
-          <button class="tb-dropdown-item" data-share="linkedin">LinkedIn</button>
-          <button class="tb-dropdown-item" data-share="x">X / Twitter</button>
-          <button class="tb-dropdown-item" data-share="copy">Copy link</button>
+      <!-- Overlays section (Tissot, Pins) -->
+      <div class="sidebar-section" id="sidebar-overlays" data-section="overlays" style="display:none">
+        <div class="sidebar-overlay-group">
+          <div class="ink-section-title">Map overlays</div>
+          <div class="sidebar-overlay-row">
+            <button class="tb-btn sidebar-tool-btn" data-tool="tissot" id="tool-tissot" aria-label="Tissot's indicatrix" title="Show projection distortion">&#x25CE; <span>Tissot's indicatrix</span></button>
+          </div>
+          <div class="sidebar-overlay-row">
+            <div class="tb-dropdown" id="pin-dropdown" style="width:100%">
+              <button class="tb-btn sidebar-tool-btn" data-tool="pin" id="tool-pin" aria-label="Drop a pin" title="Drop an emotion pin">&#x2764; <span>Emotion pins</span></button>
+              <div class="tb-dropdown-menu pin-picker" id="pin-picker"></div>
+            </div>
+          </div>
         </div>
       </div>
-      <a href="/" class="tb-btn" aria-label="Home">&larr;</a>
     </div>
-
-    <div id="coords">
-      <span id="coords-lat">51.51° N</span>
-      <span class="coord-sep">/</span>
-      <span id="coords-lon">0.13° W</span>
-      <span class="coord-sep">/</span>
-      <span id="coords-zoom">z11.0</span>
-    </div>
-  </div>
+  </aside>
 
   <!-- ── MAP FRAME ── -->
   <div id="map-frame">
@@ -154,7 +196,10 @@
 
     <!-- ── Color strip (title editor) ── -->
     <div class="color-strip" id="color-strip">
-      <button class="color-dot active" data-color="#FFE627" data-shadow="#FF48B0" aria-label="Yellow">
+      <button class="color-dot active" data-color="#000000" data-shadow="#FF48B0" aria-label="Black">
+        <span style="background:#000000"></span>
+      </button>
+      <button class="color-dot" data-color="#FFE627" data-shadow="#FF48B0" aria-label="Yellow">
         <span style="background:#FFE627"></span>
       </button>
       <button class="color-dot" data-color="#FF48B0" data-shadow="#C4305C" aria-label="Pink">
@@ -165,9 +210,6 @@
       </button>
       <button class="color-dot" data-color="#0078BF" data-shadow="#004A75" aria-label="Blue">
         <span style="background:#0078BF"></span>
-      </button>
-      <button class="color-dot" data-color="#000000" data-shadow="#333333" aria-label="Black">
-        <span style="background:#000000"></span>
       </button>
     </div>
 
@@ -243,32 +285,32 @@
       <div class="legend-row">
         <div class="leg-item">
           <svg viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="1" fill="#88898A" stroke="#6A6B6C" stroke-width="0.8"/></svg>
-          <span>Land</span>
+          <span data-short="L">Land</span>
         </div>
         <div class="leg-item">
           <svg viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="1" fill="#00838A" stroke="#006A70" stroke-width="0.8"/></svg>
-          <span>Water</span>
+          <span data-short="W">Water</span>
         </div>
         <div class="leg-item">
           <svg viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="1" fill="#0078BF" stroke="#005A90" stroke-width="0.8"/></svg>
-          <span>Buildings</span>
+          <span data-short="B">Buildings</span>
         </div>
         <div class="leg-item">
           <svg viewBox="0 0 14 14"><rect x="1" y="1" width="12" height="12" rx="1" fill="#FF48B0" stroke="#D03090" stroke-width="0.8"/></svg>
-          <span>Parks</span>
+          <span data-short="P">Parks</span>
         </div>
         <div class="leg-item">
           <svg viewBox="0 0 14 14">
             <line x1="2" y1="7" x2="12" y2="7" stroke="#000000" stroke-width="2"/>
             <line x1="2" y1="10" x2="12" y2="10" stroke="#88898A" stroke-width="1"/>
           </svg>
-          <span>Roads</span>
+          <span data-short="R">Roads</span>
         </div>
         <div class="leg-item">
           <svg viewBox="0 0 14 14">
             <line x1="2" y1="7" x2="12" y2="7" stroke="#000000" stroke-width="1.5" stroke-dasharray="2,1.5"/>
           </svg>
-          <span>Boundaries</span>
+          <span data-short="—">Boundaries</span>
         </div>
       </div>
     </div>
