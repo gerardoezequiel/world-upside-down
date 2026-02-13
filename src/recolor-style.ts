@@ -19,9 +19,20 @@ export function recolorStyle(palette: Record<string, string>, style: maplibregl.
       (layer as any).paint["fill-outline-color"] = "rgba(0, 120, 191, 0.25)";
       continue;
     }
-    if (id === "water" && "paint" in layer) { (layer as any).paint["fill-color"] = P.water; continue; }
-    if ((id === "water_stream" || id === "water_river") && "paint" in layer) { (layer as any).paint["line-color"] = P.waterLine; continue; }
-    if (id.startsWith("landuse_park") && "paint" in layer) { (layer as any).paint["fill-color"] = P.park; (layer as any).paint["fill-opacity"] = 0.7; continue; }
+    if (id === "water" && "paint" in layer) {
+      (layer as any).paint["fill-color"] = P.water;
+      (layer as any).paint["fill-antialias"] = true;
+      continue;
+    }
+    if ((id === "water_stream" || id === "water_river") && "paint" in layer) {
+      (layer as any).paint["line-color"] = P.waterLine;
+      continue;
+    }
+    if (id.startsWith("landuse_park") && "paint" in layer) {
+      (layer as any).paint["fill-color"] = P.park;
+      (layer as any).paint["fill-opacity"] = ["interpolate", ["linear"], ["zoom"], 6, 0.15, 10, 0.35, 14, 0.55];
+      continue;
+    }
     if (id === "landuse_urban_green" && "paint" in layer) { (layer as any).paint["fill-color"] = P.parkAlt; continue; }
     if (id === "landuse_hospital" && "paint" in layer) { (layer as any).paint["fill-color"] = P.hospital; continue; }
     if (id === "landuse_school" && "paint" in layer) { (layer as any).paint["fill-color"] = P.school; continue; }
@@ -45,14 +56,27 @@ export function recolorStyle(palette: Record<string, string>, style: maplibregl.
     if (id.includes("_casing") && "paint" in layer) {
       const p = (layer as any).paint;
       if (p["line-color"]) p["line-color"] = P.roadCas;
+      p["line-opacity"] = ["interpolate", ["linear"], ["zoom"], 10, 0.3, 16, 0.6];
       continue;
     }
 
     if (id.startsWith("roads_") && !id.includes("label") && !id.includes("shield") && !id.includes("oneway") && "paint" in layer) {
       const p = (layer as any).paint;
       if (p["line-color"]) {
-        if (id.includes("highway") || id.includes("major")) p["line-color"] = P.roadMajor;
-        else if (id.includes("minor") || id.includes("other") || id.includes("link")) p["line-color"] = P.roadMinor;
+        if (id.includes("highway") || id.includes("major")) {
+          p["line-color"] = P.roadMajor;
+          // Thinner roads: reduce visual weight at mid-zooms for a cleaner riso look
+          if (id.includes("highway") && !id.includes("casing")) {
+            p["line-width"] = ["interpolate", ["exponential", 1.6], ["zoom"], 3, 0, 6, 0.8, 12, 1.2, 15, 3.5, 18, 11];
+          } else if (id.includes("major") && !id.includes("casing")) {
+            p["line-width"] = ["interpolate", ["exponential", 1.6], ["zoom"], 6, 0, 12, 1.2, 15, 2.2, 18, 10];
+          }
+        }
+        else if (id.includes("minor") || id.includes("other") || id.includes("link")) {
+          p["line-color"] = P.roadMinor;
+          // Lighter minor roads
+          p["line-opacity"] = ["interpolate", ["linear"], ["zoom"], 12, 0.4, 16, 0.7];
+        }
         else if (id.includes("rail")) p["line-color"] = P.rail;
         else if (id.includes("pier")) p["line-color"] = P.pier;
         else if (id.includes("runway") || id.includes("taxiway")) p["line-color"] = P.runway;
@@ -87,6 +111,25 @@ export function recolorStyle(palette: Record<string, string>, style: maplibregl.
 
     if (id === "places_locality") { delete (layer as any).layout["icon-image"]; continue; }
     if (id === "roads_shields") { (layer as any).layout = { visibility: "none" }; continue; }
+
+    // Fix tunnel casing filter bugs: these layers incorrectly filter for surface roads
+    if (id === "roads_tunnels_major_casing" && "filter" in layer) {
+      (layer as any).filter = ["all", ["has", "is_tunnel"], ["==", "kind", "major_road"]];
+      continue;
+    }
+    if (id === "roads_tunnels_highway_casing" && "filter" in layer) {
+      (layer as any).filter = ["all", ["has", "is_tunnel"], ["==", "kind", "highway"], ["!has", "is_link"]];
+      continue;
+    }
+
+    // Narrow park filter: remove military/airfield/naval_base and vegetation overlap
+    if (id === "landuse_park" && "filter" in layer) {
+      (layer as any).filter = [
+        "in", "kind",
+        "national_park", "park", "cemetery", "protected_area",
+        "nature_reserve", "forest", "golf_course",
+      ];
+    }
 
     if ("paint" in layer) {
       const p = (layer as any).paint;

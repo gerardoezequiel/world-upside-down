@@ -3,6 +3,15 @@ import type { AppState } from "./map-state";
 const IDLE_TIMEOUT = 120000;
 const root = document.documentElement;
 
+const posterCTAs = [
+  "tap to explore the upside-down world",
+  "tap to flip everything you know",
+  "the map is waiting. tap anywhere.",
+  "south is up. tap to see why.",
+  "ready to get lost? tap the map.",
+  "tap to unlearn north",
+];
+
 export function setOverlayOpacity(val: number, transition?: string) {
   root.style.setProperty('--overlay-opacity', String(val));
   if (transition) root.style.setProperty('--overlay-transition', transition);
@@ -23,7 +32,11 @@ export function setMode(state: AppState, mode: AppState['currentMode']) {
     overlay?.classList.add('poster-mode');
     touchControls?.classList.remove('visible');
     flipHint?.classList.remove('visible');
-    document.getElementById('poster-cta')?.classList.remove('hidden');
+    const cta = document.getElementById('poster-cta');
+    if (cta) {
+      cta.textContent = posterCTAs[Math.floor(Math.random() * posterCTAs.length)];
+      cta.classList.remove('hidden');
+    }
     clearIdleTimer(state);
   }
 
@@ -40,6 +53,13 @@ export function setMode(state: AppState, mode: AppState['currentMode']) {
       if (flipHint && !localStorage.getItem('wud-explored')) {
         flipHint.classList.add('visible');
         localStorage.setItem('wud-explored', '1');
+      }
+      // Hint that title is tappable (search) — once per session
+      const titleEl = document.getElementById('city-title');
+      if (titleEl && !sessionStorage.getItem('wud-search-hinted')) {
+        titleEl.classList.add('hint-pulse');
+        sessionStorage.setItem('wud-search-hinted', '1');
+        titleEl.addEventListener('animationend', () => titleEl.classList.remove('hint-pulse'), { once: true });
       }
     }, 300);
 
@@ -65,6 +85,11 @@ export function startIdleTimer(state: AppState) {
           state.currentMode = 'poster';
           document.getElementById('screenprint-overlay')?.classList.add('poster-mode');
           document.getElementById('touch-controls')?.classList.remove('visible');
+          const cta = document.getElementById('poster-cta');
+          if (cta) {
+            cta.textContent = posterCTAs[Math.floor(Math.random() * posterCTAs.length)];
+            cta.classList.remove('hidden');
+          }
         }
       }, 3000);
     }

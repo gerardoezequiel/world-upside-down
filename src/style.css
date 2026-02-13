@@ -534,7 +534,9 @@ body {
   line-height: 0.88;
   letter-spacing: 0.06em;
   color: var(--sp-color);
-  text-shadow: var(--sp-shadow-x) var(--sp-shadow-y) 0 var(--sp-shadow);
+  text-shadow:
+    var(--sp-shadow-x) var(--sp-shadow-y) 0 var(--sp-shadow),
+    0 0 40px rgba(0, 0, 0, 0.15);
   filter: url(#riso-rough);
   transition: color 0.4s ease, text-shadow 0.4s ease, transform 0.3s ease, font-family 0.3s ease;
 }
@@ -610,10 +612,11 @@ body {
 
 /* ── FLIP TOAST ── */
 #flip-toast {
+  --toast-tilt: 0deg;
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) rotate(var(--toast-tilt));
   z-index: 15;
   font-family: 'Instrument Serif', serif;
   font-style: italic;
@@ -626,7 +629,7 @@ body {
   border: 1px solid rgba(0, 0, 0, 0.06);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.4s ease, transform 0.3s ease;
   text-align: center;
   white-space: nowrap;
   letter-spacing: 0.01em;
@@ -1506,7 +1509,17 @@ body {
   .screenprint-line { font-size: 16vw; }
 
   #city-title { font-size: 18px; }
-  .search-hint { display: none; }
+  .search-hint {
+    opacity: 0.5;
+    font-size: 12px;
+    margin-left: 4px;
+    animation: hintPulse 3s ease-in-out 2;
+    animation-delay: 4s;
+  }
+  @keyframes hintPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; color: var(--teal); }
+  }
 
   #geocoder-input {
     font-size: 16px;
@@ -2166,17 +2179,37 @@ body {
    RESPONSIVE — Landscape phone
    ══════════════════════════════════════ */
 @media (max-height: 500px) and (orientation: landscape) {
-  #top-band { height: 36px; }
-  #bot-band { height: 36px; }
+  #top-band { height: 32px; padding: 0 10px; }
+  #bot-band { height: 32px; padding: 0 10px; }
 
   .screenprint-line { font-size: 12vh; }
+
+  #city-title { font-size: 14px; }
+  .subtitle { display: none; }
+
+  .tb-btn { width: 32px; height: 32px; font-size: 12px; }
 
   .tb-dropdown-menu {
     max-height: 90vh;
   }
 
+  /* Legend: compact dots-only in landscape */
+  .legend-title { display: none; }
+  .leg-item span { display: none; }
+  .leg-item svg { width: 10px; height: 10px; }
+  .legend-row { gap: 4px; }
+
+  .north-arrow svg { width: 22px; height: 22px; }
+  .scale-ratio { display: none; }
+
+  .bot-author { font-size: 7px; }
+
+  #flip-toast { font-size: 14px; padding: 6px 14px; }
+
   .flip-fab { bottom: 6px; left: 12px; width: 40px; height: 40px; }
   .flip-fab-arrow { font-size: 18px; }
+
+  .poster-cta { font-size: 12px; }
 }
 
 /* ── Print ── */

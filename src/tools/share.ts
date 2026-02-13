@@ -2,12 +2,21 @@ import type { AppState } from "../map-state";
 import { showFlipToast } from "../orientation";
 import { closeAllDropdowns } from "../style-system";
 
+const shareTemplates = [
+  "I flipped {city} upside down. Turns out NASA did it first.",
+  "{city} looks completely different south-up. Try it.",
+  "You've been looking at {city} wrong your whole life.",
+  "I broke {city}. Or maybe the map was already broken.",
+  "The world upside down, starting with {city}.",
+];
+
 function getShareText(state: AppState): string {
   const city = state.currentCityName;
   if (city) {
-    return `I flipped ${city} upside down. \u{1F30D}\u2B07\uFE0F`;
+    const template = shareTemplates[Math.floor(Math.random() * shareTemplates.length)];
+    return template.replace('{city}', city);
   }
-  return "I flipped the world upside down. \u{1F30D}\u2B07\uFE0F";
+  return "I flipped the world upside down. Turns out NASA did it first. \u{1F30D}\u2B07\uFE0F";
 }
 
 async function triggerNativeShare(state: AppState): Promise<boolean> {
@@ -71,9 +80,15 @@ export function setupToolShare(state: AppState): void {
       } else if (platform === 'x') {
         window.open(`https://x.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=600,height=400');
       } else if (platform === 'copy') {
+        const copyToasts = [
+          'Link copied. Go spread the disorientation.',
+          'Copied. Now paste it somewhere dangerous.',
+          'Link in clipboard. Use wisely.',
+          'Copied. The world will thank you.',
+        ];
         try {
           await navigator.clipboard.writeText(window.location.href);
-          showFlipToast(state, 'Link copied');
+          showFlipToast(state, copyToasts[Math.floor(Math.random() * copyToasts.length)]);
         } catch {
           showFlipToast(state, 'Copy the URL from your browser');
         }

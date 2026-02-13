@@ -4,50 +4,105 @@ import { closeAllPanels } from "./style-system";
 
 const toastMessages: Record<Orientation, string[]> = {
   'normal': [
-    "Wait... this feels wrong", "Oh no, not this again", "The boring way up",
-    "How conventional of you", "You've been conditioned",
-    "North is a social construct", "Comfortable? That's the problem",
-    "Welcome back to the Matrix", "Plot twist: this is the weird one",
-    "Back to the colonial default", "Safety blanket: activated",
+    "How very atlas of you",
+    "Safe mode: enabled",
+    "Mercator thanks you",
+    "You chose the boring one",
+    "The school map wins again",
+    "Comfort zone: restored",
+    "Corporate cartography activated",
+    "You had one job",
+    "The boardroom orientation",
+    "Back to the PowerPoint map",
+    "Autopilot engaged",
+    "HR-approved orientation",
+    "Google Maps breathes a sigh",
+    "That's what they want you to see",
+    "Predictable, but okay",
+    "You folded",
+    "The colonisers would be proud",
+    "Your teacher would approve",
+    "Welcome back to the Matrix",
+    "North is a social construct",
+    "Plot twist: this is the weird one",
   ],
   'upside-down': [
-    "Ah, much better", "Welcome back", "Now we're talking",
-    "Home sweet upside down", "This is the real world",
-    "South is the new up", "Earth has no opinion on the matter",
-    "Suddenly everything is unfamiliar", "There is no up in space",
-    "Now you see it as Apollo 17 did", "The Southern Hemisphere approves",
+    "Ah, the correct way",
+    "Greenland just got honest",
+    "Australia finally on top",
+    "The ISS sees it this way",
+    "Nuestro norte es el Sur",
+    "Antarctica crowns the world",
+    "South is upstream on the Nile",
+    "Al-Idrisi had it right in 1154",
+    "NASA rotated the original photo",
+    "The Blue Marble was south-up",
+    "Sorry, Mercator",
+    "Flat earthers hate this one trick",
+    "Africa at its true scale",
+    "No astronaut has ever seen north",
+    "This is how satellites see it",
+    "Every compass points to a choice",
+    "500 years of habit, broken",
+    "The Southern Cross approves",
+    "Brazil is bigger than you think",
+    "Polaris is just a star",
+    "Buckminster Fuller nodded",
+    "Your geography teacher lied",
+    "The equator hasn't moved",
+    "Down Under? Under what?",
+    "The Nile approves this message",
+    "There is no up in space",
+    "Now you see it as Apollo 17 did",
+    "Earth has no opinion on the matter",
     "Antarctica is on top now. Deal with it.",
+    "Stuart McArthur sends his regards",
   ],
   'mirrored': [
-    "Through the looking glass", "Everything is backwards now",
-    "Mirror, mirror on the wall...", "East is west, west is east",
-    "Your mental map just broke", "Try giving someone directions now",
-    "Even Google Maps can't help you now",
-    "This is how da Vinci wrote his notes",
+    "Read this backwards",
+    "Your left is now your right",
+    "Ambulance mode",
+    "Leonardo would feel at home",
+    "East and west just swapped",
+    "Try parallel parking now",
+    "Every sat-nav just died",
+    "This is how mirrors see maps",
+    "Left turn means right turn",
+    "The world as a palindrome",
+    "Through the looking glass",
   ],
 };
 
 const locationToasts: Record<Orientation, string[]> = {
   'normal': [
-    "{city} looks boringly correct now",
-    "The people of {city} feel safe again",
-    "{city}: back to the atlas version",
+    "{city} snaps back to boring",
+    "Back to the tourist map of {city}",
+    "{city}: the postcard version",
+    "The {city} your GPS expects",
+    "{city} on autopilot again",
   ],
   'upside-down': [
-    "Did you get lost in {city}?",
-    "{city} looks different from down here",
-    "Welcome to {city}... upside down",
-    "Is that really {city}?",
-    "Good luck giving directions in {city} now",
+    "{city} from the other side",
+    "You just disoriented {city}",
+    "{city} has never looked like this",
+    "Try hailing a cab in {city} now",
+    "Lost in {city}? Good.",
+    "{city}, but make it honest",
+    "New perspective on {city}",
+    "{city} looking brand new",
+    "The locals in {city} approve",
+    "{city} just got interesting",
   ],
   'mirrored': [
+    "{city}: mirror edition",
+    "Finding your way in {city}? No.",
     "{city} through the looking glass",
-    "Try finding your hotel in {city} now",
-    "{city} but make it backwards",
+    "Every turn in {city} is wrong now",
+    "{city} in reverse",
   ],
 };
 
-const TOAST_COOLDOWN = 3000;
+const TOAST_COOLDOWN = 2000;
 const root = document.documentElement;
 
 function toggleMapLabels(state: AppState, show: boolean): void {
@@ -68,12 +123,15 @@ export function showFlipToast(state: AppState, text: string): void {
   const toast = document.getElementById('flip-toast');
   if (!toast) return;
   toast.textContent = text;
+  // Subtle random tilt for zine-like personality
+  const tilt = (Math.random() - 0.5) * 3;
+  toast.style.setProperty('--toast-tilt', `${tilt}deg`);
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2200);
+  setTimeout(() => toast.classList.remove('show'), 2400);
 }
 
 function getOrientationToast(state: AppState, target: Orientation): string {
-  if (state.currentCityName && Math.random() < 0.4) {
+  if (state.currentCityName && Math.random() < 0.55) {
     const locMsgs = locationToasts[target];
     const template = locMsgs[Math.floor(Math.random() * locMsgs.length)];
     return template.replace('{city}', state.currentCityName);

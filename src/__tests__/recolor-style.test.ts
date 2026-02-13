@@ -58,7 +58,8 @@ describe('recolorStyle', () => {
     const result = recolorStyle(P, style);
     const paint = (result.layers[0] as any).paint;
     expect(paint['fill-color']).toBe(P.park);
-    expect(paint['fill-opacity']).toBe(0.7);
+    expect(Array.isArray(paint['fill-opacity'])).toBe(true);
+    expect(paint['fill-opacity'][0]).toBe('interpolate');
   });
 
   it('handles landuse_park_something prefix', () => {

@@ -134,6 +134,7 @@ export function setupGeocoder(state: AppState): void {
             }
 
             titleEl.textContent = name;
+            state.currentCityName = name;
             closeGeocoder();
           });
 
