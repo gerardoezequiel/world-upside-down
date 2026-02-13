@@ -16,6 +16,7 @@ export function applyRisoMisregistration(state: AppState): void {
       id: 'water-riso-offset', type: 'fill',
       source: (waterLayer as any).source,
       'source-layer': (waterLayer as any)['source-layer'],
+      filter: (waterLayer as any).filter,
       paint: {
         'fill-color': RISO_INKS.teal.hex, 'fill-opacity': 0.12,
         'fill-translate': [misreg.teal.dx * SCALE, misreg.teal.dy * SCALE],

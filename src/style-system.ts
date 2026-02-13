@@ -13,6 +13,7 @@ import {
   type FontCategory, type StylePreset,
 } from "./font-system";
 import { updateShareableHash } from "./shareable-urls";
+import { refreshTitleColors } from "./tools/title";
 
 const root = document.documentElement;
 
@@ -94,6 +95,8 @@ function updateColorStrip(state: AppState, mp: MapPalette): void {
     root.style.setProperty('--sp-color', first.color);
     root.style.setProperty('--sp-shadow', first.shadow);
   }
+
+  refreshTitleColors(state);
 }
 
 /* ── Style UI update ─────────────────────────────────────── */

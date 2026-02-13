@@ -604,13 +604,6 @@ body {
   transition: color 0.4s ease, text-shadow 0.4s ease, transform 0.3s ease, font-family 0.3s ease;
 }
 
-/* Editable state */
-.screenprint-line[contenteditable="true"] {
-  outline: none;
-  caret-color: var(--sp-color);
-  cursor: text;
-  pointer-events: auto;
-}
 
 /* ── POSTER CTA (mobile onboarding) ── */
 .poster-cta {
@@ -1869,7 +1862,6 @@ body {
   #coords { display: none; }
 
   /* Hide power-user buttons on phone — tissot & pins are in sidebar */
-  #tool-title { display: none; }
   #tool-layers { display: none; }
 
   /* Toolbar: maintain 44px targets, tighter spacing */
@@ -2434,6 +2426,66 @@ body {
     font-size: 10px;
     min-height: 36px;
   }
+}
+
+/* ══════════════════════════════════════
+   TITLE EDITOR (sidebar)
+   ══════════════════════════════════════ */
+/* Phrase grid — 2-column, compact cards */
+.phrase-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 12px; }
+.phrase-card {
+  appearance: none;
+  background: none;
+  padding: 12px 8px; border: 1px solid var(--rule); border-radius: 4px;
+  cursor: pointer; text-align: center; font-family: var(--hero-font-family);
+  font-variation-settings: var(--hero-font-variation, normal);
+  font-size: 13px; line-height: 1.1; text-transform: uppercase;
+  color: var(--dark);
+  transition: border-color 0.2s, background 0.2s;
+}
+.phrase-card:hover { background: rgba(0,0,0,0.03); }
+.phrase-card.active { border-color: var(--sp-color); background: rgba(0,0,0,0.04); }
+.phrase-card .phrase-l1, .phrase-card .phrase-l2 { display: block; }
+
+/* Custom input */
+.title-custom-inputs { display: flex; flex-direction: column; gap: 8px; padding: 0 12px; }
+.title-input {
+  font-family: var(--hero-font-family); font-size: 16px; text-transform: uppercase;
+  font-variation-settings: var(--hero-font-variation, normal);
+  border: 1px solid var(--rule); border-radius: 4px; padding: 10px 12px;
+  background: transparent; color: var(--dark); width: 100%; text-align: center;
+}
+.title-input:focus { outline: none; border-color: var(--sp-color); }
+.title-input::placeholder { color: var(--light); text-transform: none; font-family: 'Space Mono', monospace; font-size: 11px; }
+
+/* Color picker */
+.title-colors { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; padding: 0 12px; }
+.title-color-dot {
+  appearance: none; background: none;
+  width: 28px; height: 28px; border-radius: 50%; border: 2px solid transparent;
+  cursor: pointer; padding: 2px;
+  transition: border-color 0.2s;
+}
+.title-color-dot.active { border-color: var(--dark); }
+.title-color-dot .dot-fill {
+  width: 100%; height: 100%; border-radius: 50%; display: block;
+}
+
+/* Section dividers */
+.title-section-label {
+  font-family: 'Space Mono', monospace; font-size: 9px; text-transform: uppercase;
+  letter-spacing: 0.12em; color: var(--mid); margin: 16px 12px 8px;
+}
+
+/* Title editor: bigger targets on mobile */
+@media (max-width: 768px) {
+  .phrase-card { padding: 14px 10px; font-size: 12px; min-height: 48px; }
+  .title-input { font-size: 16px; padding: 12px; min-height: 44px; }
+  .title-color-dot { width: 36px; height: 36px; }
+  .title-section-label { margin: 16px 16px 8px; }
+  .phrase-grid { padding: 0 16px; }
+  .title-custom-inputs { padding: 0 16px; }
+  .title-colors { padding: 0 16px; }
 }
 
 /* ══════════════════════════════════════

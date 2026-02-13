@@ -4,9 +4,10 @@
 import type { AppState } from "./map-state";
 import { closeAllDropdowns } from "./style-system";
 
-export type SidebarSection = 'style' | 'layers' | 'export' | 'overlays';
+export type SidebarSection = 'title' | 'style' | 'layers' | 'export' | 'overlays';
 
 const SECTION_TITLES: Record<SidebarSection, string> = {
+  title: 'Title',
   style: 'Style',
   layers: 'Layers',
   export: 'Export',
@@ -38,7 +39,7 @@ export function openSidebar(section: SidebarSection): void {
   // Update active toolbar button
   document.querySelectorAll('#toolbar .tb-btn').forEach(btn => {
     const tool = (btn as HTMLElement).dataset.tool;
-    const sectionMap: Record<string, SidebarSection> = { style: 'style', layers: 'layers', export: 'export' };
+    const sectionMap: Record<string, SidebarSection> = { title: 'title', style: 'style', layers: 'layers', export: 'export' };
     btn.classList.toggle('active', tool !== undefined && sectionMap[tool] === section);
   });
 }
@@ -52,7 +53,7 @@ export function closeSidebar(): void {
   currentSection = null;
 
   // Clear active states on toolbar buttons tied to sidebar
-  ['tool-style', 'tool-layers', 'tool-export'].forEach(id => {
+  ['tool-title', 'tool-style', 'tool-layers', 'tool-export'].forEach(id => {
     document.getElementById(id)?.classList.remove('active');
   });
 }
