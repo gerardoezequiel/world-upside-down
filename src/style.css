@@ -523,15 +523,7 @@ body {
   gap: 4px;
 }
 
-/* In poster mode, the overlay text is clickable */
-#screenprint-overlay.poster-mode {
-  pointer-events: auto;
-  cursor: pointer;
-}
-
-#screenprint-overlay.poster-mode:hover .screenprint-line {
-  transform: scale(1.005);
-}
+/* Poster mode: overlay is always non-interactive so touch gestures reach the map */
 
 .screenprint-line {
   font-family: var(--hero-font-family, 'Anton', sans-serif);
@@ -1818,8 +1810,12 @@ body {
     gap: 8px;
   }
 
-  /* Hide legend on phone, too cramped */
-  .legend-block { display: none; }
+  /* Compact legend on phone: dots only, no labels */
+  .legend-block { gap: 1px; }
+  .legend-title { display: none; }
+  .leg-item span { display: none; }
+  .leg-item svg { width: 10px; height: 10px; }
+  .legend-row { gap: 4px; }
 
   .north-arrow svg { width: 24px; height: 24px; }
   .scale-block { gap: 6px; }

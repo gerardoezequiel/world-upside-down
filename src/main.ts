@@ -71,7 +71,10 @@ async function init() {
   });
 
   const spOverlay = document.getElementById('screenprint-overlay');
-  spOverlay?.addEventListener('click', () => {
+
+  // Tap anywhere on map → enter explore mode (overlay is pointer-events:none
+  // so all touch/click events reach the map canvas directly, enabling pinch-zoom)
+  map.on('click', () => {
     if (state.currentMode === 'poster') setMode(state, 'explore');
   });
 
