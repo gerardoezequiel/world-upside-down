@@ -248,6 +248,7 @@
     {
       "id": "water",
       "type": "fill",
+      "filter": ["==", "$type", "Polygon"],
       "source": "protomaps",
       "source-layer": "water",
       "paint": {
