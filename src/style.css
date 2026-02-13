@@ -1801,6 +1801,7 @@ body {
   /* Hide power-user buttons on phone */
   #tool-title { display: none; }
   #tool-style { display: none; }
+  #tool-tissot { display: none; }
 
   /* Toolbar: maintain 44px targets, tighter spacing */
   .tb-btn {
@@ -1910,6 +1911,7 @@ body {
   /* Toolbar: hide less-used buttons on very small screens */
   #tool-globe { display: none; }
   #tool-style { display: none; }
+  #tool-tissot { display: none; }
 
   .tb-btn {
     width: 36px;

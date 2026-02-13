@@ -16,6 +16,7 @@ import { setupToolTitle } from "./tools/title";
 import { setupToolGlobe } from "./tools/globe";
 import { setupToolDownload } from "./tools/download";
 import { setupToolShare } from "./tools/share";
+import { setupTissot } from "./tissot";
 import { applyShareableParams } from "./shareable-urls";
 import { startSubtitleAnimation } from "./subtitle";
 
@@ -94,6 +95,7 @@ async function init() {
     setupToolGlobe(state);
     setupToolDownload(state);
     setupToolShare(state);
+    setupTissot(state);
 
     setupTicker(state);
     applyShareableParams(state);
