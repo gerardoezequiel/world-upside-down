@@ -371,6 +371,7 @@ body {
   grid-area: map;
   position: relative;
   overflow: hidden;
+  touch-action: none;
 }
 
 /* Risograph halftone texture overlay */
@@ -414,6 +415,7 @@ body {
   position: absolute;
   inset: 0;
   transition: transform 0.8s ease;
+  touch-action: none;
 }
 
 #map.mirrored {
@@ -430,6 +432,7 @@ body {
   justify-content: center;
   background: var(--paper);
   transition: opacity 0.8s ease;
+  pointer-events: none;
 }
 
 .map-loading.hidden {
@@ -1968,6 +1971,7 @@ body {
   #tool-globe { display: none; }
   #tool-style { display: none; }
   #tool-tissot { display: none; }
+  #tool-pin { display: none; }
 
   .tb-btn {
     width: 36px;

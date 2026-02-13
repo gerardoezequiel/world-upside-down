@@ -2,6 +2,7 @@ import type { AppState } from "../map-state";
 import { showFlipToast } from "../orientation";
 import { closeAllDropdowns } from "../style-system";
 import { trackEvent } from "../analytics";
+import { getFont } from "../font-system";
 
 const root = document.documentElement;
 
@@ -19,104 +20,10 @@ function getShareText(state: AppState): string {
     const template = shareTemplates[Math.floor(Math.random() * shareTemplates.length)];
     return template.replace('{city}', city);
   }
-  return "I flipped the world upside down. Turns out NASA did it first. \u{1F30D}\u2B07\uFE0F";
+  return "I flipped the world upside down. Turns out NASA did it first.";
 }
 
-async function triggerNativeShare(state: AppState): Promise<boolean> {
-  if (!navigator.share) return false;
-  try {
-    await navigator.share({
-      title: "Upside Down \u2014 You've Been Holding the Map Wrong",
-      text: getShareText(state),
-      url: window.location.href,
-    });
-    return true;
-  } catch (e) {
-    // User cancelled or share failed — not an error worth surfacing
-    if (e instanceof Error && e.name !== 'AbortError') {
-      return false;
-    }
-    return true; // AbortError = user cancelled, still counts as "handled"
-  }
-}
-
-export function setupToolShare(state: AppState): void {
-  const btn = document.getElementById('tool-share');
-  const menu = document.getElementById('share-menu');
-  const nativeItem = document.getElementById('share-native');
-  if (!btn || !menu) return;
-
-  // Hide native share option if API unavailable
-  if (!navigator.share && nativeItem) {
-    nativeItem.style.display = 'none';
-  }
-
-  btn.addEventListener('click', async (e) => {
-    e.stopPropagation();
-
-    // On mobile with native share: skip dropdown, share directly
-    if ('share' in navigator && window.matchMedia('(max-width: 768px)').matches) {
-      closeAllDropdowns();
-      await triggerNativeShare(state);
-      return;
-    }
-
-    const isOpen = menu.classList.contains('open');
-    closeAllDropdowns();
-    if (!isOpen) menu.classList.add('open');
-  });
-
-  // Hide share-as-image if Web Share Files API is unavailable
-  const imageItem = document.getElementById('share-image');
-  if (imageItem) {
-    const testFile = new File([''], 'test.png', { type: 'image/png' });
-    if (!navigator.canShare?.({ files: [testFile] })) {
-      imageItem.style.display = 'none';
-    }
-  }
-
-  menu.querySelectorAll('.tb-dropdown-item').forEach(item => {
-    item.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      closeAllDropdowns();
-
-      const platform = (item as HTMLElement).dataset.share;
-      const url = encodeURIComponent(window.location.href);
-      const text = encodeURIComponent(getShareText(state));
-
-      trackEvent('share', { platform: platform || 'unknown', city: state.currentCityName || 'unknown' });
-
-      if (platform === 'native') {
-        await triggerNativeShare(state);
-      } else if (platform === 'linkedin') {
-        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank', 'width=600,height=500');
-      } else if (platform === 'x') {
-        window.open(`https://x.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=600,height=400');
-      } else if (platform === 'image') {
-        await shareAsImage(state);
-      } else if (platform === 'copy') {
-        const copyToasts = [
-          'Link copied. Go spread the disorientation.',
-          'Copied. Now paste it somewhere dangerous.',
-          'Link in clipboard. Use wisely.',
-          'Copied. The world will thank you.',
-        ];
-        try {
-          await navigator.clipboard.writeText(window.location.href);
-          showFlipToast(state, copyToasts[Math.floor(Math.random() * copyToasts.length)]);
-        } catch {
-          showFlipToast(state, 'Copy the URL from your browser');
-        }
-      }
-    });
-  });
-}
-
-/** Capture the map canvas as a 1080x1080 image and share via Web Share Files API */
-async function shareAsImage(state: AppState): Promise<void> {
-  showFlipToast(state, 'Capturing...');
-  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-
+async function captureMapImage(state: AppState): Promise<Blob> {
   const mapCanvas = state.map.getCanvas();
   const size = 1080;
   const canvas = document.createElement('canvas');
@@ -138,8 +45,10 @@ async function shareAsImage(state: AppState): Promise<void> {
   const l1 = document.getElementById('screenprint-l1')?.textContent || '';
   const l2 = document.getElementById('screenprint-l2')?.textContent || '';
 
-  const fontSize = size * 0.14;
-  ctx.font = `400 ${fontSize}px Anton, sans-serif`;
+  const fontSize = size * 0.12;
+  const heroFont = getFont(state.fontState.activeHero);
+  const heroFamily = heroFont ? heroFont.family.replace(/'/g, '') : 'Anton, sans-serif';
+  ctx.font = `400 ${fontSize}px ${heroFamily}`;
   ctx.textAlign = 'center';
   ctx.globalCompositeOperation = 'multiply';
 
@@ -148,8 +57,8 @@ async function shareAsImage(state: AppState): Promise<void> {
 
   ctx.fillStyle = spShadow;
   ctx.globalAlpha = 0.9;
-  ctx.fillText(l1, cx + 5, cy - fontSize * 0.1 + 4);
-  ctx.fillText(l2, cx + 5, cy + fontSize * 0.88 + 4);
+  ctx.fillText(l1, cx + 4, cy - fontSize * 0.1 + 3);
+  ctx.fillText(l2, cx + 4, cy + fontSize * 0.88 + 3);
 
   ctx.fillStyle = spColor;
   ctx.globalAlpha = 0.9;
@@ -160,41 +69,142 @@ async function shareAsImage(state: AppState): Promise<void> {
   ctx.globalAlpha = 1;
 
   // Watermark
-  ctx.font = `400 ${size * 0.012}px 'Space Mono', monospace`;
+  ctx.font = `400 ${size * 0.009}px 'Space Mono', monospace`;
   ctx.fillStyle = '#88898A';
-  ctx.globalAlpha = 0.6;
+  ctx.globalAlpha = 0.5;
   ctx.textAlign = 'right';
-  ctx.fillText('upsidedown.earth', size - 20, size - 20);
+  ctx.fillText('upside-down.vercel.app', size - 16, size - 16);
   ctx.globalAlpha = 1;
 
-  // Convert to blob and share
-  const blob = await new Promise<Blob>((resolve) => {
+  return new Promise<Blob>((resolve) => {
     canvas.toBlob(b => resolve(b!), 'image/png');
   });
+}
 
-  const citySlug = (state.currentCityName || 'world').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-  const file = new File([blob], `upside-down-${citySlug}.png`, { type: 'image/png' });
+async function shareAsImage(state: AppState): Promise<void> {
+  showFlipToast(state, 'Preparing image...');
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-  if (navigator.canShare?.({ files: [file] })) {
-    try {
+  try {
+    const blob = await captureMapImage(state);
+    const citySlug = (state.currentCityName || 'world').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    const file = new File([blob], `upside-down-${citySlug}.png`, { type: 'image/png' });
+
+    if (navigator.canShare?.({ files: [file] })) {
       await navigator.share({
-        text: getShareText(state) + '\nupsidedown.earth',
         files: [file],
+        title: "Upside Down",
+        text: getShareText(state),
       });
+      trackEvent('share', { platform: 'image-native', city: state.currentCityName || 'unknown' });
       showFlipToast(state, 'Shared. The disorientation spreads.');
-    } catch (e) {
-      if (e instanceof Error && e.name !== 'AbortError') {
-        downloadFallback(canvas, citySlug);
-      }
+    } else {
+      // Fallback: download the image
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `upside-down-${citySlug}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showFlipToast(state, 'Image downloaded \u2014 share it anywhere');
+      trackEvent('share', { platform: 'image-download', city: state.currentCityName || 'unknown' });
     }
-  } else {
-    downloadFallback(canvas, citySlug);
+  } catch (e) {
+    if (e instanceof Error && e.name !== 'AbortError') {
+      showFlipToast(state, 'Could not share image');
+    }
   }
 }
 
-function downloadFallback(canvas: HTMLCanvasElement, citySlug: string): void {
-  const link = document.createElement('a');
-  link.download = `upside-down-${citySlug}.png`;
-  link.href = canvas.toDataURL('image/png');
-  link.click();
+async function triggerNativeShare(state: AppState): Promise<boolean> {
+  if (!navigator.share) return false;
+  try {
+    await navigator.share({
+      title: "Upside Down \u2014 You've Been Holding the Map Wrong",
+      text: getShareText(state),
+      url: window.location.href,
+    });
+    return true;
+  } catch (e) {
+    if (e instanceof Error && e.name !== 'AbortError') {
+      return false;
+    }
+    return true; // AbortError = user cancelled, still counts as "handled"
+  }
+}
+
+export function setupToolShare(state: AppState): void {
+  const btn = document.getElementById('tool-share');
+  const menu = document.getElementById('share-menu');
+  const nativeItem = document.getElementById('share-native');
+  if (!btn || !menu) return;
+
+  // Hide native share option if API unavailable
+  if (!navigator.share && nativeItem) {
+    nativeItem.style.display = 'none';
+  }
+
+  // Hide share-as-image if Web Share Files API is unavailable
+  const imageItem = document.getElementById('share-image');
+  if (imageItem) {
+    try {
+      const testFile = new File([''], 'test.png', { type: 'image/png' });
+      if (!navigator.canShare?.({ files: [testFile] })) {
+        imageItem.style.display = 'none';
+      }
+    } catch {
+      if (imageItem) imageItem.style.display = 'none';
+    }
+  }
+
+  btn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+
+    // On mobile with native share: skip dropdown, share directly
+    if ('share' in navigator && window.matchMedia('(max-width: 768px)').matches) {
+      closeAllDropdowns();
+      await triggerNativeShare(state);
+      return;
+    }
+
+    const isOpen = menu.classList.contains('open');
+    closeAllDropdowns();
+    if (!isOpen) menu.classList.add('open');
+  });
+
+  menu.querySelectorAll('.tb-dropdown-item').forEach(item => {
+    item.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      closeAllDropdowns();
+
+      const platform = (item as HTMLElement).dataset.share;
+      const url = encodeURIComponent(window.location.href);
+      const text = encodeURIComponent(getShareText(state));
+
+      trackEvent('share', { platform: platform || 'unknown', city: state.currentCityName || 'unknown' });
+
+      if (platform === 'native') {
+        await triggerNativeShare(state);
+      } else if (platform === 'image') {
+        await shareAsImage(state);
+      } else if (platform === 'linkedin') {
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank', 'width=600,height=500');
+      } else if (platform === 'x') {
+        window.open(`https://x.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=600,height=400');
+      } else if (platform === 'copy') {
+        const copyToasts = [
+          'Link copied. Go spread the disorientation.',
+          'Copied. Now paste it somewhere dangerous.',
+          'Link in clipboard. Use wisely.',
+          'Copied. The world will thank you.',
+        ];
+        try {
+          await navigator.clipboard.writeText(window.location.href);
+          showFlipToast(state, copyToasts[Math.floor(Math.random() * copyToasts.length)]);
+        } catch {
+          showFlipToast(state, 'Copy the URL from your browser');
+        }
+      }
+    });
+  });
 }

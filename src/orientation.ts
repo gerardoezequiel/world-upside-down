@@ -225,6 +225,18 @@ export function applyOrientation(state: AppState, target: Orientation): void {
   showFlipToast(state, getOrientationToast(state, target));
   trackEvent('flip', { orientation: target, city: state.currentCityName || 'unknown' });
 
+  // Share nudge: after first flip, suggest sharing (once per session)
+  if (!sessionStorage.getItem('wud-share-nudged')) {
+    sessionStorage.setItem('wud-share-nudged', '1');
+    setTimeout(() => {
+      const city = state.currentCityName;
+      const msg = city
+        ? `Share ${city} upside down with someone`
+        : 'Share this with someone who needs disorienting';
+      showFlipToast(state, msg);
+    }, 4000);
+  }
+
   if (state.currentMode === 'poster') {
     setMode(state, 'explore');
   }

@@ -17,9 +17,9 @@ import { setupToolGlobe } from "./tools/globe";
 import { setupToolDownload } from "./tools/download";
 import { setupToolShare } from "./tools/share";
 import { setupTissot } from "./tissot";
+import { setupPins } from "./pins";
 import { applyShareableParams } from "./shareable-urls";
 import { startSubtitleAnimation } from "./subtitle";
-import { setupPins } from "./pins";
 
 const root = document.documentElement;
 
