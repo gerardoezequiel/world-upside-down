@@ -48,13 +48,25 @@ async function init() {
   const state = createAppState(map);
 
   map.dragRotate.disable();
-  map.touchZoomRotate.disableRotation();
+  // Note: we do NOT call touchZoomRotate.disableRotation() because in
+  // MapLibre 5.x it appears to also break pinch-to-zoom on some devices.
+  // Instead, we let the bearing lock below correct any accidental rotation.
 
   map.on('moveend', () => {
     if (!state.bearingLocked) return;
     const expected = state.orientation === 'upside-down' ? 180 : 0;
     if (state.orientation !== 'mirrored' && Math.abs(map.getBearing() - expected) > 0.1) {
       map.easeTo({ bearing: expected, duration: 200 });
+    }
+  });
+
+  // Continuously correct bearing during touch gestures so rotation
+  // from pinch doesn't visually drift far before moveend snaps it back.
+  map.on('rotate', () => {
+    if (!state.bearingLocked) return;
+    const expected = state.orientation === 'upside-down' ? 180 : 0;
+    if (state.orientation !== 'mirrored' && Math.abs(map.getBearing() - expected) > 1) {
+      map.setBearing(expected);
     }
   });
 
